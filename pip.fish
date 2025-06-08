@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 argparse -n 'caelestia-pip' -X 0 \
     'h/help' \

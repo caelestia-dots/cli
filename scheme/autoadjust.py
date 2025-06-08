@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 import sys
 from colorsys import hls_to_rgb, rgb_to_hls

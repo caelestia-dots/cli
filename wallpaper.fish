@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 function get-valid-wallpapers
     identify -ping -format '%i\n' $wallpapers_dir/** 2> /dev/null

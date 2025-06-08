@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 if ! hyprctl workspaces -j | jq -e 'first(.[] | select(.name == "special:special"))'
     set activews (hyprctl activewindow -j | jq -r '.workspace.name')

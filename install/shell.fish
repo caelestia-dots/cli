@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 . (dirname (status filename))/util.fish
 

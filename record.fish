@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 function get-audio-source
     pactl list short sources | grep '\.monitor.*RUNNING' | cut -f 2 | head -1

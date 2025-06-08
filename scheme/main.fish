@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 # Usage:
 #   caelestia scheme <scheme> <flavour> [mode]

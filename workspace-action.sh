@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 active_ws=$(hyprctl activeworkspace -j | jq -r '.id')
 
