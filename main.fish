@@ -7,7 +7,11 @@ set -l src (dirname (realpath (status filename)))
 if test "$argv[1]" = shell
     # Start shell if no args
     if test -z "$argv[2..]"
-        $C_DATA/shell/run.fish
+        if qs list --all | grep "Config path: $C_DATA/shell/shell.qml" &> /dev/null
+            warn 'Shell already running'
+        else
+            $C_DATA/shell/run.fish
+        end
     else
         if test "$argv[2]" = help
             qs -p $C_DATA/shell ipc show
