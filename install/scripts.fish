@@ -2,7 +2,7 @@
 
 . (dirname (status filename))/util.fish
 
-install-deps git hyprland-git hyprpaper-git imagemagick wl-clipboard fuzzel-git socat foot jq python xdg-user-dirs python-materialyoucolor-git app2unit-git grim wayfreeze-git wl-screenrec
+install-deps git hyprland-git hyprpaper-git imagemagick wl-clipboard fuzzel-git socat foot jq python xdg-user-dirs python-materialyoucolor-git app2unit-git grim wayfreeze-git wl-screenrec swappy
 install-optional-deps 'discord (messaging app)' 'btop (system monitor)' 'zen-browser (web browser)'
 
 set -l dist $C_DATA/scripts
