@@ -96,7 +96,7 @@ def get_scheme_colours() -> dict[str, str]:
 
     if scheme_colours is None:
         scheme_colours = {
-            k.strip(): v.strip() for k, v in (line.split(" ") for line in get_scheme_path().read_text().split("\n"))
+            k.strip(): v.strip() for k, v in (line.split(" ") for line in get_scheme_path().read_text().splitlines())
         }
 
     return scheme_colours
