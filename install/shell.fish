@@ -7,7 +7,7 @@ if ! pacman -Q lm_sensors > /dev/null
     sudo sensors-detect --auto
 end
 
-install-deps git quickshell curl jq ttf-material-symbols-variable-git ttf-jetbrains-mono-nerd ttf-ibm-plex app2unit-git fd fish python-aubio python-pyaudio python-numpy cava networkmanager bluez-utils ddcutil brightnessctl
+install-deps git quickshell curl jq ttf-material-symbols-variable-git ttf-jetbrains-mono-nerd ttf-ibm-plex app2unit-git fd fish python-aubio python-pyaudio python-numpy cava networkmanager bluez-utils ddcutil brightnessctl imagemagick
 install-optional-deps 'uwsm (for systems using uwsm)'
 
 set -l shell $C_DATA/shell
