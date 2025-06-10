@@ -1,7 +1,19 @@
 import argparse
 
-from data import get_scheme_names, scheme_variants
-from subcommands import clipboard, emoji, pip, record, scheme, screenshot, shell, toggle, variant, wallpaper, wsaction
+from caelestia.data import get_scheme_names, scheme_variants
+from caelestia.subcommands import (
+    clipboard,
+    emoji,
+    pip,
+    record,
+    scheme,
+    screenshot,
+    shell,
+    toggle,
+    variant,
+    wallpaper,
+    wsaction,
+)
 
 
 def parse_args() -> argparse.Namespace:

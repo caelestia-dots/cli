@@ -15,7 +15,7 @@ scheme_colours_path = c_state_dir / "scheme/colours.txt"
 scheme_mode_path = c_state_dir / "scheme/mode.txt"
 scheme_variant_path = c_state_dir / "scheme/variant.txt"
 
-scheme_data_path = Path(__file__).parent.parent / "data/schemes"
+scheme_data_path = Path(__file__).parent / "data/schemes"
 
 scheme_variants = [
     "tonalspot",

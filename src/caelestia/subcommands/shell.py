@@ -1,7 +1,7 @@
 import subprocess
 from argparse import Namespace
 
-import data
+from caelestia import data
 
 
 class Command:

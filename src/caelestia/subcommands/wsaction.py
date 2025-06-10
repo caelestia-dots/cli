@@ -1,6 +1,6 @@
 from argparse import Namespace
 
-from utils import hypr
+from caelestia.utils import hypr
 
 
 class Command:
