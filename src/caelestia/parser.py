@@ -1,6 +1,5 @@
 import argparse
 
-from caelestia.data import get_scheme_names, scheme_variants
 from caelestia.subcommands import (
     clipboard,
     emoji,
@@ -14,6 +13,7 @@ from caelestia.subcommands import (
     wallpaper,
     wsaction,
 )
+from caelestia.utils.scheme import get_scheme_names, scheme_variants
 
 
 def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):

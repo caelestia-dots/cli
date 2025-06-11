@@ -1,0 +1,194 @@
+import json
+from pathlib import Path
+
+from caelestia.utils.paths import scheme_data_path, scheme_path
+
+
+class Scheme:
+    _name: str
+    _flavour: str
+    _mode: str
+    _variant: str
+    _colours: dict[str, str]
+
+    def __init__(self, json: dict[str, any] | None) -> None:
+        if json is None:
+            self._name = "catppuccin"
+            self._flavour = "mocha"
+            self._mode = "dark"
+            self._variant = "tonalspot"
+            self._colours = read_colours_from_file(self.get_colours_path())
+        else:
+            self._name = json["name"]
+            self._flavour = json["flavour"]
+            self._mode = json["mode"]
+            self._variant = json["variant"]
+            self._colours = json["colours"]
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        if name == self._name:
+            return
+
+        if name not in get_scheme_names():
+            raise ValueError(f"Invalid scheme name: {name}")
+
+        self._name = name
+        self._check_flavour()
+        self._check_mode()
+        self._update_colours()
+        self.save()
+
+    @property
+    def flavour(self) -> str:
+        return self._flavour
+
+    @flavour.setter
+    def flavour(self, flavour: str) -> None:
+        if flavour == self._flavour:
+            return
+
+        if flavour not in get_scheme_flavours():
+            raise ValueError(f"Invalid scheme flavour: {flavour}")
+
+        self._flavour = flavour
+        self._check_mode()
+        self._update_colours()
+        self.save()
+
+    @property
+    def mode(self) -> str:
+        return self._mode
+
+    @mode.setter
+    def mode(self, mode: str) -> None:
+        if mode == self._mode:
+            return
+
+        if mode not in get_scheme_modes():
+            raise ValueError(f"Invalid scheme mode: {mode}")
+
+        self._mode = mode
+        self._update_colours()
+        self.save()
+
+    @property
+    def variant(self) -> str:
+        return self._variant
+
+    @variant.setter
+    def variant(self, variant: str) -> None:
+        self._variant = variant
+
+    @property
+    def colours(self) -> dict[str, str]:
+        return self._colours
+
+    def get_colours_path(self) -> Path:
+        return (scheme_data_path / self.name / self.flavour / self.mode).with_suffix(".txt")
+
+    def save(self) -> None:
+        scheme_path.parent.mkdir(parents=True, exist_ok=True)
+        with scheme_path.open("w") as f:
+            json.dump(
+                {
+                    "name": self.name,
+                    "flavour": self.flavour,
+                    "mode": self.mode,
+                    "variant": self.variant,
+                    "colours": self.colours,
+                },
+                f,
+            )
+
+    def _check_flavour(self) -> None:
+        global scheme_flavours
+        scheme_flavours = None
+        if self._flavour not in get_scheme_flavours():
+            self._flavour = get_scheme_flavours()[0]
+
+    def _check_mode(self) -> None:
+        global scheme_modes
+        scheme_modes = None
+        if self._mode not in get_scheme_modes():
+            self._mode = get_scheme_modes()[0]
+
+    def _update_colours(self) -> None:
+        self._colours = read_colours_from_file(self.get_colours_path())
+
+
+scheme_variants = [
+    "tonalspot",
+    "vibrant",
+    "expressive",
+    "fidelity",
+    "fruitsalad",
+    "monochrome",
+    "neutral",
+    "rainbow",
+    "content",
+]
+
+scheme_names: list[str] = None
+scheme_flavours: list[str] = None
+scheme_modes: list[str] = None
+
+scheme: Scheme = None
+
+
+def read_colours_from_file(path: Path) -> dict[str, str]:
+    return {k.strip(): v.strip() for k, v in (line.split(" ") for line in path.read_text().splitlines())}
+
+
+def get_scheme_path() -> Path:
+    return get_scheme().get_colours_path()
+
+
+def get_scheme() -> Scheme:
+    global scheme
+
+    if scheme is None:
+        try:
+            scheme_json = json.loads(scheme_path.read_text())
+            scheme = Scheme(scheme_json)
+        except (IOError, json.JSONDecodeError):
+            scheme = Scheme(None)
+
+    return scheme
+
+
+def get_scheme_names() -> list[str]:
+    global scheme_names
+
+    if scheme_names is None:
+        scheme_names = [f.name for f in scheme_data_path.iterdir() if f.is_dir()]
+        scheme_names.append("dynamic")
+
+    return scheme_names
+
+
+def get_scheme_flavours() -> list[str]:
+    global scheme_flavours
+
+    if scheme_flavours is None:
+        name = get_scheme().name
+        if name == "dynamic":
+            scheme_flavours = ["default", "alt1", "alt2"]
+        else:
+            scheme_flavours = [f.name for f in (scheme_data_path / name).iterdir() if f.is_dir()]
+
+    return scheme_flavours
+
+
+def get_scheme_modes() -> list[str]:
+    global scheme_modes
+
+    if scheme_modes is None:
+        scheme = get_scheme()
+        scheme_modes = [f.stem for f in (scheme_data_path / scheme.name / scheme.flavour).iterdir() if f.is_file()]
+
+    return scheme_modes

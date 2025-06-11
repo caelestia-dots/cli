@@ -1,7 +1,7 @@
 import subprocess
 from argparse import Namespace
 
-from caelestia import data
+from caelestia.utils import paths
 
 
 class Command:
@@ -25,7 +25,7 @@ class Command:
             self.shell()
 
     def shell(self, *args: list[str]) -> str:
-        return subprocess.check_output(["qs", "-p", data.c_data_dir / "shell", *args], text=True)
+        return subprocess.check_output(["qs", "-p", paths.c_data_dir / "shell", *args], text=True)
 
     def print_ipc(self) -> None:
         print(self.shell("ipc", "show"), end="")

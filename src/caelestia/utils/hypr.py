@@ -5,7 +5,7 @@ import socket
 socket_path = f"{os.getenv('XDG_RUNTIME_DIR')}/hypr/{os.getenv('HYPRLAND_INSTANCE_SIGNATURE')}/.socket.sock"
 
 
-def message(msg: str, json: bool = True) -> str or dict[str, any]:
+def message(msg: str, json: bool = True) -> str | dict[str, any]:
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
         sock.connect(socket_path)
 
