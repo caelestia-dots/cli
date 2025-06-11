@@ -61,7 +61,6 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     # Create parser for scheme opts
     scheme_parser = command_parser.add_parser("scheme", help="manage the colour scheme")
     scheme_parser.set_defaults(cls=scheme.Command)
-    scheme_parser.add_argument("-g", "--get", action="store_true", help="print the current scheme")
     scheme_parser.add_argument("-r", "--random", action="store_true", help="switch to a random scheme")
     scheme_parser.add_argument("-n", "--name", choices=get_scheme_names(), help="the name of the scheme to switch to")
     scheme_parser.add_argument("-f", "--flavour", help="the flavour to switch to")

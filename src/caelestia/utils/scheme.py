@@ -120,6 +120,9 @@ class Scheme:
     def _update_colours(self) -> None:
         self._colours = read_colours_from_file(self.get_colours_path())
 
+    def __str__(self) -> str:
+        return f"Scheme(name={self.name}, flavour={self.flavour}, mode={self.mode}, variant={self.variant})"
+
 
 scheme_variants = [
     "tonalspot",
