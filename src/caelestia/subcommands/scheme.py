@@ -1,6 +1,7 @@
 from argparse import Namespace
 
 from caelestia.utils.scheme import get_scheme
+from caelestia.utils.theme import apply_colours
 
 
 class Command:
@@ -21,5 +22,6 @@ class Command:
                 scheme.flavour = self.args.flavour
             if self.args.mode:
                 scheme.mode = self.args.mode
+            apply_colours(scheme.colours)
         else:
             print(scheme)

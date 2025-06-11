@@ -24,4 +24,4 @@ def message(msg: str, json: bool = True) -> str | dict[str, any]:
 
 
 def dispatch(dispatcher: str, *args: list[any]) -> bool:
-    return message(f"dispatch {dispatcher} {' '.join(str(a) for a in args)}".rstrip(), json=False) == "ok"
+    return message(f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), json=False) == "ok"
