@@ -16,7 +16,7 @@ from caelestia.subcommands import (
 )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     parser = argparse.ArgumentParser(prog="caelestia", description="Main control script for the Caelestia dotfiles")
 
     # Add subcommand parsers
@@ -122,4 +122,4 @@ def parse_args() -> argparse.Namespace:
     pip_parser.set_defaults(cls=pip.Command)
     pip_parser.add_argument("-d", "--daemon", action="store_true", help="start the daemon")
 
-    return parser.parse_args()
+    return parser, parser.parse_args()
