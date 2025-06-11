@@ -19,10 +19,10 @@ def gen_scss(colours: dict[str, str]) -> str:
     return scss
 
 
-def gen_replace(colours: dict[str, str], template: Path) -> str:
+def gen_replace(colours: dict[str, str], template: Path, hash: bool = False) -> str:
     template = template.read_text()
     for name, colour in colours.items():
-        template = template.replace(f"${name}", colour)
+        template = template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
     return template
 
 
@@ -107,9 +107,16 @@ def apply_fuzzel(colours: dict[str, str]) -> None:
     try_write(config_dir / "fuzzel/fuzzel.ini", template)
 
 
+def apply_btop(colours: dict[str, str]) -> None:
+    template = gen_replace(colours, templates_dir / "btop.theme", hash=True)
+    try_write(config_dir / "btop/themes/caelestia.theme", template)
+    subprocess.run(["killall", "-USR2", "btop"])
+
+
 def apply_colours(colours: dict[str, str]) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))
     apply_discord(gen_scss(colours))
     apply_spicetify(colours)
     apply_fuzzel(colours)
+    apply_btop(colours)
