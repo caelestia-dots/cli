@@ -53,7 +53,7 @@ class Scheme:
             return
 
         if flavour not in get_scheme_flavours():
-            raise ValueError(f"Invalid scheme flavour: {flavour}")
+            raise ValueError(f'Invalid scheme flavour: "{flavour}". Valid flavours: {get_scheme_flavours()}')
 
         self._flavour = flavour
         self._check_mode()
@@ -70,7 +70,7 @@ class Scheme:
             return
 
         if mode not in get_scheme_modes():
-            raise ValueError(f"Invalid scheme mode: {mode}")
+            raise ValueError(f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}')
 
         self._mode = mode
         self._update_colours()
