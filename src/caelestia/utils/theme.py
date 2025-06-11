@@ -1,4 +1,3 @@
-import json
 import subprocess
 import tempfile
 from pathlib import Path
@@ -91,7 +90,17 @@ def apply_discord(scss: str) -> None:
         try_write(config_dir / client / "themes/caelestia.theme.css", conf)
 
 
+def apply_spicetify(colours: dict[str, str]) -> None:
+    template = (templates_dir / "spicetify.ini").read_text()
+
+    for name, colour in colours.items():
+        template = template.replace(f"${name}", colour)
+
+    try_write(config_dir / "spicetify/Themes/caelestia/color.ini", template)
+
+
 def apply_colours(colours: dict[str, str]) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))
     apply_discord(gen_scss(colours))
+    apply_spicetify(colours)
