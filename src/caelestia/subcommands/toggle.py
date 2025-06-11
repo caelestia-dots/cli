@@ -50,6 +50,7 @@ class Command:
     def communication(self) -> None:
         self.spawn_or_move(lambda c: c["class"] == "discord", ["discord"], "communication")
         self.move_client(lambda c: c["class"] == "whatsapp", "communication")
+        hypr.dispatch("togglespecialworkspace", "communication")
 
     def music(self) -> None:
         self.spawn_or_move(
@@ -58,16 +59,18 @@ class Command:
             "music",
         )
         self.move_client(lambda c: c["class"] == "feishin", "music")
+        hypr.dispatch("togglespecialworkspace", "music")
 
     def sysmon(self) -> None:
         self.spawn_client(
             lambda c: c["class"] == "btop" and c["title"] == "btop" and c["workspace"]["name"] == "special:sysmon",
             ["foot", "-a", "btop", "-T", "btop", "--", "btop"],
-            "sysmon",
         )
+        hypr.dispatch("togglespecialworkspace", "sysmon")
 
     def todo(self) -> None:
         self.spawn_or_move(lambda c: c["class"] == "Todoist", ["todoist"], "todo")
+        hypr.dispatch("togglespecialworkspace", "todo")
 
     def specialws(self) -> None:
         workspaces = hypr.message("workspaces")
