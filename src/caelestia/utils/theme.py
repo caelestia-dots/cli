@@ -97,8 +97,8 @@ def apply_discord(scss: str) -> None:
         try_write(config_dir / client / "themes/caelestia.theme.css", conf)
 
 
-def apply_spicetify(colours: dict[str, str]) -> None:
-    template = gen_replace(colours, templates_dir / "spicetify.ini")
+def apply_spicetify(colours: dict[str, str], mode: str) -> None:
+    template = gen_replace(colours, templates_dir / f"spicetify-{mode}.ini")
     try_write(config_dir / "spicetify/Themes/caelestia/color.ini", template)
 
 
@@ -113,10 +113,10 @@ def apply_btop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "btop"])
 
 
-def apply_colours(colours: dict[str, str]) -> None:
+def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))
     apply_discord(gen_scss(colours))
-    apply_spicetify(colours)
+    apply_spicetify(colours, mode)
     apply_fuzzel(colours)
     apply_btop(colours)

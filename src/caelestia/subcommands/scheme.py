@@ -22,6 +22,6 @@ class Command:
                 scheme.flavour = self.args.flavour
             if self.args.mode:
                 scheme.mode = self.args.mode
-            apply_colours(scheme.colours)
+            apply_colours(scheme.colours, scheme.mode)
         else:
             print(scheme)
