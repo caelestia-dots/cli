@@ -19,6 +19,13 @@ def gen_scss(colours: dict[str, str]) -> str:
     return scss
 
 
+def gen_replace(colours: dict[str, str], template: Path) -> str:
+    template = template.read_text()
+    for name, colour in colours.items():
+        template = template.replace(f"${name}", colour)
+    return template
+
+
 def c2s(c: str, *i: list[int]) -> str:
     """Hex to ANSI sequence (e.g. ffffff, 11 -> \x1b]11;rgb:ff/ff/ff\x1b\\)"""
     return f"\x1b]{';'.join(map(str, i))};rgb:{c[0:2]}/{c[2:4]}/{c[4:6]}\x1b\\"
@@ -91,12 +98,13 @@ def apply_discord(scss: str) -> None:
 
 
 def apply_spicetify(colours: dict[str, str]) -> None:
-    template = (templates_dir / "spicetify.ini").read_text()
-
-    for name, colour in colours.items():
-        template = template.replace(f"${name}", colour)
-
+    template = gen_replace(colours, templates_dir / "spicetify.ini")
     try_write(config_dir / "spicetify/Themes/caelestia/color.ini", template)
+
+
+def apply_fuzzel(colours: dict[str, str]) -> None:
+    template = gen_replace(colours, templates_dir / "fuzzel.ini")
+    try_write(config_dir / "fuzzel/fuzzel.ini", template)
 
 
 def apply_colours(colours: dict[str, str]) -> None:
@@ -104,3 +112,4 @@ def apply_colours(colours: dict[str, str]) -> None:
     apply_hypr(gen_conf(colours))
     apply_discord(gen_scss(colours))
     apply_spicetify(colours)
+    apply_fuzzel(colours)
