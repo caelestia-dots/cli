@@ -1,8 +1,9 @@
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 
-from caelestia.utils.paths import config_dir
+from caelestia.utils.paths import config_dir, templates_dir
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -15,7 +16,7 @@ def gen_conf(colours: dict[str, str]) -> str:
 def gen_scss(colours: dict[str, str]) -> str:
     scss = ""
     for name, colour in colours.items():
-        scss += f"${name}: {colour};\n"
+        scss += f"${name}: #{colour};\n"
     return scss
 
 
@@ -81,6 +82,16 @@ def apply_hypr(conf: str) -> None:
     try_write(config_dir / "hypr/scheme/current.conf", conf)
 
 
+def apply_discord(scss: str) -> None:
+    with tempfile.TemporaryDirectory("w") as tmp_dir:
+        (Path(tmp_dir) / "_colours.scss").write_text(scss)
+        conf = subprocess.check_output(["sass", "-I", tmp_dir, templates_dir / "discord.scss"], text=True)
+
+    for client in "Equicord", "Vencord", "BetterDiscord", "equicord", "vesktop", "legcord":
+        try_write(config_dir / client / "themes/caelestia.theme.css", conf)
+
+
 def apply_colours(colours: dict[str, str]) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))
+    apply_discord(gen_scss(colours))

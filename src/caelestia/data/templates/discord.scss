@@ -1,0 +1,174 @@
+/**
+ * @name Midnight (Caelestia)
+ * @description A dark, rounded discord theme. Caelestia scheme colours.
+ * @author refact0r, esme, anubis
+ * @version 1.6.2
+ * @invite nz87hXyvcy
+ * @website https://github.com/refact0r/midnight-discord
+ * @authorId 508863359777505290
+ * @authorLink https://www.refact0r.dev
+*/
+
+@use "sass:color";
+@use "colours" as c;
+
+@import url("https://refact0r.github.io/midnight-discord/build/midnight.css");
+
+body {
+    /* font, change to '' for default discord font */
+    --font: "figtree";
+
+    /* sizes */
+    --gap: 12px; /* spacing between panels */
+    --divider-thickness: 4px; /* thickness of unread messages divider and highlighted message borders */
+    --border-thickness: 1px; /* thickness of borders around main panels. DOES NOT AFFECT OTHER BORDERS */
+
+    /* animation/transition options */
+    --animations: on; /* turn off to disable all midnight animations/transitions */
+    --list-item-transition: 0.2s ease; /* transition for list items */
+    --dms-icon-svg-transition: 0.4s ease; /* transition for the dms icon */
+
+    /* top bar options */
+    --top-bar-height: var(
+        --gap
+    ); /* height of the titlebar/top bar (discord default is 36px, 24px recommended if moving/hiding top bar buttons) */
+    --top-bar-button-position: hide; /* off: default position, hide: hide inbox/support buttons completely, serverlist: move inbox button to server list, titlebar: move inbox button to titlebar (will hide title) */
+    --top-bar-title-position: hide; /* off: default centered position, hide: hide title completely, left: left align title (like old discord) */
+    --subtle-top-bar-title: off; /* off: default, on: hide the icon and use subtle text color (like old discord) */
+
+    /* window controls */
+    --custom-window-controls: on; /* turn off to use discord default window controls */
+    --window-control-size: 14px; /* size of custom window controls */
+
+    /* dms button icon options */
+    --custom-dms-icon: custom; /* off: use default discord icon, hide: remove icon entirely, custom: use custom icon */
+    --dms-icon-svg-url: url("https://upload.wikimedia.org/wikipedia/commons/c/c4/Font_Awesome_5_solid_moon.svg"); /* icon svg url. MUST BE A SVG. */
+    --dms-icon-svg-size: 90%; /* size of the svg (css mask-size) */
+    --dms-icon-color-before: var(--icon-secondary); /* normal icon color */
+    --dms-icon-color-after: var(--white); /* icon color when button is hovered/selected */
+
+    /* dms button background options */
+    --custom-dms-background: off; /* off to disable, image to use a background image (must set url variable below), color to use a custom color/gradient */
+    --dms-background-image-url: url(""); /* url of the background image */
+    --dms-background-image-size: cover; /* size of the background image (css background-size) */
+    --dms-background-color: linear-gradient(
+        70deg,
+        var(--blue-2),
+        var(--purple-2),
+        var(--red-2)
+    ); /* fixed color/gradient (css background) */
+
+    /* background image options */
+    --background-image: off; /* turn on to use a background image */
+    --background-image-url: url(""); /* url of the background image */
+
+    /* transparency/blur options */
+    /* NOTE: TO USE TRANSPARENCY/BLUR, YOU MUST HAVE TRANSPARENT BG COLORS. FOR EXAMPLE: --bg-4: hsla(220, 15%, 10%, 0.7); */
+    --transparency-tweaks: off; /* turn on to remove some elements for better transparency */
+    --remove-bg-layer: off; /* turn on to remove the base --bg-3 layer for use with window transparency (WILL OVERRIDE BACKGROUND IMAGE) */
+    --panel-blur: off; /* turn on to blur the background of panels */
+    --blur-amount: 12px; /* amount of blur */
+    --bg-floating: #{c.$surface}; /* you can set this to a more opaque color if floating panels look too transparent */
+
+    /* chatbar options */
+    --custom-chatbar: aligned; /* off: default chatbar, aligned: chatbar aligned with the user panel, separated: chatbar separated from chat */
+    --chatbar-height: 47px; /* height of the chatbar (52px by default, 47px recommended for aligned, 56px recommended for separated) */
+    --chatbar-padding: 8px; /* padding of the chatbar. only applies in aligned mode. */
+
+    /* other options */
+    --small-user-panel: off; /* turn on to make the user panel smaller like in old discord */
+}
+
+/* color options */
+:root {
+    --colors: on; /* turn off to use discord default colors */
+
+    /* text colors */
+    --text-0: #{c.$onPrimary}; /* text on colored elements */
+    --text-1: #{color.scale(c.$onSurface, $lightness: 10%)}; /* bright text on colored elements */
+    --text-2: #{color.scale(c.$onSurface, $lightness: 5%)}; /* headings and important text */
+    --text-3: #{c.$onSurface}; /* normal text */
+    --text-4: #{c.$outline}; /* icon buttons and channels */
+    --text-5: #{c.$outline}; /* muted channels/chats and timestamps */
+
+    /* background and dark colors */
+    --bg-1: #{c.$surfaceContainerHighest}; /* dark buttons when clicked */
+    --bg-2: #{c.$surfaceContainerHigh}; /* dark buttons */
+    --bg-3: #{c.$surface}; /* spacing, secondary elements */
+    --bg-4: #{c.$surfaceContainer}; /* main background color */
+    --hover: #{color.change(c.$onSurface, $alpha: 0.08)}; /* channels and buttons when hovered */
+    --active: #{color.change(c.$onSurface, $alpha: 0.1)}; /* channels and buttons when clicked or selected */
+    --active-2: #{color.change(c.$onSurface, $alpha: 0.2)}; /* extra state for transparent buttons */
+    --message-hover: #{color.change(c.$onSurface, $alpha: 0.08)}; /* messages when hovered */
+
+    /* accent colors */
+    --accent-1: var(--blue-1); /* links and other accent text */
+    --accent-2: var(--blue-2); /* small accent elements */
+    --accent-3: var(--blue-3); /* accent buttons */
+    --accent-4: var(--blue-4); /* accent buttons when hovered */
+    --accent-5: var(--blue-5); /* accent buttons when clicked */
+    --accent-new: #{c.$error}; /* stuff that's normally red like mute/deafen buttons */
+    --mention: linear-gradient(
+        to right,
+        color-mix(in hsl, var(--blue-2), transparent 90%) 40%,
+        transparent
+    ); /* background of messages that mention you */
+    --mention-hover: linear-gradient(
+        to right,
+        color-mix(in hsl, var(--blue-2), transparent 95%) 40%,
+        transparent
+    ); /* background of messages that mention you when hovered */
+    --reply: linear-gradient(
+        to right,
+        color-mix(in hsl, var(--text-3), transparent 90%) 40%,
+        transparent
+    ); /* background of messages that reply to you */
+    --reply-hover: linear-gradient(
+        to right,
+        color-mix(in hsl, var(--text-3), transparent 95%) 40%,
+        transparent
+    ); /* background of messages that reply to you when hovered */
+
+    /* status indicator colors */
+    --online: var(--green-2); /* change to #43a25a for default */
+    --dnd: var(--red-2); /* change to #d83a42 for default */
+    --idle: var(--yellow-2); /* change to #ca9654 for default */
+    --streaming: var(--purple-2); /* change to #593695 for default */
+    --offline: var(--text-4); /* change to #83838b for default offline color */
+
+    /* border colors */
+    --border-light: #{color.change(c.$outline, $alpha: 0)}; /* light border color */
+    --border: #{color.change(c.$outline, $alpha: 0)}; /* normal border color */
+    --button-border: #{color.change(c.$outline, $alpha: 0)}; /* neutral border color of buttons */
+
+    /* base colors */
+    --red-1: #{c.$error};
+    --red-2: #{color.scale(c.$error, $lightness: -5%)};
+    --red-3: #{color.scale(c.$error, $lightness: -10%)};
+    --red-4: #{color.scale(c.$error, $lightness: -15%)};
+    --red-5: #{color.scale(c.$error, $lightness: -20%)};
+
+    --green-1: #{c.$green};
+    --green-2: #{color.scale(c.$green, $lightness: -5%)};
+    --green-3: #{color.scale(c.$green, $lightness: -10%)};
+    --green-4: #{color.scale(c.$green, $lightness: -15%)};
+    --green-5: #{color.scale(c.$green, $lightness: -20%)};
+
+    --blue-1: #{c.$primary};
+    --blue-2: #{color.scale(c.$primary, $lightness: -5%)};
+    --blue-3: #{color.scale(c.$primary, $lightness: -10%)};
+    --blue-4: #{color.scale(c.$primary, $lightness: -15%)};
+    --blue-5: #{color.scale(c.$primary, $lightness: -20%)};
+
+    --yellow-1: #{c.$yellow};
+    --yellow-2: #{color.scale(c.$yellow, $lightness: -5%)};
+    --yellow-3: #{color.scale(c.$yellow, $lightness: -10%)};
+    --yellow-4: #{color.scale(c.$yellow, $lightness: -15%)};
+    --yellow-5: #{color.scale(c.$yellow, $lightness: -20%)};
+
+    --purple-1: #{c.$mauve};
+    --purple-2: #{color.scale(c.$mauve, $lightness: -5%)};
+    --purple-3: #{color.scale(c.$mauve, $lightness: -10%)};
+    --purple-4: #{color.scale(c.$mauve, $lightness: -15%)};
+    --purple-5: #{color.scale(c.$mauve, $lightness: -20%)};
+}
