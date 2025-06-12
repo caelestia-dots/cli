@@ -20,9 +20,8 @@ class Score:
         pass
 
     @staticmethod
-    def score(colors_to_population: dict) -> tuple[list[Hct], list[Hct]]:
+    def score(colors_to_population: dict, filter_enabled: bool = True) -> tuple[list[Hct], list[Hct]]:
         desired = 14
-        filter_enabled = True
         dislike_filter = True
 
         colors_hct = []
@@ -109,6 +108,10 @@ class Score:
                 chosen_primaries[i] = DislikeAnalyzer.fix_if_disliked(chosen_hct)
             for i, chosen_hct in enumerate(chosen_colors):
                 chosen_colors[i] = DislikeAnalyzer.fix_if_disliked(chosen_hct)
+
+        # Ensure enough colours
+        if len(chosen_colors) < desired:
+            return Score.score(colors_to_population, False)
 
         return chosen_primaries, chosen_colors
 
