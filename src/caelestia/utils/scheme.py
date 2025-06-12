@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-from caelestia.utils.paths import scheme_data_path, scheme_path
+from caelestia.utils.material import get_colours_for_image
+from caelestia.utils.paths import scheme_data_dir, scheme_path
 
 
 class Scheme:
@@ -89,7 +90,7 @@ class Scheme:
         return self._colours
 
     def get_colours_path(self) -> Path:
-        return (scheme_data_path / self.name / self.flavour / self.mode).with_suffix(".txt")
+        return (scheme_data_dir / self.name / self.flavour / self.mode).with_suffix(".txt")
 
     def save(self) -> None:
         scheme_path.parent.mkdir(parents=True, exist_ok=True)
@@ -118,7 +119,10 @@ class Scheme:
             self._mode = get_scheme_modes()[0]
 
     def _update_colours(self) -> None:
-        self._colours = read_colours_from_file(self.get_colours_path())
+        if self.name == "dynamic":
+            self._colours = get_colours_for_image()
+        else:
+            self._colours = read_colours_from_file(self.get_colours_path())
 
     def __str__(self) -> str:
         return f"Scheme(name={self.name}, flavour={self.flavour}, mode={self.mode}, variant={self.variant})"
@@ -168,7 +172,7 @@ def get_scheme_names() -> list[str]:
     global scheme_names
 
     if scheme_names is None:
-        scheme_names = [f.name for f in scheme_data_path.iterdir() if f.is_dir()]
+        scheme_names = [f.name for f in scheme_data_dir.iterdir() if f.is_dir()]
         scheme_names.append("dynamic")
 
     return scheme_names
@@ -182,7 +186,7 @@ def get_scheme_flavours() -> list[str]:
         if name == "dynamic":
             scheme_flavours = ["default", "alt1", "alt2"]
         else:
-            scheme_flavours = [f.name for f in (scheme_data_path / name).iterdir() if f.is_dir()]
+            scheme_flavours = [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
     return scheme_flavours
 
@@ -192,6 +196,9 @@ def get_scheme_modes() -> list[str]:
 
     if scheme_modes is None:
         scheme = get_scheme()
-        scheme_modes = [f.stem for f in (scheme_data_path / scheme.name / scheme.flavour).iterdir() if f.is_file()]
+        if scheme.name == "dynamic":
+            scheme_modes = ["light", "dark"]
+        else:
+            scheme_modes = [f.stem for f in (scheme_data_dir / scheme.name / scheme.flavour).iterdir() if f.is_file()]
 
     return scheme_modes

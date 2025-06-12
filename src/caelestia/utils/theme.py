@@ -115,7 +115,7 @@ def apply_btop(colours: dict[str, str]) -> None:
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_terms(gen_sequences(colours))
-    apply_hypr(gen_conf(colours))
+    apply_hypr(gen_conf(colours))  # FIXME: LAGGY
     apply_discord(gen_scss(colours))
     apply_spicetify(colours, mode)
     apply_fuzzel(colours)
