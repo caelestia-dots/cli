@@ -1,3 +1,4 @@
+import subprocess
 from argparse import Namespace
 
 from caelestia.utils import hypr
@@ -6,7 +7,6 @@ from caelestia.utils import hypr
 class Command:
     args: Namespace
     clients: list[dict[str, any]] = None
-    app2unit: str = None
 
     def __init__(self, args: Namespace) -> None:
         self.args = args
@@ -20,14 +20,6 @@ class Command:
 
         return self.clients
 
-    def get_app2unit(self) -> str:
-        if self.app2unit is None:
-            import shutil
-
-            self.app2unit = shutil.which("app2unit")
-
-        return self.app2unit
-
     def move_client(self, selector: callable, workspace: str) -> None:
         for client in self.get_clients():
             if selector(client):
@@ -37,9 +29,7 @@ class Command:
         exists = any(selector(client) for client in self.get_clients())
 
         if not exists:
-            import subprocess
-
-            subprocess.Popen([self.get_app2unit(), "--", *spawn], start_new_session=True)
+            subprocess.Popen(["app2unit", "--", *spawn], start_new_session=True)
 
         return not exists
 

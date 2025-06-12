@@ -28,6 +28,9 @@ wallpaper_link_path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path = c_state_dir / "wallpaper/thumbnail.jpg"
 wallpapers_cache_dir = c_cache_dir / "wallpapers"
 
+screenshots_dir = Path.home() / "Pictures/Screenshots"
+screenshots_cache_dir = c_cache_dir / "screenshots"
+
 
 def compute_hash(path: Path | str) -> str:
     sha = hashlib.sha256()

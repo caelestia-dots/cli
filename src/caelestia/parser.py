@@ -60,7 +60,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     # Create parser for screenshot opts
     screenshot_parser = command_parser.add_parser("screenshot", help="take a screenshot")
     screenshot_parser.set_defaults(cls=screenshot.Command)
-    screenshot_parser.add_argument("-r", "--region", help="take a screenshot of a region")
+    screenshot_parser.add_argument("-r", "--region", nargs="?", const="slurp", help="take a screenshot of a region")
     screenshot_parser.add_argument(
         "-f", "--freeze", action="store_true", help="freeze the screen while selecting a region"
     )
