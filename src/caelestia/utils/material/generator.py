@@ -187,6 +187,6 @@ def gen_scheme(scheme, primary: Hct, colours: list[Hct]) -> dict[str, str]:
     colours["success"] = harmonize(base[8], primary)
 
     # For debugging
-    print("\n".join(["{}: \x1b[48;2;{};{};{}m   \x1b[0m".format(n, *c.to_rgba()[:3]) for n, c in colours.items()]))
+    # print("\n".join(["{}: \x1b[48;2;{};{};{}m   \x1b[0m".format(n, *c.to_rgba()[:3]) for n, c in colours.items()]))
 
     return {k: hex(v.to_int())[4:] for k, v in colours.items()}

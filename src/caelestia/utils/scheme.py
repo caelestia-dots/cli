@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 
 from caelestia.utils.material import get_colours_for_image
@@ -105,6 +106,13 @@ class Scheme:
                 },
                 f,
             )
+
+    def set_random(self) -> None:
+        self._name = random.choice(get_scheme_names())
+        self._flavour = random.choice(get_scheme_flavours())
+        self._mode = random.choice(get_scheme_modes())
+        self._update_colours()
+        self.save()
 
     def _check_flavour(self) -> None:
         global scheme_flavours
