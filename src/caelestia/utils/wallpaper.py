@@ -10,10 +10,10 @@ from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.paths import (
     compute_hash,
-    thumbnail_cache_dir,
     wallpaper_link_path,
     wallpaper_path_path,
     wallpaper_thumbnail_path,
+    wallpapers_cache_dir,
 )
 from caelestia.utils.scheme import Scheme, get_scheme
 from caelestia.utils.theme import apply_colours
@@ -55,8 +55,8 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     return [f for f in walls if check_wall(f, filter_size, args.threshold)]
 
 
-def get_thumb(wall: Path) -> Path:
-    thumb = (thumbnail_cache_dir / compute_hash(wall)).with_suffix(".jpg")
+def get_thumb(wall: Path, cache: Path) -> Path:
+    thumb = cache / "thumbnail.jpg"
 
     if not thumb.exists():
         with Image.open(wall) as img:
@@ -68,28 +68,38 @@ def get_thumb(wall: Path) -> Path:
     return thumb
 
 
-def get_smart_mode(wall: Path) -> str:
-    with Image.open(get_thumb(wall)) as img:
+def get_smart_mode(wall: Path, cache: Path) -> str:
+    mode_cache = cache / "mode.txt"
+
+    if mode_cache.exists():
+        return mode_cache.read_text()
+
+    with Image.open(get_thumb(wall, cache)) as img:
         img.thumbnail((1, 1), Image.LANCZOS)
-        tone = Hct.from_int(argb_from_rgb(*img.getpixel((0, 0)))).tone
-    return "light" if tone > 60 else "dark"
+        mode = "light" if Hct.from_int(argb_from_rgb(*img.getpixel((0, 0)))).tone > 60 else "dark"
+
+    mode_cache.parent.mkdir(parents=True, exist_ok=True)
+    mode_cache.write_text(mode)
+
+    return mode
 
 
 def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
+    cache = wallpapers_cache_dir / compute_hash(wall)
 
     if not no_smart:
         scheme = Scheme(
             {
                 "name": scheme.name,
                 "flavour": scheme.flavour,
-                "mode": get_smart_mode(wall),
+                "mode": get_smart_mode(wall, cache),
                 "variant": scheme.variant,
                 "colours": scheme.colours,
             }
         )
 
-    return get_colours_for_image(get_thumb(wall), scheme)
+    return get_colours_for_image(get_thumb(wall, cache), scheme)
 
 
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
@@ -103,8 +113,10 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     wallpaper_link_path.unlink(missing_ok=True)
     wallpaper_link_path.symlink_to(wall)
 
+    cache = wallpapers_cache_dir / compute_hash(wall)
+
     # Generate thumbnail or get from cache
-    thumb = get_thumb(wall)
+    thumb = get_thumb(wall, cache)
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
@@ -112,7 +124,8 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
 
     # Change mode based on wallpaper colour
-    scheme.mode = get_smart_mode(wall)
+    if not no_smart:
+        scheme.mode = get_smart_mode(wall, cache)
 
     # Update colours
     scheme.update_colours()

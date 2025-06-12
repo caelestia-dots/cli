@@ -26,7 +26,7 @@ wallpapers_dir = Path.home() / "Pictures/Wallpapers"
 wallpaper_path_path = c_state_dir / "wallpaper/path.txt"
 wallpaper_link_path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path = c_state_dir / "wallpaper/thumbnail.jpg"
-thumbnail_cache_dir = c_cache_dir / "thumbnails"
+wallpapers_cache_dir = c_cache_dir / "wallpapers"
 
 
 def compute_hash(path: Path | str) -> str:
