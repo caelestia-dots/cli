@@ -74,8 +74,10 @@ colour_names = [
 ]
 
 
-def grayscale(colour: Hct, light: bool) -> None:
+def grayscale(colour: Hct, light: bool) -> Hct:
+    colour = darken(colour, 0.35) if light else lighten(colour, 0.65)
     colour.chroma = 0
+    return colour
 
 
 def mix(a: Hct, b: Hct, w: float) -> Hct:
@@ -159,7 +161,7 @@ def gen_scheme(scheme, primary: Hct, colours: list[Hct]) -> dict[str, str]:
     # Harmonize colours
     for name, hct in colours.items():
         if scheme.variant == "monochrome":
-            grayscale(hct, light)
+            colours[name] = grayscale(hct, light)
         else:
             harmonized = harmonize(hct, primary)
             colours[name] = darken(harmonized, 0.35) if light else lighten(harmonized, 0.65)
