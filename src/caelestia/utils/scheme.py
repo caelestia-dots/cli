@@ -133,7 +133,15 @@ class Scheme:
             self._colours = read_colours_from_file(self.get_colours_path())
 
     def __str__(self) -> str:
-        return f"Scheme(name={self.name}, flavour={self.flavour}, mode={self.mode}, variant={self.variant})"
+        return (
+            f"Current scheme:\n"
+            f"    Name: {self.name}\n"
+            f"    Flavour: {self.flavour}\n"
+            f"    Mode: {self.mode}\n"
+            f"    Variant: {self.variant}\n"
+            f"    Colours:\n"
+            f"        {'\n        '.join(f'{n}: \x1b[38;2;{int(c[0:2], 16)};{int(c[2:4], 16)};{int(c[4:6], 16)}m{c}\x1b[0m' for n, c in self.colours.items())}"
+        )
 
 
 scheme_variants = [
