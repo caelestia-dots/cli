@@ -88,12 +88,12 @@ def harmonize(a: Hct, b: Hct) -> Hct:
 
 def lighten(colour: Hct, amount: float) -> Hct:
     diff = (100 - colour.tone) * amount
-    return Hct.from_hct(colour.hue, colour.chroma + diff / 2, colour.tone + diff)
+    return Hct.from_hct(colour.hue, colour.chroma + diff / 5, colour.tone + diff)
 
 
 def darken(colour: Hct, amount: float) -> Hct:
     diff = colour.tone * amount
-    return Hct.from_hct(colour.hue, colour.chroma + diff / 2, colour.tone - diff)
+    return Hct.from_hct(colour.hue, colour.chroma + diff / 5, colour.tone - diff)
 
 
 def distance(colour: Cam16, base: Cam16) -> float:
