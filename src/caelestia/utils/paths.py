@@ -1,5 +1,8 @@
 import hashlib
+import json
 import os
+import shutil
+import tempfile
 from pathlib import Path
 
 config_dir = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
@@ -31,3 +34,10 @@ def compute_hash(path: str) -> str:
             sha.update(chunk)
 
     return sha.hexdigest()
+
+
+def atomic_dump(path: Path, content: dict[str, any]) -> None:
+    with tempfile.NamedTemporaryFile("w") as f:
+        json.dump(content, f)
+        f.flush()
+        shutil.move(f.name, path)

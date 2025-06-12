@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 
 from caelestia.utils.material import get_colours_for_image
-from caelestia.utils.paths import scheme_data_dir, scheme_path
+from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
 
 
 class Scheme:
@@ -100,17 +100,16 @@ class Scheme:
 
     def save(self) -> None:
         scheme_path.parent.mkdir(parents=True, exist_ok=True)
-        with scheme_path.open("w") as f:
-            json.dump(
-                {
-                    "name": self.name,
-                    "flavour": self.flavour,
-                    "mode": self.mode,
-                    "variant": self.variant,
-                    "colours": self.colours,
-                },
-                f,
-            )
+        atomic_dump(
+            scheme_path,
+            {
+                "name": self.name,
+                "flavour": self.flavour,
+                "mode": self.mode,
+                "variant": self.variant,
+                "colours": self.colours,
+            },
+        )
 
     def set_random(self) -> None:
         self._name = random.choice(get_scheme_names())
