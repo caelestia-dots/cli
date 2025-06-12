@@ -84,7 +84,12 @@ class Scheme:
 
     @variant.setter
     def variant(self, variant: str) -> None:
+        if variant == self._variant:
+            return
+
         self._variant = variant
+        self._update_colours()
+        self.save()
 
     @property
     def colours(self) -> dict[str, str]:

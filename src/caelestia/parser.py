@@ -1,18 +1,6 @@
 import argparse
 
-from caelestia.subcommands import (
-    clipboard,
-    emoji,
-    pip,
-    record,
-    scheme,
-    screenshot,
-    shell,
-    toggle,
-    variant,
-    wallpaper,
-    wsaction,
-)
+from caelestia.subcommands import clipboard, emoji, pip, record, scheme, screenshot, shell, toggle, wallpaper, wsaction
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 
 
@@ -65,13 +53,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     scheme_parser.add_argument("-n", "--name", choices=get_scheme_names(), help="the name of the scheme to switch to")
     scheme_parser.add_argument("-f", "--flavour", help="the flavour to switch to")
     scheme_parser.add_argument("-m", "--mode", choices=["dark", "light"], help="the mode to switch to")
-
-    # Create parser for variant opts
-    variant_parser = command_parser.add_parser("variant", help="manage the dynamic scheme variant")
-    variant_parser.set_defaults(cls=variant.Command)
-    variant_parser.add_argument("-g", "--get", action="store_true", help="print the current dynamic scheme variant")
-    variant_parser.add_argument("-s", "--set", choices=scheme_variants, help="set the current dynamic scheme variant")
-    variant_parser.add_argument("-r", "--random", action="store_true", help="switch to a random variant")
+    scheme_parser.add_argument("-v", "--variant", choices=scheme_variants, help="the variant to switch to")
 
     # Create parser for screenshot opts
     screenshot_parser = command_parser.add_parser("screenshot", help="take a screenshot")

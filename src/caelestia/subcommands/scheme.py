@@ -16,13 +16,15 @@ class Command:
         if self.args.random:
             scheme.set_random()
             apply_colours(scheme.colours, scheme.mode)
-        elif self.args.name or self.args.flavour or self.args.mode:
+        elif self.args.name or self.args.flavour or self.args.mode or self.args.variant:
             if self.args.name:
                 scheme.name = self.args.name
             if self.args.flavour:
                 scheme.flavour = self.args.flavour
             if self.args.mode:
                 scheme.mode = self.args.mode
+            if self.args.variant:
+                scheme.variant = self.args.variant
             apply_colours(scheme.colours, scheme.mode)
         else:
             print(scheme)
