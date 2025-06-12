@@ -1,7 +1,9 @@
 import argparse
 
 from caelestia.subcommands import clipboard, emoji, pip, record, scheme, screenshot, shell, toggle, wallpaper, wsaction
+from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
+from caelestia.utils.wallpaper import get_wallpaper
 
 
 def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
@@ -81,14 +83,18 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     # Create parser for wallpaper opts
     wallpaper_parser = command_parser.add_parser("wallpaper", help="manage the wallpaper")
     wallpaper_parser.set_defaults(cls=wallpaper.Command)
-    wallpaper_parser.add_argument("-g", "--get", action="store_true", help="print the current wallpaper")
-    wallpaper_parser.add_argument("-r", "--random", action="store_true", help="switch to a random wallpaper")
+    wallpaper_parser.add_argument(
+        "-p", "--print", nargs="?", const=get_wallpaper(), metavar="PATH", help="print the scheme for a wallpaper"
+    )
+    wallpaper_parser.add_argument(
+        "-r", "--random", nargs="?", const=wallpapers_dir, metavar="DIR", help="switch to a random wallpaper"
+    )
     wallpaper_parser.add_argument("-f", "--file", help="the path to the wallpaper to switch to")
     wallpaper_parser.add_argument("-n", "--no-filter", action="store_true", help="do not filter by size")
     wallpaper_parser.add_argument(
         "-t",
         "--threshold",
-        default=80,
+        default=0.8,
         help="the minimum percentage of the largest monitor size the image must be greater than to be selected",
     )
     wallpaper_parser.add_argument(

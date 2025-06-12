@@ -59,8 +59,7 @@ class Scheme:
 
         self._flavour = flavour
         self._check_mode()
-        self._update_colours()
-        self.save()
+        self.update_colours()
 
     @property
     def mode(self) -> str:
@@ -75,8 +74,7 @@ class Scheme:
             raise ValueError(f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}')
 
         self._mode = mode
-        self._update_colours()
-        self.save()
+        self.update_colours()
 
     @property
     def variant(self) -> str:
@@ -88,8 +86,7 @@ class Scheme:
             return
 
         self._variant = variant
-        self._update_colours()
-        self.save()
+        self.update_colours()
 
     @property
     def colours(self) -> dict[str, str]:
@@ -115,6 +112,9 @@ class Scheme:
         self._name = random.choice(get_scheme_names())
         self._flavour = random.choice(get_scheme_flavours())
         self._mode = random.choice(get_scheme_modes())
+        self.update_colours()
+
+    def update_colours(self) -> None:
         self._update_colours()
         self.save()
 
