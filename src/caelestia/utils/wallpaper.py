@@ -31,7 +31,10 @@ def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bo
 
 
 def get_wallpaper() -> str:
-    return wallpaper_path_path.read_text()
+    try:
+        return wallpaper_path_path.read_text()
+    except IOError:
+        return None
 
 
 def get_wallpapers(args: Namespace) -> list[Path]:
@@ -71,17 +74,17 @@ def get_thumb(wall: Path, cache: Path) -> Path:
 def get_smart_mode(wall: Path, cache: Path) -> str:
     mode_cache = cache / "mode.txt"
 
-    if mode_cache.exists():
+    try:
         return mode_cache.read_text()
+    except IOError:
+        with Image.open(get_thumb(wall, cache)) as img:
+            img.thumbnail((1, 1), Image.LANCZOS)
+            mode = "light" if Hct.from_int(argb_from_rgb(*img.getpixel((0, 0)))).tone > 60 else "dark"
 
-    with Image.open(get_thumb(wall, cache)) as img:
-        img.thumbnail((1, 1), Image.LANCZOS)
-        mode = "light" if Hct.from_int(argb_from_rgb(*img.getpixel((0, 0)))).tone > 60 else "dark"
+        mode_cache.parent.mkdir(parents=True, exist_ok=True)
+        mode_cache.write_text(mode)
 
-    mode_cache.parent.mkdir(parents=True, exist_ok=True)
-    mode_cache.write_text(mode)
-
-    return mode
+        return mode
 
 
 def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:

@@ -18,4 +18,4 @@ class Command:
         elif self.args.random:
             set_random(self.args)
         else:
-            print(get_wallpaper())
+            print(get_wallpaper() or "No wallpaper set")
