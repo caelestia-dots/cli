@@ -31,6 +31,10 @@ wallpapers_cache_dir = c_cache_dir / "wallpapers"
 screenshots_dir = Path.home() / "Pictures/Screenshots"
 screenshots_cache_dir = c_cache_dir / "screenshots"
 
+recordings_dir = Path.home() / "Videos/Recordings"
+recording_path = c_state_dir / "record/recording.mp4"
+recording_notif_path = c_state_dir / "record/notifid.txt"
+
 
 def compute_hash(path: Path | str) -> str:
     sha = hashlib.sha256()
