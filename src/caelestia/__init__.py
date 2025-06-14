@@ -7,7 +7,3 @@ def main() -> None:
         args.cls(args).run()
     else:
         parser.print_help()
-
-
-if __name__ == "__main__":
-    main()
