@@ -1,4 +1,5 @@
 import subprocess
+import time
 from argparse import Namespace
 from datetime import datetime
 
@@ -19,19 +20,28 @@ class Command:
             self.fullscreen()
 
     def region(self) -> None:
-        freeze_proc = None
-
-        if self.args.freeze:
-            freeze_proc = subprocess.Popen(["wayfreeze", "--hide-cursor"])
-
         if self.args.region == "slurp":
-            ws = hypr.message("activeworkspace")["id"]
-            geoms = [
-                f"{','.join(map(str, c['at']))} {'x'.join(map(str, c['size']))}"
-                for c in hypr.message("clients")
-                if c["workspace"]["id"] == ws
-            ]
-            region = subprocess.check_output(["slurp"], input="\n".join(geoms), text=True)
+            freeze_proc = None
+
+            if self.args.freeze:
+                freeze_proc = subprocess.Popen(["wayfreeze", "--hide-cursor"])
+
+            try:
+                ws = hypr.message("activeworkspace")["id"]
+                geoms = [
+                    f"{','.join(map(str, c['at']))} {'x'.join(map(str, c['size']))}"
+                    for c in hypr.message("clients")
+                    if c["workspace"]["id"] == ws
+                ]
+
+                # Delay to ensure wayfreeze starts first
+                if freeze_proc:
+                    time.sleep(0.01)
+
+                region = subprocess.check_output(["slurp"], input="\n".join(geoms), text=True)
+            finally:
+                if freeze_proc:
+                    freeze_proc.kill()
         else:
             region = self.args.region
 
@@ -39,9 +49,6 @@ class Command:
         swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
         swappy.stdin.write(sc_data)
         swappy.stdin.close()
-
-        if freeze_proc:
-            freeze_proc.kill()
 
     def fullscreen(self) -> None:
         sc_data = subprocess.check_output(["grim", "-"])
