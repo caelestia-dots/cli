@@ -1,0 +1,83 @@
+# Main background, empty for terminal default, need to be empty if you want transparent background
+theme[main_bg]={{ $surface }}
+
+# Main text color
+theme[main_fg]={{ $onSurface }}
+
+# Title color for boxes
+theme[title]={{ $onSurface }}
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]={{ $primary }}
+
+# Background color of selected item in processes box
+theme[selected_bg]={{ $surfaceContainer }}
+
+# Foreground color of selected item in processes box
+theme[selected_fg]={{ $primary }}
+
+# Color of inactive/disabled text
+theme[inactive_fg]={{ $outline }}
+
+# Color of text appearing on top of graphs, i.e uptime and current network graph scaling
+theme[graph_text]={{ $tertiary }}
+
+# Background color of the percentage meters
+theme[meter_bg]={{ $outline }}
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]={{ $tertiary }}
+
+# CPU, Memory, Network, Proc box outline colors
+theme[cpu_box]={{ $mauve }}
+theme[mem_box]={{ $green }}
+theme[net_box]={{ $maroon }}
+theme[proc_box]={{ $blue }}
+
+# Box divider line and small boxes line color
+theme[div_line]={{ $outlineVariant }}
+
+# Temperature graph color (Green -> Yellow -> Red)
+theme[temp_start]={{ $green }}
+theme[temp_mid]={{ $yellow }}
+theme[temp_end]={{ $red }}
+
+# CPU graph colors (Teal -> Sapphire -> Lavender)
+theme[cpu_start]={{ $teal }}
+theme[cpu_mid]={{ $sapphire }}
+theme[cpu_end]={{ $lavender }}
+
+# Mem/Disk free meter (Mauve -> Lavender -> Blue)
+theme[free_start]={{ $mauve }}
+theme[free_mid]={{ $lavender }}
+theme[free_end]={{ $blue }}
+
+# Mem/Disk cached meter (Sapphire -> Blue -> Lavender)
+theme[cached_start]={{ $sapphire }}
+theme[cached_mid]={{ $blue }}
+theme[cached_end]={{ $lavender }}
+
+# Mem/Disk available meter (Peach -> Maroon -> Red)
+theme[available_start]={{ $peach }}
+theme[available_mid]={{ $maroon }}
+theme[available_end]={{ $red }}
+
+# Mem/Disk used meter (Green -> Teal -> Sky)
+theme[used_start]={{ $green }}
+theme[used_mid]={{ $teal }}
+theme[used_end]={{ $sky }}
+
+# Download graph colors (Peach -> Maroon -> Red)
+theme[download_start]={{ $peach }}
+theme[download_mid]={{ $maroon }}
+theme[download_end]={{ $red }}
+
+# Upload graph colors (Green -> Teal -> Sky)
+theme[upload_start]={{ $green }}
+theme[upload_mid]={{ $teal }}
+theme[upload_end]={{ $sky }}
+
+# Process box color gradient for threads, mem and cpu usage (Sapphire -> Lavender -> Mauve)
+theme[process_start]={{ $sapphire }}
+theme[process_mid]={{ $lavender }}
+theme[process_end]={{ $mauve }}

@@ -1,34 +1,17 @@
-# caelestia-scripts
+# caelestia-cli
 
-A collection of scripts for my caelestia dotfiles.
+The main control script for the Caelestia dotfiles.
 
 ## Installation
 
-Clone this repo.
+### Package manager
 
-Run `install/scripts.fish`.
-`~/.local/bin` must be in your path.
+TODO
+
+### Manual installation
+
+TODO
 
 ## Usage
 
-```
-> caelestia help
-Usage: caelestia COMMAND [ ...args ]
-
-COMMAND := help | install | shell | toggle | workspace-action | scheme | screenshot | record | clipboard | clipboard-delete | emoji-picker | wallpaper | pip
-
-  help: show this help message
-  install: install a module
-  shell: start the shell or message it
-  toggle: toggle a special workspace
-  workspace-action: execute a Hyprland workspace dispatcher in the current group
-  scheme: change the current colour scheme
-  variant: change the current scheme variant
-  screenshot: take a screenshot
-  record: take a screen recording
-  clipboard: open clipboard history
-  clipboard-delete: delete an item from clipboard history
-  emoji-picker: open the emoji picker
-  wallpaper: change the wallpaper
-  pip: move the focused window into picture in picture mode or start the pip daemon
-```
+TODO
