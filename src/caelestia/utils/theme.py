@@ -69,11 +69,9 @@ def gen_sequences(colours: dict[str, str]) -> str:
     )
 
 
-def try_write(path: Path, content: str) -> None:
-    try:
-        path.write_text(content)
-    except FileNotFoundError:
-        pass
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content)
 
 
 def apply_terms(sequences: str) -> None:
@@ -89,7 +87,7 @@ def apply_terms(sequences: str) -> None:
 
 
 def apply_hypr(conf: str) -> None:
-    try_write(config_dir / "hypr/scheme/current.conf", conf)
+    write_file(config_dir / "hypr/scheme/current.conf", conf)
 
 
 def apply_discord(scss: str) -> None:
@@ -98,22 +96,22 @@ def apply_discord(scss: str) -> None:
         conf = subprocess.check_output(["sass", "-I", tmp_dir, templates_dir / "discord.scss"], text=True)
 
     for client in "Equicord", "Vencord", "BetterDiscord", "equicord", "vesktop", "legcord":
-        try_write(config_dir / client / "themes/caelestia.theme.css", conf)
+        write_file(config_dir / client / "themes/caelestia.theme.css", conf)
 
 
 def apply_spicetify(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / f"spicetify-{mode}.ini")
-    try_write(config_dir / "spicetify/Themes/caelestia/color.ini", template)
+    write_file(config_dir / "spicetify/Themes/caelestia/color.ini", template)
 
 
 def apply_fuzzel(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "fuzzel.ini")
-    try_write(config_dir / "fuzzel/fuzzel.ini", template)
+    write_file(config_dir / "fuzzel/fuzzel.ini", template)
 
 
 def apply_btop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "btop.theme", hash=True)
-    try_write(config_dir / "btop/themes/caelestia.theme", template)
+    write_file(config_dir / "btop/themes/caelestia.theme", template)
     subprocess.run(["killall", "-USR2", "btop"])
 
 
