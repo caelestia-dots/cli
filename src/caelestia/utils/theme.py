@@ -2,7 +2,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from caelestia.utils.paths import config_dir, templates_dir
+from caelestia.utils.paths import c_state_dir, config_dir, templates_dir
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -77,6 +77,10 @@ def try_write(path: Path, content: str) -> None:
 
 
 def apply_terms(sequences: str) -> None:
+    state = c_state_dir / "sequences.txt"
+    state.parent.mkdir(parents=True, exist_ok=True)
+    state.write_text(sequences)
+
     pts_path = Path("/dev/pts")
     for pt in pts_path.iterdir():
         if pt.name.isdigit():
