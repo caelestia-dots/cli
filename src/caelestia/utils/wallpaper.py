@@ -102,7 +102,13 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
             }
         )
 
-    return get_colours_for_image(get_thumb(wall, cache), scheme)
+    return {
+        "name": scheme.name,
+        "flavour": scheme.flavour,
+        "mode": get_smart_mode(wall, cache),
+        "variant": scheme.variant,
+        "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
+    }
 
 
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
