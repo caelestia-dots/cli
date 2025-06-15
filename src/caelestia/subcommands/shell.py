@@ -22,10 +22,10 @@ class Command:
             self.message(*self.args.message)
         else:
             # Start the shell
-            self.shell()
+            subprocess.Popen(["qs", "-c", "caelestia"]).wait()
 
     def shell(self, *args: list[str]) -> str:
-        return subprocess.check_output(["qs", "-p", paths.c_data_dir / "shell", *args], text=True)
+        return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
 
     def print_ipc(self) -> None:
         print(self.shell("ipc", "show"), end="")
