@@ -112,7 +112,17 @@ def apply_fuzzel(colours: dict[str, str]) -> None:
 def apply_btop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "btop.theme", hash=True)
     write_file(config_dir / "btop/themes/caelestia.theme", template)
-    subprocess.run(["killall", "-USR2", "btop"])
+    subprocess.run(["killall", "-USR2", "btop"], stderr=subprocess.DEVNULL)
+
+
+def apply_gtk(colours: dict[str, str], mode: str) -> None:
+    template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
+    write_file(config_dir / "gtk-3.0/gtk.css", template)
+    write_file(config_dir / "gtk-4.0/gtk.css", template)
+
+    subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "gtk-theme", "adw-gtk3-dark"])
+    subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", f"prefer-{mode}"])
+    subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", f"Papirus-{mode.capitalize()}"])
 
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
@@ -122,3 +132,4 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_spicetify(colours, mode)
     apply_fuzzel(colours)
     apply_btop(colours)
+    apply_gtk(colours, mode)
