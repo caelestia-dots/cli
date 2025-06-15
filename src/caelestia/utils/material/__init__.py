@@ -8,7 +8,7 @@ from caelestia.utils.material.score import score
 from caelestia.utils.paths import compute_hash, scheme_cache_dir, wallpaper_thumbnail_path
 
 
-def get_score_for_image(image: str, cache_base: Path) -> tuple[list[Hct], list[Hct]]:
+def get_score_for_image(image: Path | str, cache_base: Path) -> tuple[list[Hct], list[Hct]]:
     cache = cache_base / "score.json"
 
     try:
@@ -17,7 +17,7 @@ def get_score_for_image(image: str, cache_base: Path) -> tuple[list[Hct], list[H
     except (IOError, json.JSONDecodeError):
         pass
 
-    s = score(image)
+    s = score(str(image))
 
     cache.parent.mkdir(parents=True, exist_ok=True)
     with cache.open("w") as f:
@@ -26,7 +26,7 @@ def get_score_for_image(image: str, cache_base: Path) -> tuple[list[Hct], list[H
     return s
 
 
-def get_colours_for_image(image: str = str(wallpaper_thumbnail_path), scheme=None) -> dict[str, str]:
+def get_colours_for_image(image: Path | str = wallpaper_thumbnail_path, scheme=None) -> dict[str, str]:
     if scheme is None:
         from caelestia.utils.scheme import get_scheme
 

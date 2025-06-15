@@ -1,8 +1,6 @@
 import subprocess
 from argparse import Namespace
 
-from caelestia.utils import paths
-
 
 class Command:
     args: Namespace
