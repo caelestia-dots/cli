@@ -54,7 +54,7 @@ class Command:
     def sysmon(self) -> None:
         self.spawn_client(
             lambda c: c["class"] == "btop" and c["title"] == "btop" and c["workspace"]["name"] == "special:sysmon",
-            ["foot", "-a", "btop", "-T", "btop", "--", "btop"],
+            ["foot", "-a", "btop", "-T", "btop", "fish", "-C", "exec btop"],
         )
         hypr.dispatch("togglespecialworkspace", "sysmon")
 
