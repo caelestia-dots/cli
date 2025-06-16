@@ -125,6 +125,19 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", f"Papirus-{mode.capitalize()}"])
 
 
+def apply_qt(colours: dict[str, str], mode: str) -> None:
+    template = gen_replace(colours, templates_dir / "qtcolors.conf", hash=True)
+    write_file(config_dir / "qt5ct/colors/caelestia.conf", template)
+    write_file(config_dir / "qt6ct/colors/caelestia.conf", template)
+
+    qtct = (templates_dir / "qtct.conf").read_text()
+    qtct = qtct.replace("{{ $mode }}", mode.capitalize())
+
+    for ver in 5, 6:
+        conf = qtct.replace("{{ $config }}", str(config_dir / f"qt{ver}ct"))
+        write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
+
+
 def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))  # FIXME: LAGGY
@@ -133,3 +146,4 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_fuzzel(colours)
     apply_btop(colours)
     apply_gtk(colours, mode)
+    apply_qt(colours, mode)
