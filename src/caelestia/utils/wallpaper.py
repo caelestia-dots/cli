@@ -91,7 +91,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    if not no_smart:
+    if scheme.name == "dynamic" and not no_smart:
         scheme = Scheme(
             {
                 "name": scheme.name,
@@ -105,7 +105,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     return {
         "name": scheme.name,
         "flavour": scheme.flavour,
-        "mode": get_smart_mode(wall, cache),
+        "mode": scheme.mode,
         "variant": scheme.variant,
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
@@ -133,7 +133,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
 
     # Change mode based on wallpaper colour
-    if not no_smart:
+    if scheme.name == "dynamic" and not no_smart:
         scheme.mode = get_smart_mode(wall, cache)
 
     # Update colours
