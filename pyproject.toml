@@ -6,6 +6,10 @@ build-backend = "hatchling.build"
 name = "caelestia"
 requires-python = ">=3.13"
 dynamic = ["version"]
+dependencies = [
+    "pillow",
+    "materialyoucolor"
+]
 
 [project.scripts]
 caelestia = "caelestia:main"
