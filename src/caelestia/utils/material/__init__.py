@@ -32,8 +32,10 @@ def get_colours_for_image(image: Path | str = wallpaper_thumbnail_path, scheme=N
 
         scheme = get_scheme()
 
+    flavour = scheme.flavour if scheme.flavour in ("default", "alt1", "alt2") else "default"
+
     cache_base = scheme_cache_dir / compute_hash(image)
-    cache = (cache_base / scheme.variant / scheme.flavour / scheme.mode).with_suffix(".json")
+    cache = (cache_base / scheme.variant / flavour / scheme.mode).with_suffix(".json")
 
     try:
         with cache.open("r") as f:
@@ -42,7 +44,7 @@ def get_colours_for_image(image: Path | str = wallpaper_thumbnail_path, scheme=N
         pass
 
     primaries, colours = get_score_for_image(image, cache_base)
-    i = ["default", "alt1", "alt2"].index(scheme.flavour)
+    i = ["default", "alt1", "alt2"].index(flavour)
     scheme = gen_scheme(scheme, primaries[i], colours)
 
     cache.parent.mkdir(parents=True, exist_ok=True)

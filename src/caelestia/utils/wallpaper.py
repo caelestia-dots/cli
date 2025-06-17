@@ -91,11 +91,14 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    if scheme.name == "dynamic" and not no_smart:
+    name = "dynamic"
+    flavour = scheme.flavour if scheme.flavour in ("default", "alt1", "alt2") else "default"
+
+    if not no_smart:
         scheme = Scheme(
             {
-                "name": scheme.name,
-                "flavour": scheme.flavour,
+                "name": name,
+                "flavour": flavour,
                 "mode": get_smart_mode(wall, cache),
                 "variant": scheme.variant,
                 "colours": scheme.colours,
@@ -103,8 +106,8 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         )
 
     return {
-        "name": scheme.name,
-        "flavour": scheme.flavour,
+        "name": name,
+        "flavour": flavour,
         "mode": scheme.mode,
         "variant": scheme.variant,
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
