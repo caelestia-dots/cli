@@ -78,11 +78,27 @@ set -l commands workspace workspacegroup movetoworkspace movetoworkspacegroup
 complete -c caelestia -n "$seen workspace-action && not $seen $commands" -a "$commands" -d 'action'
 
 # Scheme
-complete -c caelestia -n "$seen scheme" -s 'r' -l 'random' -d 'Switch to a random scheme'
-complete -c caelestia -n "$seen scheme" -s 'n' -l 'name' -d 'Set scheme name'
-complete -c caelestia -n "$seen scheme" -s 'f' -l 'flavour' -d 'Set scheme flavour'
-complete -c caelestia -n "$seen scheme" -s 'm' -l 'mode' -d 'Set scheme mode' -a 'light dark'
-complete -c caelestia -n "$seen scheme" -s 'v' -l 'variant' -d 'Set scheme variant' -a 'vibrant tonalspot expressive fidelity fruitsalad rainbow neutral content monochrome'
+set -l commands list get set
+set -l not_seen "$seen scheme && not $seen $commands"
+complete -c caelestia -n $not_seen -a 'list' -d 'List available schemes'
+complete -c caelestia -n $not_seen -a 'get' -d 'Get scheme properties'
+complete -c caelestia -n $not_seen -a 'set' -d 'Set the current scheme'
+
+complete -c caelestia -n "$seen scheme && $seen list" -s 'n' -l 'names' -d 'List scheme names'
+complete -c caelestia -n "$seen scheme && $seen list" -s 'f' -l 'flavours' -d 'List scheme flavours'
+complete -c caelestia -n "$seen scheme && $seen list" -s 'm' -l 'modes' -d 'List scheme modes'
+complete -c caelestia -n "$seen scheme && $seen list" -s 'v' -l 'variants' -d 'List scheme variants'
+
+complete -c caelestia -n "$seen scheme && $seen get" -s 'n' -l 'name' -d 'Get scheme name'
+complete -c caelestia -n "$seen scheme && $seen get" -s 'f' -l 'flavour' -d 'Get scheme flavour'
+complete -c caelestia -n "$seen scheme && $seen get" -s 'm' -l 'mode' -d 'Get scheme mode'
+complete -c caelestia -n "$seen scheme && $seen get" -s 'v' -l 'variant' -d 'Get scheme variant'
+
+complete -c caelestia -n "$seen scheme && $seen set" -s 'r' -l 'random' -d 'Switch to a random scheme'
+complete -c caelestia -n "$seen scheme && $seen set" -s 'n' -l 'name' -d 'Set scheme name' -a "$(caelestia scheme list -n)" -r
+complete -c caelestia -n "$seen scheme && $seen set" -s 'f' -l 'flavour' -d 'Set scheme flavour' -a "$(caelestia scheme list -f)" -r
+complete -c caelestia -n "$seen scheme && $seen set" -s 'm' -l 'mode' -d 'Set scheme mode' -a "$(caelestia scheme list -m)" -r
+complete -c caelestia -n "$seen scheme && $seen set" -s 'v' -l 'variant' -d 'Set scheme variant' -a "$(caelestia scheme list -v)" -r
 
 # Record
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
