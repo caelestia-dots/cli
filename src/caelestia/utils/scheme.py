@@ -146,13 +146,13 @@ class Scheme:
     def _check_flavour(self) -> None:
         global scheme_flavours
         scheme_flavours = None
-        if self._flavour not in get_scheme_flavours():
+        if self._flavour not in get_scheme_flavours(self.name):
             self._flavour = get_scheme_flavours()[0]
 
     def _check_mode(self) -> None:
         global scheme_modes
         scheme_modes = None
-        if self._mode not in get_scheme_modes():
+        if self._mode not in get_scheme_modes(self.name, self.flavour):
             self._mode = get_scheme_modes()[0]
 
     def _update_colours(self) -> None:
@@ -223,7 +223,13 @@ def get_scheme_names() -> list[str]:
     return scheme_names
 
 
-def get_scheme_flavours() -> list[str]:
+def get_scheme_flavours(name: str = None) -> list[str]:
+    if name is not None:
+        if name == "dynamic":
+            return ["default", "alt1", "alt2"]
+        else:
+            return [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
+
     global scheme_flavours
 
     if scheme_flavours is None:
@@ -236,7 +242,13 @@ def get_scheme_flavours() -> list[str]:
     return scheme_flavours
 
 
-def get_scheme_modes() -> list[str]:
+def get_scheme_modes(name: str = None, flavour: str = None) -> list[str]:
+    if name is not None:
+        if name == "dynamic":
+            return ["light", "dark"]
+        else:
+            return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
+
     global scheme_modes
 
     if scheme_modes is None:

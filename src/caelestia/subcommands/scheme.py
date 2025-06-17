@@ -1,6 +1,14 @@
+import json
 from argparse import Namespace
 
-from caelestia.utils.scheme import get_scheme, get_scheme_flavours, get_scheme_modes, get_scheme_names, scheme_variants
+from caelestia.utils.scheme import (
+    Scheme,
+    get_scheme,
+    get_scheme_flavours,
+    get_scheme_modes,
+    get_scheme_names,
+    scheme_variants,
+)
 from caelestia.utils.theme import apply_colours
 
 
@@ -86,4 +94,24 @@ class List:
                 else:
                     print("\n".join(scheme_variants))
         else:
-            print("No args given. Use --names, --flavours, --modes or --variants to list schemes")
+            current_scheme = get_scheme()
+            schemes = {}
+            for scheme in get_scheme_names():
+                schemes[scheme] = {}
+                for flavour in get_scheme_flavours(scheme):
+                    s = Scheme(
+                        {
+                            "name": scheme,
+                            "flavour": flavour,
+                            "mode": current_scheme.mode,
+                            "variant": current_scheme.variant,
+                            "colours": current_scheme.colours,
+                        }
+                    )
+                    modes = get_scheme_modes(scheme, flavour)
+                    if s.mode not in modes:
+                        s._mode = modes[0]
+                    s._update_colours()
+                    schemes[scheme][flavour] = s.colours
+
+            print(json.dumps(schemes))
