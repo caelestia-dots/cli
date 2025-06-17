@@ -25,6 +25,7 @@ complete -c caelestia -n $not_seen -a 'pip' -d 'Picture in picture utilities'
 # Shell
 set -l commands mpris drawers wallpaper notifs
 set -l not_seen "$seen shell && not $seen $commands"
+complete -c caelestia -n $not_seen -s 'd' -l 'daemon' -d 'Start the shell detached'
 complete -c caelestia -n $not_seen -s 's' -l 'show' -d 'Print all IPC commands'
 complete -c caelestia -n $not_seen -s 'l' -l 'log' -d 'Print the shell log'
 complete -c caelestia -n $not_seen -a 'mpris' -d 'Mpris control'

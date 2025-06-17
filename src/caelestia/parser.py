@@ -18,6 +18,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     shell_parser = command_parser.add_parser("shell", help="start or message the shell")
     shell_parser.set_defaults(cls=shell.Command)
     shell_parser.add_argument("message", nargs="*", help="a message to send to the shell")
+    shell_parser.add_argument("-d", "--daemon", action="store_true", help="start the shell detached")
     shell_parser.add_argument("-s", "--show", action="store_true", help="print all shell IPC commands")
     shell_parser.add_argument(
         "-l",

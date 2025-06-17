@@ -20,7 +20,10 @@ class Command:
             self.message(*self.args.message)
         else:
             # Start the shell
-            subprocess.Popen(["qs", "-c", "caelestia"]).wait()
+            args = ["qs", "-n", "-c", "caelestia"]
+            if self.args.daemon:
+                args.append("-d")
+            subprocess.run(args)
 
     def shell(self, *args: list[str]) -> str:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
