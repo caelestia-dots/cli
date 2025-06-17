@@ -3,6 +3,7 @@ import time
 from argparse import Namespace
 from datetime import datetime
 
+from caelestia.utils.notify import notify
 from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir
 
 
@@ -48,20 +49,10 @@ class Command:
         # Send notif if proc hasn't ended after a small delay
         time.sleep(0.1)
         if proc.poll() is None:
-            notif = subprocess.check_output(
-                ["notify-send", "-p", "-a", "caelestia-cli", "Recording started", "Recording..."], text=True
-            ).strip()
+            notif = notify("-p", "Recording started", "Recording...")
             recording_notif_path.write_text(notif)
         else:
-            subprocess.run(
-                [
-                    "notify-send",
-                    "-a",
-                    "caelestia-cli",
-                    "Recording failed",
-                    f"Recording failed to start: {proc.communicate()[1]}",
-                ]
-            )
+            notify("Recording failed", f"Recording failed to start: {proc.communicate()[1]}")
 
     def stop(self) -> None:
         subprocess.run(["pkill", "wl-screenrec"])
@@ -87,19 +78,13 @@ class Command:
         except IOError:
             pass
 
-        action = subprocess.check_output(
-            [
-                "notify-send",
-                "-a",
-                "caelestia-cli",
-                "--action=watch=Watch",
-                "--action=open=Open",
-                "--action=delete=Delete",
-                "Recording stopped",
-                f"Recording saved in {new_path}",
-            ],
-            text=True,
-        ).strip()
+        action = notify(
+            "--action=watch=Watch",
+            "--action=open=Open",
+            "--action=delete=Delete",
+            "Recording stopped",
+            f"Recording saved in {new_path}",
+        )
 
         if action == "watch":
             subprocess.Popen(["app2unit", "-O", new_path], start_new_session=True)

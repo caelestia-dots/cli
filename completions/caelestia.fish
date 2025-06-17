@@ -94,6 +94,7 @@ complete -c caelestia -n "$seen scheme && $seen get" -s 'f' -l 'flavour' -d 'Get
 complete -c caelestia -n "$seen scheme && $seen get" -s 'm' -l 'mode' -d 'Get scheme mode'
 complete -c caelestia -n "$seen scheme && $seen get" -s 'v' -l 'variant' -d 'Get scheme variant'
 
+complete -c caelestia -n "$seen scheme && $seen set" -l 'notify' -d 'Send a notification on error'
 complete -c caelestia -n "$seen scheme && $seen set" -s 'r' -l 'random' -d 'Switch to a random scheme'
 complete -c caelestia -n "$seen scheme && $seen set" -s 'n' -l 'name' -d 'Set scheme name' -a "$(caelestia scheme list -n)" -r
 complete -c caelestia -n "$seen scheme && $seen set" -s 'f' -l 'flavour' -d 'Set scheme flavour' -a "$(caelestia scheme list -f)" -r

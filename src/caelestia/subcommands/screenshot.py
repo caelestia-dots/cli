@@ -4,6 +4,7 @@ from argparse import Namespace
 from datetime import datetime
 
 from caelestia.utils import hypr
+from caelestia.utils.notify import notify
 from caelestia.utils.paths import screenshots_cache_dir, screenshots_dir
 
 
@@ -59,22 +60,16 @@ class Command:
         screenshots_cache_dir.mkdir(exist_ok=True, parents=True)
         dest.write_bytes(sc_data)
 
-        action = subprocess.check_output(
-            [
-                "notify-send",
-                "-i",
-                "image-x-generic-symbolic",
-                "-h",
-                f"STRING:image-path:{dest}",
-                "-a",
-                "caelestia-cli",
-                "--action=open=Open",
-                "--action=save=Save",
-                "Screenshot taken",
-                f"Screenshot stored in {dest} and copied to clipboard",
-            ],
-            text=True,
-        ).strip()
+        action = notify(
+            "-i",
+            "image-x-generic-symbolic",
+            "-h",
+            f"STRING:image-path:{dest}",
+            "--action=open=Open",
+            "--action=save=Save",
+            "Screenshot taken",
+            f"Screenshot stored in {dest} and copied to clipboard",
+        )
 
         if action == "open":
             subprocess.Popen(["swappy", "-f", dest], start_new_session=True)
@@ -82,4 +77,4 @@ class Command:
             new_dest = (screenshots_dir / dest.name).with_suffix(".png")
             new_dest.parent.mkdir(exist_ok=True, parents=True)
             dest.rename(new_dest)
-            subprocess.run(["notify-send", "Screenshot saved", f"Saved to {new_dest}"])
+            notify("Screenshot saved", f"Saved to {new_dest}")

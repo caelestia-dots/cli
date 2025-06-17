@@ -68,6 +68,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
 
     set_parser = scheme_command_parser.add_parser("set", help="set the current scheme")
     set_parser.set_defaults(cls=scheme.Set)
+    set_parser.add_argument("--notify", action="store_true", help="send a notification on error")
     set_parser.add_argument("-r", "--random", action="store_true", help="switch to a random scheme")
     set_parser.add_argument("-n", "--name", choices=get_scheme_names(), help="the name of the scheme to switch to")
     set_parser.add_argument("-f", "--flavour", help="the flavour to switch to")

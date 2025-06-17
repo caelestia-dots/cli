@@ -13,6 +13,9 @@ class Set:
     def run(self) -> None:
         scheme = get_scheme()
 
+        if self.args.notify:
+            scheme.notify = True
+
         if self.args.random:
             scheme.set_random()
             apply_colours(scheme.colours, scheme.mode)

@@ -3,6 +3,7 @@ import random
 from pathlib import Path
 
 from caelestia.utils.material import get_colours_for_image
+from caelestia.utils.notify import notify
 from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
 
 
@@ -12,6 +13,7 @@ class Scheme:
     _mode: str
     _variant: str
     _colours: dict[str, str]
+    notify: bool
 
     def __init__(self, json: dict[str, any] | None) -> None:
         if json is None:
@@ -26,6 +28,7 @@ class Scheme:
             self._mode = json["mode"]
             self._variant = json["variant"]
             self._colours = json["colours"]
+        self.notify = False
 
     @property
     def name(self) -> str:
@@ -37,6 +40,11 @@ class Scheme:
             return
 
         if name not in get_scheme_names():
+            if self.notify:
+                notify(
+                    "Unable to set scheme",
+                    f'"{name}" is not a valid scheme.\nValid schemes are: {get_scheme_names()}',
+                )
             raise ValueError(f"Invalid scheme name: {name}")
 
         self._name = name
@@ -55,6 +63,12 @@ class Scheme:
             return
 
         if flavour not in get_scheme_flavours():
+            if self.notify:
+                notify(
+                    "Unable to set scheme flavour",
+                    f'"{flavour}" is not a valid flavour of scheme "{self.name}".\n'
+                    f"Valid flavours are: {get_scheme_flavours()}",
+                )
             raise ValueError(f'Invalid scheme flavour: "{flavour}". Valid flavours: {get_scheme_flavours()}')
 
         self._flavour = flavour
@@ -71,6 +85,12 @@ class Scheme:
             return
 
         if mode not in get_scheme_modes():
+            if self.notify:
+                notify(
+                    "Unable to set scheme mode",
+                    f'"{mode}" is not a valid mode of scheme "{self.name} {self.flavour}".\n'
+                    f"Valid modes are: {get_scheme_modes()}",
+                )
             raise ValueError(f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}')
 
         self._mode = mode
