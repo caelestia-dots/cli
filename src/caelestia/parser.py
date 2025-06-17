@@ -50,12 +50,29 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
 
     # Create parser for scheme opts
     scheme_parser = command_parser.add_parser("scheme", help="manage the colour scheme")
-    scheme_parser.set_defaults(cls=scheme.Command)
-    scheme_parser.add_argument("-r", "--random", action="store_true", help="switch to a random scheme")
-    scheme_parser.add_argument("-n", "--name", choices=get_scheme_names(), help="the name of the scheme to switch to")
-    scheme_parser.add_argument("-f", "--flavour", help="the flavour to switch to")
-    scheme_parser.add_argument("-m", "--mode", choices=["dark", "light"], help="the mode to switch to")
-    scheme_parser.add_argument("-v", "--variant", choices=scheme_variants, help="the variant to switch to")
+    scheme_command_parser = scheme_parser.add_subparsers(title="subcommands")
+
+    list_parser = scheme_command_parser.add_parser("list", help="list available schemes")
+    list_parser.set_defaults(cls=scheme.List)
+    list_parser.add_argument("-n", "--names", action="store_true", help="list scheme names")
+    list_parser.add_argument("-f", "--flavours", action="store_true", help="list scheme flavours")
+    list_parser.add_argument("-m", "--modes", action="store_true", help="list scheme modes")
+    list_parser.add_argument("-v", "--variants", action="store_true", help="list scheme variants")
+
+    get_parser = scheme_command_parser.add_parser("get", help="get scheme properties")
+    get_parser.set_defaults(cls=scheme.Get)
+    get_parser.add_argument("-n", "--name", action="store_true", help="print the current scheme name")
+    get_parser.add_argument("-f", "--flavour", action="store_true", help="print the current scheme flavour")
+    get_parser.add_argument("-m", "--mode", action="store_true", help="print the current scheme mode")
+    get_parser.add_argument("-v", "--variant", action="store_true", help="print the current scheme variant")
+
+    set_parser = scheme_command_parser.add_parser("set", help="set the current scheme")
+    set_parser.set_defaults(cls=scheme.Set)
+    set_parser.add_argument("-r", "--random", action="store_true", help="switch to a random scheme")
+    set_parser.add_argument("-n", "--name", choices=get_scheme_names(), help="the name of the scheme to switch to")
+    set_parser.add_argument("-f", "--flavour", help="the flavour to switch to")
+    set_parser.add_argument("-m", "--mode", choices=["dark", "light"], help="the mode to switch to")
+    set_parser.add_argument("-v", "--variant", choices=scheme_variants, help="the variant to switch to")
 
     # Create parser for screenshot opts
     screenshot_parser = command_parser.add_parser("screenshot", help="take a screenshot")
