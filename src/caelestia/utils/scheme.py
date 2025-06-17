@@ -42,6 +42,8 @@ class Scheme:
         if name not in get_scheme_names():
             if self.notify:
                 notify(
+                    "-u",
+                    "critical",
                     "Unable to set scheme",
                     f'"{name}" is not a valid scheme.\nValid schemes are: {get_scheme_names()}',
                 )
@@ -65,6 +67,8 @@ class Scheme:
         if flavour not in get_scheme_flavours():
             if self.notify:
                 notify(
+                    "-u",
+                    "critical",
                     "Unable to set scheme flavour",
                     f'"{flavour}" is not a valid flavour of scheme "{self.name}".\n'
                     f"Valid flavours are: {get_scheme_flavours()}",
@@ -87,9 +91,10 @@ class Scheme:
         if mode not in get_scheme_modes():
             if self.notify:
                 notify(
+                    "-u",
+                    "critical",
                     "Unable to set scheme mode",
-                    f'"{mode}" is not a valid mode of scheme "{self.name} {self.flavour}".\n'
-                    f"Valid modes are: {get_scheme_modes()}",
+                    f'Scheme "{self.name} {self.flavour}" does not have a {mode} mode.',
                 )
             raise ValueError(f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}')
 
