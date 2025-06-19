@@ -20,13 +20,12 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     shell_parser.add_argument("message", nargs="*", help="a message to send to the shell")
     shell_parser.add_argument("-d", "--daemon", action="store_true", help="start the shell detached")
     shell_parser.add_argument("-s", "--show", action="store_true", help="print all shell IPC commands")
+    shell_parser.add_argument("-l", "--log", action="store_true", help="print the shell log")
     shell_parser.add_argument(
-        "-l",
-        "--log",
-        nargs="?",
-        const="quickshell.dbus.properties.warning=false;quickshell.dbus.dbusmenu.warning=false;quickshell.service.notifications.warning=false;quickshell.service.sni.host.warning=false",
+        "--log-rules",
+        default="quickshell.dbus.properties.warning=false;quickshell.dbus.dbusmenu.warning=false;quickshell.service.notifications.warning=false;quickshell.service.sni.host.warning=false",
         metavar="RULES",
-        help="print the shell log",
+        help="log rules to apply",
     )
 
     # Create parser for toggle opts

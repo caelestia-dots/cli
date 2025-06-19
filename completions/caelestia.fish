@@ -28,6 +28,7 @@ set -l not_seen "$seen shell && not $seen $commands"
 complete -c caelestia -n $not_seen -s 'd' -l 'daemon' -d 'Start the shell detached'
 complete -c caelestia -n $not_seen -s 's' -l 'show' -d 'Print all IPC commands'
 complete -c caelestia -n $not_seen -s 'l' -l 'log' -d 'Print the shell log'
+complete -c caelestia -n $not_seen -l 'log-rules' -d 'Log rules to apply'
 complete -c caelestia -n $not_seen -a 'mpris' -d 'Mpris control'
 complete -c caelestia -n $not_seen -a 'drawers' -d 'Toggle drawers'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Wallpaper control (for internal use)'
