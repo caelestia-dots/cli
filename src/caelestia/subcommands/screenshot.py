@@ -1,9 +1,7 @@
 import subprocess
-import time
 from argparse import Namespace
 from datetime import datetime
 
-from caelestia.utils import hypr
 from caelestia.utils.notify import notify
 from caelestia.utils.paths import screenshots_cache_dir, screenshots_dir
 
@@ -22,34 +20,14 @@ class Command:
 
     def region(self) -> None:
         if self.args.region == "slurp":
-            freeze_proc = None
-
-            if self.args.freeze:
-                freeze_proc = subprocess.Popen(["wayfreeze", "--hide-cursor"])
-
-            try:
-                ws = hypr.message("activeworkspace")["id"]
-                geoms = [
-                    f"{','.join(map(str, c['at']))} {'x'.join(map(str, c['size']))}"
-                    for c in hypr.message("clients")
-                    if c["workspace"]["id"] == ws
-                ]
-
-                # Delay to ensure wayfreeze starts first
-                if freeze_proc:
-                    time.sleep(0.01)
-
-                region = subprocess.check_output(["slurp"], input="\n".join(geoms), text=True)
-            finally:
-                if freeze_proc:
-                    freeze_proc.kill()
+            subprocess.run(
+                ["qs", "-c", "caelestia", "ipc", "call", "picker", "openFreeze" if self.args.freeze else "open"]
+            )
         else:
-            region = self.args.region
-
-        sc_data = subprocess.check_output(["grim", "-l", "0", "-g", region.strip(), "-"])
-        swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
-        swappy.stdin.write(sc_data)
-        swappy.stdin.close()
+            sc_data = subprocess.check_output(["grim", "-l", "0", "-g", self.args.region.strip(), "-"])
+            swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
+            swappy.stdin.write(sc_data)
+            swappy.stdin.close()
 
     def fullscreen(self) -> None:
         sc_data = subprocess.check_output(["grim", "-"])
