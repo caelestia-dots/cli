@@ -103,6 +103,10 @@ complete -c caelestia -n "$seen scheme && $seen set" -s 'f' -l 'flavour' -d 'Set
 complete -c caelestia -n "$seen scheme && $seen set" -s 'm' -l 'mode' -d 'Set scheme mode' -a "$(caelestia scheme list -m)" -r
 complete -c caelestia -n "$seen scheme && $seen set" -s 'v' -l 'variant' -d 'Set scheme variant' -a "$(caelestia scheme list -v)" -r
 
+# Screenshot
+complete -c caelestia -n "$seen screenshot" -s 'r' -l 'region' -d 'Capture region'
+complete -c caelestia -n "$seen screenshot" -s 'f' -l 'freeze' -d 'Freeze while selecting region'
+
 # Record
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
 complete -c caelestia -n "$seen record" -s 's' -l 'sound' -d 'Capture sound'
