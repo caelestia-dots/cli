@@ -39,6 +39,7 @@ class Command:
             else:
                 raise ValueError("No audio source found")
 
+        recording_path.parent.mkdir(parents=True, exist_ok=True)
         proc = subprocess.Popen(
             ["wl-screenrec", *args, "--codec", "hevc", "-f", recording_path],
             stderr=subprocess.PIPE,
