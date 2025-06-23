@@ -15,7 +15,7 @@ const custom = [
   "⇶ three rightwards arrows",
   "• dot circle separator",
   "「」 japanese quote square bracket",
-  "¯\_(ツ)_/¯ shrug idk i dont know",
+  "¯\\_(ツ)_/¯ shrug idk i dont know",
   "(ง🔥ﾛ🔥)ง person with fire eyes eyes on fire",
   "↵ enter key return",
 
