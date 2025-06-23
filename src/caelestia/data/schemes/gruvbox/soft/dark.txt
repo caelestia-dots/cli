@@ -79,3 +79,7 @@ tertiaryFixed DFE8B2
 tertiaryFixedDim C2CB98
 onTertiaryFixed 181E00
 onTertiaryFixedVariant 434A23
+success B5CCBA
+onSuccess 213528
+successContainer 374B3E
+onSuccessContainer D1E9D6
