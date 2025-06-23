@@ -20,7 +20,7 @@ class Score:
         pass
 
     @staticmethod
-    def score(colors_to_population: dict, filter_enabled: bool = True) -> tuple[list[Hct], list[Hct]]:
+    def score(colors_to_population: dict, filter_enabled: bool = False) -> tuple[list[Hct], list[Hct]]:
         desired = 14
         dislike_filter = True
 
@@ -62,7 +62,7 @@ class Score:
 
         # Choose distinct colours
         chosen_colors = []
-        for difference_degrees_ in range(90, 0, -1):
+        for difference_degrees_ in range(90, -1, -1):
             chosen_colors.clear()
             for item in scored_hct:
                 hct = item["hct"]
@@ -78,13 +78,17 @@ class Score:
 
         # Get primary colour
         primary = None
-        for cutoff in range(20, 0, -1):
+        for cutoff in range(20, -1, -1):
             for item in scored_hct:
                 if item["hct"].chroma > cutoff and item["hct"].tone > cutoff * 3:
                     primary = item["hct"]
                     break
             if primary:
                 break
+
+        # Ensure primary exists
+        if not primary:
+            return Score.score(colors_to_population, False)
 
         # Choose distinct primaries
         chosen_primaries = [primary]
