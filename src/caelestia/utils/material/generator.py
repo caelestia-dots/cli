@@ -4,7 +4,6 @@ from materialyoucolor.dynamiccolor.material_dynamic_colors import (
     MaterialDynamicColors,
 )
 from materialyoucolor.hct import Hct
-from materialyoucolor.hct.cam16 import Cam16
 from materialyoucolor.scheme.scheme_content import SchemeContent
 from materialyoucolor.scheme.scheme_expressive import SchemeExpressive
 from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity
@@ -14,13 +13,52 @@ from materialyoucolor.scheme.scheme_neutral import SchemeNeutral
 from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow
 from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot
 from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant
+from materialyoucolor.utils.math_utils import difference_degrees, rotation_direction, sanitize_degrees_double
 
 
 def hex_to_hct(hex: str) -> Hct:
     return Hct.from_int(int(f"0xFF{hex}", 16))
 
 
-light_colours = [
+light_gruvbox = [
+    hex_to_hct("FDF9F3"),
+    hex_to_hct("FF6188"),
+    hex_to_hct("A9DC76"),
+    hex_to_hct("FC9867"),
+    hex_to_hct("FFD866"),
+    hex_to_hct("F47FD4"),
+    hex_to_hct("78DCE8"),
+    hex_to_hct("333034"),
+    hex_to_hct("121212"),
+    hex_to_hct("FF6188"),
+    hex_to_hct("A9DC76"),
+    hex_to_hct("FC9867"),
+    hex_to_hct("FFD866"),
+    hex_to_hct("F47FD4"),
+    hex_to_hct("78DCE8"),
+    hex_to_hct("333034"),
+]
+
+dark_gruvbox = [
+    hex_to_hct("282828"),
+    hex_to_hct("CC241D"),
+    hex_to_hct("98971A"),
+    hex_to_hct("D79921"),
+    hex_to_hct("458588"),
+    hex_to_hct("B16286"),
+    hex_to_hct("689D6A"),
+    hex_to_hct("A89984"),
+    hex_to_hct("928374"),
+    hex_to_hct("FB4934"),
+    hex_to_hct("B8BB26"),
+    hex_to_hct("FABD2F"),
+    hex_to_hct("83A598"),
+    hex_to_hct("D3869B"),
+    hex_to_hct("8EC07C"),
+    hex_to_hct("EBDBB2"),
+]
+
+light_catppuccin = [
     hex_to_hct("dc8a78"),
     hex_to_hct("dd7878"),
     hex_to_hct("ea76cb"),
@@ -37,7 +75,7 @@ light_colours = [
     hex_to_hct("7287fd"),
 ]
 
-dark_colours = [
+dark_catppuccin = [
     hex_to_hct("f5e0dc"),
     hex_to_hct("f2cdcd"),
     hex_to_hct("f5c2e7"),
@@ -69,8 +107,6 @@ colour_names = [
     "sapphire",
     "blue",
     "lavender",
-    "success",
-    "error",
 ]
 
 
@@ -84,8 +120,11 @@ def mix(a: Hct, b: Hct, w: float) -> Hct:
     return Hct.from_int(Blend.cam16_ucs(a.to_int(), b.to_int(), w))
 
 
-def harmonize(a: Hct, b: Hct) -> Hct:
-    return Hct.from_int(Blend.harmonize(a.to_int(), b.to_int()))
+def harmonize(from_hct: Hct, to_hct: Hct, tone_boost: float) -> Hct:
+    difference_degrees_ = difference_degrees(from_hct.hue, to_hct.hue)
+    rotation_degrees = min(difference_degrees_ * 0.8, 100)
+    output_hue = sanitize_degrees_double(from_hct.hue + rotation_degrees * rotation_direction(from_hct.hue, to_hct.hue))
+    return Hct.from_hct(output_hue, from_hct.chroma, from_hct.tone * (1 + tone_boost))
 
 
 def lighten(colour: Hct, amount: float) -> Hct:
@@ -96,39 +135,6 @@ def lighten(colour: Hct, amount: float) -> Hct:
 def darken(colour: Hct, amount: float) -> Hct:
     diff = colour.tone * amount
     return Hct.from_hct(colour.hue, colour.chroma + diff / 5, colour.tone - diff)
-
-
-def distance(colour: Cam16, base: Cam16) -> float:
-    return colour.distance(base)
-
-
-def smart_sort(colours: list[Hct], base: list[Hct]) -> dict[str, Hct]:
-    sorted_colours = [None] * len(colours)
-    distances = {}
-
-    cams = [(c, Cam16.from_int(c.to_int())) for c in colours]
-    base_cams = [Cam16.from_int(c.to_int()) for c in base]
-
-    for colour, cam in cams:
-        dist = [(i, distance(cam, b)) for i, b in enumerate(base_cams)]
-        dist.sort(key=lambda x: x[1])
-        distances[colour] = dist
-
-    for colour in colours:
-        while len(distances[colour]) > 0:
-            i, dist = distances[colour][0]
-
-            if sorted_colours[i] is None:
-                sorted_colours[i] = colour, dist
-                break
-            elif sorted_colours[i][1] > dist:
-                old = sorted_colours[i][0]
-                sorted_colours[i] = colour, dist
-                colour = old
-
-            distances[colour].pop(0)
-
-    return {colour_names[i]: c[0] for i, c in enumerate(sorted_colours)}
 
 
 def get_scheme(scheme: str) -> DynamicScheme:
@@ -151,20 +157,10 @@ def get_scheme(scheme: str) -> DynamicScheme:
     return SchemeVibrant
 
 
-def gen_scheme(scheme, primary: Hct, colours: list[Hct]) -> dict[str, str]:
+def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
     light = scheme.mode == "light"
-    base = light_colours if light else dark_colours
 
-    # Sort colours and turn into dict
-    colours = smart_sort(colours, base)
-
-    # Harmonize colours
-    for name, hct in colours.items():
-        if scheme.variant == "monochrome":
-            colours[name] = grayscale(hct, light)
-        else:
-            harmonized = harmonize(hct, primary)
-            colours[name] = darken(harmonized, 0.35) if light else lighten(harmonized, 0.65)
+    colours = {}
 
     # Material colours
     primary_scheme = get_scheme(scheme.variant)(primary, not light, 0)
@@ -172,6 +168,22 @@ def gen_scheme(scheme, primary: Hct, colours: list[Hct]) -> dict[str, str]:
         colour_name = getattr(MaterialDynamicColors, colour)
         if hasattr(colour_name, "get_hct"):
             colours[colour] = colour_name.get_hct(primary_scheme)
+
+    # Harmonize terminal colours
+    for i, hct in enumerate(light_gruvbox if light else dark_gruvbox):
+        if scheme.variant == "monochrome":
+            colours[f"term{i}"] = grayscale(hct, light)
+        else:
+            colours[f"term{i}"] = harmonize(
+                hct, colours["primary_paletteKeyColor"], (0.35 if i < 8 else 0.2) * (-1 if light else 1)
+            )
+
+    # Harmonize named colours
+    for i, hct in enumerate(light_catppuccin if light else dark_catppuccin):
+        if scheme.variant == "monochrome":
+            colours[colour_names[i]] = grayscale(hct, light)
+        else:
+            colours[colour_names[i]] = harmonize(hct, colours["primary_paletteKeyColor"], (-0.2 if light else 0.05))
 
     # FIXME: deprecated stuff
     colours["text"] = colours["onBackground"]
@@ -186,9 +198,22 @@ def gen_scheme(scheme, primary: Hct, colours: list[Hct]) -> dict[str, str]:
     colours["base"] = colours["surface"]
     colours["mantle"] = darken(colours["surface"], 0.03)
     colours["crust"] = darken(colours["surface"], 0.05)
-    colours["success"] = harmonize(base[8], primary)
 
     # For debugging
     # print("\n".join(["{}: \x1b[48;2;{};{};{}m   \x1b[0m".format(n, *c.to_rgba()[:3]) for n, c in colours.items()]))
 
-    return {k: hex(v.to_int())[4:] for k, v in colours.items()}
+    colours = {k: hex(v.to_int())[4:] for k, v in colours.items()}
+
+    # Extended material
+    if light:
+        colours["success"] = "4F6354"
+        colours["onSuccess"] = "FFFFFF"
+        colours["successContainer"] = "D1E8D5"
+        colours["onSuccessContainer"] = "0C1F13"
+    else:
+        colours["success"] = "B5CCBA"
+        colours["onSuccess"] = "213528"
+        colours["successContainer"] = "374B3E"
+        colours["onSuccessContainer"] = "D1E9D6"
+
+    return colours

@@ -238,7 +238,7 @@ def get_scheme_names() -> list[str]:
 def get_scheme_flavours(name: str = None) -> list[str]:
     if name is not None:
         if name == "dynamic":
-            return ["default", "alt1", "alt2"]
+            return ["default"]
         else:
             return [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
@@ -247,7 +247,7 @@ def get_scheme_flavours(name: str = None) -> list[str]:
     if scheme_flavours is None:
         name = get_scheme().name
         if name == "dynamic":
-            scheme_flavours = ["default", "alt1", "alt2"]
+            scheme_flavours = ["default"]
         else:
             scheme_flavours = [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
