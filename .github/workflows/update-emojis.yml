@@ -1,0 +1,36 @@
+# Updates the emoji/glyph list in src/caelestia/data/emojis.txt
+
+name: Update emojis
+
+on:
+    push:
+        branches: [$default-branch]
+
+    workflow_dispatch:
+
+jobs:
+    update:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.x"
+
+            - name: Fetch emojis
+              run: ./run.sh emoji -f
+
+            - name: Check for changes
+              id: check
+              run: echo ::set-output name=modified::$(test -n "$(git status --porcelain)" && echo 'true' || echo 'false')
+
+            - name: Commit and push changes
+              if: steps.check.outputs.modified == 'true'
+              uses: EndBug/add-and-commit@v9
+              with:
+                  add: src/caelestia/data/emojis.txt
+                  default_author: github_actions
+                  message: "[CI] emojis: update data"
