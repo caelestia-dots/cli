@@ -1,3 +1,4 @@
+import json
 import random
 from argparse import Namespace
 from pathlib import Path
@@ -71,20 +72,28 @@ def get_thumb(wall: Path, cache: Path) -> Path:
     return thumb
 
 
-def get_smart_mode(wall: Path, cache: Path) -> str:
-    mode_cache = cache / "mode.txt"
+def get_smart_opts(wall: Path, cache: Path) -> str:
+    opts_cache = cache / "smart.json"
 
     try:
-        return mode_cache.read_text()
-    except IOError:
-        with Image.open(get_thumb(wall, cache)) as img:
-            img.thumbnail((1, 1), Image.LANCZOS)
-            mode = "light" if Hct.from_int(argb_from_rgb(*img.getpixel((0, 0)))).tone > 60 else "dark"
+        return json.loads(opts_cache.read_text())
+    except (IOError, json.JSONDecodeError):
+        pass
 
-        mode_cache.parent.mkdir(parents=True, exist_ok=True)
-        mode_cache.write_text(mode)
+    with Image.open(get_thumb(wall, cache)) as img:
+        img.thumbnail((1, 1), Image.LANCZOS)
+        hct = Hct.from_int(argb_from_rgb(*img.getpixel((0, 0))))
 
-        return mode
+        opts = {
+            "mode": "light" if hct.tone > 60 else "dark",
+            "variant": "neutral" if hct.chroma < 20 else "tonalspot",
+        }
+
+    opts_cache.parent.mkdir(parents=True, exist_ok=True)
+    with opts_cache.open("w") as f:
+        json.dump(opts, f)
+
+    return opts
 
 
 def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
@@ -94,12 +103,13 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     name = "dynamic"
 
     if not no_smart:
+        smart_opts = get_smart_opts(wall, cache)
         scheme = Scheme(
             {
                 "name": name,
                 "flavour": "default",
-                "mode": get_smart_mode(wall, cache),
-                "variant": scheme.variant,
+                "mode": smart_opts["mode"],
+                "variant": smart_opts["variant"],
                 "colours": scheme.colours,
             }
         )
@@ -134,9 +144,11 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
 
     scheme = get_scheme()
 
-    # Change mode based on wallpaper colour
+    # Change mode and variant based on wallpaper colour
     if scheme.name == "dynamic" and not no_smart:
-        scheme.mode = get_smart_mode(wall, cache)
+        smart_opts = get_smart_opts(wall, cache)
+        scheme.mode = smart_opts["mode"]
+        scheme.variant = smart_opts["variant"]
 
     # Update colours
     scheme.update_colours()
