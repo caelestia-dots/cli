@@ -12,6 +12,9 @@ jobs:
     update:
         runs-on: ubuntu-latest
 
+        permissions:
+            contents: write
+
         steps:
             - uses: actions/checkout@v4
 
@@ -30,7 +33,7 @@ jobs:
 
             - name: Check for changes
               id: check
-              run: echo ::set-output name=modified::$(test -n "$(git status --porcelain)" && echo 'true' || echo 'false')
+              run: echo modified=$(test -n "$(git status --porcelain)" && echo 'true' || echo 'false') >> $GITHUB_OUTPUT
 
             - name: Commit and push changes
               if: steps.check.outputs.modified == 'true'
