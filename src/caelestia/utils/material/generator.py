@@ -185,6 +185,10 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
         else:
             colours[colour_names[i]] = harmonize(hct, colours["primary_paletteKeyColor"], (-0.2 if light else 0.05))
 
+    if scheme.variant == "neutral":
+        for name, hct in colours.items():
+            colours[name].chroma -= 15
+
     # FIXME: deprecated stuff
     colours["text"] = colours["onBackground"]
     colours["subtext1"] = colours["onSurfaceVariant"]
