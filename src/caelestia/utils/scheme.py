@@ -144,14 +144,10 @@ class Scheme:
         self.save()
 
     def _check_flavour(self) -> None:
-        global scheme_flavours
-        scheme_flavours = None
         if self._flavour not in get_scheme_flavours(self.name):
             self._flavour = get_scheme_flavours()[0]
 
     def _check_mode(self) -> None:
-        global scheme_modes
-        scheme_modes = None
         if self._mode not in get_scheme_modes(self.name, self.flavour):
             self._mode = get_scheme_modes()[0]
 
@@ -197,10 +193,6 @@ scheme_variants = [
     "content",
 ]
 
-scheme_names: list[str] = None
-scheme_flavours: list[str] = None
-scheme_modes: list[str] = None
-
 scheme: Scheme = None
 
 
@@ -221,53 +213,29 @@ def get_scheme() -> Scheme:
             scheme = Scheme(scheme_json)
         except (IOError, json.JSONDecodeError):
             scheme = Scheme(None)
+            scheme.save()
 
     return scheme
 
 
 def get_scheme_names() -> list[str]:
-    global scheme_names
-
-    if scheme_names is None:
-        scheme_names = [f.name for f in scheme_data_dir.iterdir() if f.is_dir()]
-        scheme_names.append("dynamic")
-
-    return scheme_names
+    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic"]
 
 
 def get_scheme_flavours(name: str = None) -> list[str]:
-    if name is not None:
-        if name == "dynamic":
-            return ["default"]
-        else:
-            return [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
-
-    global scheme_flavours
-
-    if scheme_flavours is None:
+    if name is None:
         name = get_scheme().name
-        if name == "dynamic":
-            scheme_flavours = ["default"]
-        else:
-            scheme_flavours = [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
-    return scheme_flavours
+    return ["default"] if name == "dynamic" else [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
 
 def get_scheme_modes(name: str = None, flavour: str = None) -> list[str]:
-    if name is not None:
-        if name == "dynamic":
-            return ["light", "dark"]
-        else:
-            return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
-
-    global scheme_modes
-
-    if scheme_modes is None:
+    if name is None:
         scheme = get_scheme()
-        if scheme.name == "dynamic":
-            scheme_modes = ["light", "dark"]
-        else:
-            scheme_modes = [f.stem for f in (scheme_data_dir / scheme.name / scheme.flavour).iterdir() if f.is_file()]
+        name = scheme.name
+        flavour = scheme.flavour
 
-    return scheme_modes
+    if name == "dynamic":
+        return ["light", "dark"]
+    else:
+        return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
