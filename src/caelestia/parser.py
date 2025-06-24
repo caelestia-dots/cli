@@ -1,6 +1,6 @@
 import argparse
 
-from caelestia.subcommands import clipboard, emoji, pip, record, scheme, screenshot, shell, toggle, wallpaper, wsaction
+from caelestia.subcommands import clipboard, emoji, pip, record, scheme, screenshot, shell, toggle, wallpaper
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
@@ -34,19 +34,6 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     toggle_parser.add_argument(
         "workspace", choices=["communication", "music", "sysmon", "specialws", "todo"], help="the workspace to toggle"
     )
-
-    # Create parser for workspace-action opts
-    ws_action_parser = command_parser.add_parser(
-        "workspace-action", help="execute a Hyprland workspace dispatcher in the current group"
-    )
-    ws_action_parser.set_defaults(cls=wsaction.Command)
-    ws_action_parser.add_argument(
-        "-g", "--group", action="store_true", help="whether to execute the dispatcher on a group"
-    )
-    ws_action_parser.add_argument(
-        "dispatcher", choices=["workspace", "movetoworkspace"], help="the dispatcher to execute"
-    )
-    ws_action_parser.add_argument("workspace", type=int, help="the workspace to pass to the dispatcher")
 
     # Create parser for scheme opts
     scheme_parser = command_parser.add_parser("scheme", help="manage the colour scheme")

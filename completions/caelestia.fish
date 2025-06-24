@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle workspace-action scheme screenshot record clipboard emoji-picker wallpaper pip
+set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper pip
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -13,7 +13,6 @@ complete -c caelestia -s 'h' -l 'help' -d 'Show help'
 # Subcommands
 complete -c caelestia -n $not_seen -a 'shell' -d 'Start the shell or message it'
 complete -c caelestia -n $not_seen -a 'toggle' -d 'Toggle a special workspace'
-complete -c caelestia -n $not_seen -a 'workspace-action' -d 'Exec a dispatcher in the current group'
 complete -c caelestia -n $not_seen -a 'scheme' -d 'Manage the colour scheme'
 complete -c caelestia -n $not_seen -a 'screenshot' -d 'Take a screenshot'
 complete -c caelestia -n $not_seen -a 'record' -d 'Start a screen recording'
@@ -74,10 +73,6 @@ complete -c caelestia -n "$seen shell && $seen notifs && not $seen clear" -a 'cl
 # Toggles
 set -l commands communication music specialws sysmon todo
 complete -c caelestia -n "$seen toggle && not $seen drawers && not $seen $commands" -a "$commands" -d 'toggle'
-
-# Workspace action
-set -l commands workspace workspacegroup movetoworkspace movetoworkspacegroup
-complete -c caelestia -n "$seen workspace-action && not $seen $commands" -a "$commands" -d 'action'
 
 # Scheme
 set -l commands list get set
