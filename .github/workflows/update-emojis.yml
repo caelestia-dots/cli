@@ -4,7 +4,6 @@ name: Update emojis
 
 on:
     push:
-        branches: [$default-branch]
 
     workflow_dispatch:
 
