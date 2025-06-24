@@ -2,7 +2,6 @@ import json
 import random
 from pathlib import Path
 
-from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.notify import notify
 from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
 
@@ -135,8 +134,8 @@ class Scheme:
 
     def set_random(self) -> None:
         self._name = random.choice(get_scheme_names())
-        self._flavour = random.choice(get_scheme_flavours())
-        self._mode = random.choice(get_scheme_modes())
+        self._flavour = random.choice(get_scheme_flavours(self.name))
+        self._mode = random.choice(get_scheme_modes(self.name, self.flavour))
         self.update_colours()
 
     def update_colours(self) -> None:
@@ -144,15 +143,19 @@ class Scheme:
         self.save()
 
     def _check_flavour(self) -> None:
-        if self._flavour not in get_scheme_flavours(self.name):
-            self._flavour = get_scheme_flavours()[0]
+        flavours = get_scheme_flavours(self.name)
+        if self._flavour not in flavours:
+            self._flavour = flavours[0]
 
     def _check_mode(self) -> None:
-        if self._mode not in get_scheme_modes(self.name, self.flavour):
-            self._mode = get_scheme_modes()[0]
+        modes = get_scheme_modes(self.name, self.flavour)
+        if self._mode not in modes:
+            self._mode = modes[0]
 
     def _update_colours(self) -> None:
         if self.name == "dynamic":
+            from caelestia.utils.material import get_colours_for_image
+
             try:
                 self._colours = get_colours_for_image()
             except FileNotFoundError:

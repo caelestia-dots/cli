@@ -1,5 +1,4 @@
 import subprocess
-import tempfile
 from pathlib import Path
 
 from caelestia.utils.paths import c_state_dir, config_dir, templates_dir
@@ -91,6 +90,8 @@ def apply_hypr(conf: str) -> None:
 
 
 def apply_discord(scss: str) -> None:
+    import tempfile
+
     with tempfile.TemporaryDirectory("w") as tmp_dir:
         (Path(tmp_dir) / "_colours.scss").write_text(scss)
         conf = subprocess.check_output(["sass", "-I", tmp_dir, templates_dir / "discord.scss"], text=True)
@@ -140,7 +141,7 @@ def apply_qt(colours: dict[str, str], mode: str) -> None:
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_terms(gen_sequences(colours))
-    apply_hypr(gen_conf(colours))  # FIXME: LAGGY
+    apply_hypr(gen_conf(colours))
     apply_discord(gen_scss(colours))
     apply_spicetify(colours, mode)
     apply_fuzzel(colours)
