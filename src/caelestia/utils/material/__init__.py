@@ -1,20 +1,20 @@
 import json
 from pathlib import Path
 
-from materialyoucolor.hct import Hct
-
-from caelestia.utils.material.generator import gen_scheme
-from caelestia.utils.material.score import score
 from caelestia.utils.paths import compute_hash, scheme_cache_dir, wallpaper_thumbnail_path
 
 
-def get_score_for_image(image: Path | str, cache_base: Path) -> Hct:
+def get_score_for_image(image: Path | str, cache_base: Path):
+    from materialyoucolor.hct import Hct
+
     cache = cache_base / "score.json"
 
     try:
         return Hct.from_int(cache.read_text())
     except (IOError, TypeError):
         pass
+
+    from caelestia.utils.material.score import score
 
     s = score(str(image))
 
@@ -38,6 +38,8 @@ def get_colours_for_image(image: Path | str = wallpaper_thumbnail_path, scheme=N
             return json.load(f)
     except (IOError, json.JSONDecodeError):
         pass
+
+    from caelestia.utils.material.generator import gen_scheme
 
     primary = get_score_for_image(image, cache_base)
     scheme = gen_scheme(scheme, primary)

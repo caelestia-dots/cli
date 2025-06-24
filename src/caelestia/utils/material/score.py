@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-
 from materialyoucolor.dislike.dislike_analyzer import DislikeAnalyzer
 from materialyoucolor.hct import Hct
 from materialyoucolor.quantize import ImageQuantizeCelebi
