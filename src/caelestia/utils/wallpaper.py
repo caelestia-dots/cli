@@ -80,14 +80,16 @@ def get_smart_opts(wall: Path, cache: Path) -> str:
     except (IOError, json.JSONDecodeError):
         pass
 
+    from caelestia.utils.colourfulness import get_variant
+
+    opts = {}
+
     with Image.open(get_thumb(wall, cache)) as img:
+        opts["variant"] = get_variant(img)
+
         img.thumbnail((1, 1), Image.LANCZOS)
         hct = Hct.from_int(argb_from_rgb(*img.getpixel((0, 0))))
-
-        opts = {
-            "mode": "light" if hct.tone > 60 else "dark",
-            "variant": "neutral" if hct.chroma < 20 else "tonalspot",
-        }
+        opts["mode"] = "light" if hct.tone > 60 else "dark"
 
     opts_cache.parent.mkdir(parents=True, exist_ok=True)
     with opts_cache.open("w") as f:
