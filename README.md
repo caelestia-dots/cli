@@ -65,7 +65,7 @@ sudo cp completions/caelestia.fish /usr/share/fish/vendor_completions.d/caelesti
 All subcommands/options can be explored via the help flag.
 
 ```
-> caelestia -h
+$ caelestia -h
 usage: caelestia [-h] COMMAND ...
 
 Main control script for the Caelestia dotfiles
