@@ -138,7 +138,7 @@ body {
 
     /* border colors */
     --border-light: #{color.change(c.$outline, $alpha: 0)}; /* light border color */
-    --border: #{color.change(c.$outline, $alpha: 0)}; /* normal border color */
+    --border: #{color.change(c.$outline, $alpha: 0.2)}; /* normal border color */
     --button-border: #{color.change(c.$outline, $alpha: 0)}; /* neutral border color of buttons */
 
     /* base colors */
