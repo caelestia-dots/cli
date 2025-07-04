@@ -6,7 +6,9 @@ from caelestia.utils.paths import config_dir
 def print_version() -> None:
     print("Packages:")
     pkgs = ["caelestia-shell-git", "caelestia-cli-git", "caelestia-meta"]
-    versions = subprocess.run(["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, text=True).stdout
+    versions = subprocess.run(
+        ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+    ).stdout
 
     for pkg in pkgs:
         if pkg not in versions:
@@ -40,6 +42,7 @@ def print_version() -> None:
                     "upstream/main",
                 ],
                 text=True,
+                stderr=subprocess.DEVNULL,
             )
             print("    Last merged upstream commit:", shell_ver.split()[1])
             print("    Commit message:", *shell_ver.splitlines()[1:])
