@@ -60,6 +60,7 @@ class Command:
 
         # Move to recordings folder
         new_path = recordings_dir / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
+        recordings_dir.mkdir(exist_ok=True, parents=True)
         recording_path.rename(new_path)
 
         # Close start notification
