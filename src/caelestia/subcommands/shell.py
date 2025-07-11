@@ -22,7 +22,7 @@ class Command:
             self.message(*self.args.message)
         else:
             # Start the shell
-            args = ["qs", "-n", "-c", "caelestia", "--log-rules", self.args.log_rules]
+            args = ["qs", "-c", "caelestia", "-n", "--log-rules", self.args.log_rules]
             if self.args.daemon:
                 args.append("-d")
                 subprocess.run(args)
