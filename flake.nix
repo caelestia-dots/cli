@@ -53,8 +53,8 @@
             chmod +w src/caelestia/subcommands/screenshot.py
 
             substituteInPlace src/caelestia/utils/version.py --replace-quiet "qs" "caelestia-shell";
-            substituteInPlace src/caelestia/subcommands/shell.py --replace-quiet "qs" "caelestia-shell";
-            substituteInPlace src/caelestia/subcommands/screenshot.py --replace-quiet "qs" "caelestia-shell";
+            substituteInPlace src/caelestia/subcommands/shell.py --replace-quiet "\"qs\", \"-c\", \"caelestia\"" "\"caelestia-shell\"";
+            substituteInPlace src/caelestia/subcommands/screenshot.py --replace-quiet "\"qs\", \"-c\", \"caelestia\"" "\"caelestia-shell\"";
           '';
 
           dependencies = deps;
