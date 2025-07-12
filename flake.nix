@@ -47,6 +47,16 @@
             hatchling
           ];
 
+          patchPhase = ''
+            chmod +w src/caelestia/utils/version.py
+            chmod +w src/caelestia/subcommands/shell.py
+            chmod +w src/caelestia/subcommands/screenshot.py
+
+            substituteInPlace src/caelestia/utils/version.py --replace-quiet "qs" "caelestia-shell";
+            substituteInPlace src/caelestia/subcommands/shell.py --replace-quiet "qs" "caelestia-shell";
+            substituteInPlace src/caelestia/subcommands/screenshot.py --replace-quiet "qs" "caelestia-shell";
+          '';
+
           dependencies = deps;
         };
       }
