@@ -30,11 +30,15 @@
       default = caelestia-cli;
     });
 
-    # devShells = forAllSystems (pkgs: {
-    #   default = pkgs.mkShellNoCC {
-    #     inputsFrom = [self.packages.${pkgs.system}.caelestia-cli];
-    #     packages = [inputs.caelestia-shell.packages.${pkgs.system}.default];
-    #   };
-    # });
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShellNoCC {
+        inputsFrom = [self.packages.${pkgs.system}.caelestia-cli];
+        packages = [
+          (pkgs.writeShellScriptBin "caelestia" ''
+            cd src && python -m caelestia "$@"
+          '')
+        ];
+      };
+    });
   };
 }
