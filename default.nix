@@ -65,9 +65,10 @@ python3.pkgs.buildPythonApplication {
     substituteInPlace src/caelestia/subcommands/screenshot.py \
     	--replace-fail '"qs", "-c", "caelestia"' '"caelestia-shell"'
 
-    # Use config bin instead of discord
+    # Use config bin instead of discord + fix todoist
     substituteInPlace src/caelestia/subcommands/toggle.py \
-    	--replace-fail 'discord' ${discordBin}
+    	--replace-fail 'discord' ${discordBin} \
+      --replace-fail 'todoist' 'todoist.desktop'
 
     # Use config style instead of fusion
     substituteInPlace src/caelestia/data/templates/qtct.conf \
