@@ -32,7 +32,7 @@
       caelestia-cli = pkgs.callPackage ./default.nix {
         rev = self.rev or self.dirtyRev;
         app2unit = inputs.app2unit.packages.${pkgs.system}.default;
-        caelestia-shell = inputs.caelestia-cli.packages.${pkgs.system}.default;
+        caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
       };
       default = caelestia-cli;
     });
