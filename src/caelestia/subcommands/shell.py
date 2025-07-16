@@ -36,10 +36,7 @@ class Command:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
 
     def filter_log(self, line: str) -> bool:
-        return (
-            "QProcess: Destroyed while process" not in line
-            and f"Cannot open: file://{c_cache_dir}/imagecache/" not in line
-        )
+        return f"Cannot open: file://{c_cache_dir}/imagecache/" not in line
 
     def print_ipc(self) -> None:
         print(self.shell("ipc", "show"), end="")
