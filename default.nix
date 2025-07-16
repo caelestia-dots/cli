@@ -81,6 +81,6 @@ python3.pkgs.buildPythonApplication {
     homepage = "https://github.com/caelestia-dots/cli";
     license = lib.licenses.gpl3Only;
     mainProgram = "caelestia";
-    platforms = lib.platforms.all;
+    platforms = lib.platforms.linux;
   };
 }
