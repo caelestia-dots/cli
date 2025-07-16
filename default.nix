@@ -15,6 +15,8 @@
   wl-screenrec,
   dconf,
   killall,
+  caelestia-shell,
+  withShell ? false,
   discordBin ? "discord",
   qtctStyle ? "Fusion",
 }:
@@ -37,20 +39,22 @@ python3.pkgs.buildPythonApplication {
   pythonImportsCheck = ["caelestia"];
 
   nativeBuildInputs = [installShellFiles];
-  propagatedBuildInputs = [
-    swappy
-    libnotify
-    slurp
-    wl-clipboard
-    cliphist
-    app2unit
-    dart-sass
-    grim
-    fuzzel
-    wl-screenrec
-    dconf
-    killall
-  ];
+  propagatedBuildInputs =
+    [
+      swappy
+      libnotify
+      slurp
+      wl-clipboard
+      cliphist
+      app2unit
+      dart-sass
+      grim
+      fuzzel
+      wl-screenrec
+      dconf
+      killall
+    ]
+    ++ lib.optional withShell caelestia-shell;
 
   SETUPTOOLS_SCM_PRETEND_VERSION = 1;
 

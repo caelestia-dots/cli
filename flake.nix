@@ -8,6 +8,12 @@
       url = "github:soramanew/app2unit";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    caelestia-shell = {
+      url = "github:caelestia-dots/shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.app2unit.follows = "app2unit";
+    };
   };
 
   outputs = {
@@ -26,6 +32,7 @@
       caelestia-cli = pkgs.callPackage ./default.nix {
         rev = self.rev or self.dirtyRev;
         app2unit = inputs.app2unit.packages.${pkgs.system}.default;
+        caelestia-shell = inputs.caelestia-cli.packages.${pkgs.system}.default;
       };
       default = caelestia-cli;
     });

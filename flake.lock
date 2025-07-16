@@ -20,6 +20,56 @@
         "type": "github"
       }
     },
+    "caelestia-cli": {
+      "inputs": {
+        "app2unit": [
+          "caelestia-shell",
+          "app2unit"
+        ],
+        "nixpkgs": [
+          "caelestia-shell",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752566000,
+        "narHash": "sha256-xaSDZXvZtuM+88PsmfTDWv6+VxN5cOsT/5/czsk3xgI=",
+        "owner": "caelestia-dots",
+        "repo": "cli",
+        "rev": "b1019d11924d1bc9440f457ddf94fc0d8a230ff4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "caelestia-dots",
+        "repo": "cli",
+        "type": "github"
+      }
+    },
+    "caelestia-shell": {
+      "inputs": {
+        "app2unit": [
+          "app2unit"
+        ],
+        "caelestia-cli": "caelestia-cli",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "quickshell": "quickshell"
+      },
+      "locked": {
+        "lastModified": 1752637099,
+        "narHash": "sha256-08oPnEGYkuU7Vqa4F7rOi4E9j2Drigm3DxdOA+/mgF4=",
+        "owner": "caelestia-dots",
+        "repo": "shell",
+        "rev": "19431534c954f763eb095dd131fd0b19ff74837b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "caelestia-dots",
+        "repo": "shell",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1752480373,
@@ -36,9 +86,31 @@
         "type": "github"
       }
     },
+    "quickshell": {
+      "inputs": {
+        "nixpkgs": [
+          "caelestia-shell",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752631407,
+        "narHash": "sha256-dLDtKxh1VabwLxv5xbjI+oRkDyqWEKGITU+0dEaaW28=",
+        "ref": "refs/heads/master",
+        "rev": "4d8055f1cd9924bcace59405894b8879633eb83d",
+        "revCount": 638,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
     "root": {
       "inputs": {
         "app2unit": "app2unit",
+        "caelestia-shell": "caelestia-shell",
         "nixpkgs": "nixpkgs"
       }
     }
