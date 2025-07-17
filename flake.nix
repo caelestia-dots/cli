@@ -13,6 +13,7 @@
       url = "github:caelestia-dots/shell";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.app2unit.follows = "app2unit";
+      inputs.caelestia-cli.follows = "";
     };
   };
 
