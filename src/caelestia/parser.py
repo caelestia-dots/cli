@@ -22,12 +22,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     shell_parser.add_argument("-d", "--daemon", action="store_true", help="start the shell detached")
     shell_parser.add_argument("-s", "--show", action="store_true", help="print all shell IPC commands")
     shell_parser.add_argument("-l", "--log", action="store_true", help="print the shell log")
-    shell_parser.add_argument(
-        "--log-rules",
-        default="quickshell.dbus.properties.warning=false;quickshell.dbus.dbusmenu.warning=false;quickshell.service.notifications.warning=false;quickshell.service.sni.host.warning=false;qt.qpa.wayland.textinput.warning=false",
-        metavar="RULES",
-        help="log rules to apply",
-    )
+    shell_parser.add_argument("--log-rules", metavar="RULES", help="log rules to apply")
 
     # Create parser for toggle opts
     toggle_parser = command_parser.add_parser("toggle", help="toggle a special workspace")
