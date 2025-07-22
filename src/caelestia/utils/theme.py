@@ -81,8 +81,11 @@ def apply_terms(sequences: str) -> None:
     pts_path = Path("/dev/pts")
     for pt in pts_path.iterdir():
         if pt.name.isdigit():
-            with pt.open("a") as f:
-                f.write(sequences)
+            try:
+                with pt.open("a") as f:
+                    f.write(sequences)
+            except PermissionError:
+                pass
 
 
 def apply_hypr(conf: str) -> None:
