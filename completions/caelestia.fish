@@ -58,7 +58,7 @@ set -l not_seen "$seen shell && $seen drawers && not $seen $commands"
 complete -c caelestia -n $not_seen -a 'list' -d 'List togglable drawers'
 complete -c caelestia -n $not_seen -a 'toggle' -d 'Toggle a drawer'
 
-set -l commands (caelestia shell drawers list)
+set -l commands (caelestia shell drawers list 2> /dev/null)
 complete -c caelestia -n "$seen shell && $seen drawers && $seen toggle && not $seen $commands" -a "$commands" -d 'drawer'
 
 set -l commands list get set
