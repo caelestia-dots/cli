@@ -27,7 +27,7 @@ class Command:
                 args.append("--log-rules", self.args.log_rules)
             if self.args.daemon:
                 args.append("-d")
-                subprocess.run(args)
+                subprocess.run(args, check=False)
             else:
                 shell = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
                 for line in shell.stdout:
@@ -44,9 +44,10 @@ class Command:
         print(self.shell("ipc", "show"), end="")
 
     def print_log(self) -> None:
-        log = self.shell("log")
+        log_args = ["log"]
         if self.args.log_rules:
-            log.append("r", self.args.log_rules)
+            log_args.append("r", self.args.log_rules)
+        log = self.shell(*log_args)
         # FIXME: remove when logging rules are added/warning is removed
         for line in log.splitlines():
             if self.filter_log(line):
