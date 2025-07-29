@@ -108,9 +108,24 @@ def apply_spicetify(colours: dict[str, str], mode: str) -> None:
     write_file(config_dir / "spicetify/Themes/caelestia/color.ini", template)
 
 
+def init_fuzzel() -> None:
+    user_config = config_dir / "fuzzel/fuzzel.ini"
+    user_config.parent.mkdir(parents=True, exist_ok=True)
+    user_config.touch(exist_ok=True)
+
+    theme_config = config_dir / "fuzzel/caelestia.ini"
+    include_line = f"include={theme_config.resolve()}"
+
+    content = user_config.read_text().splitlines()
+    if include_line not in content:
+        content.insert(0, include_line)
+        user_config.write_text("\n".join(content))
+
+
 def apply_fuzzel(colours: dict[str, str]) -> None:
+    init_fuzzel()
     template = gen_replace(colours, templates_dir / "fuzzel.ini")
-    write_file(config_dir / "fuzzel/fuzzel.ini", template)
+    write_file(config_dir / "fuzzel/caelestia.ini", template)
 
 
 def apply_btop(colours: dict[str, str]) -> None:
