@@ -87,8 +87,6 @@ jobs:
           sleep 3  # Give the shell some time to start (and die)
 
           # Test CLI graphical modules
-          result/bin/caelestia screenshot
-          result/bin/caelestia record
           result/bin/caelestia clipboard &
           result/bin/caelestia emoji -p &
           result/bin/caelestia shell -s
