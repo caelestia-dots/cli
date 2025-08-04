@@ -27,7 +27,7 @@ class Command:
         scale_factor = mon["height"] / 4 / height
         scaled_win_size = f"{int(width * scale_factor)} {int(height * scale_factor)}"
         off = min(mon["width"], mon["height"]) * 0.03
-        move_to = f"{int(mon['width'] - off - width * scale_factor)} {int(mon['height'] - off - height * scale_factor)}"
+        move_to = f"{int(mon['x']) + int(mon['width'] - off - width * scale_factor)} {int(mon['y']) + int(mon['height'] - off - height * scale_factor)}"
 
         hypr.dispatch("resizewindowpixel", "exact", f"{scaled_win_size},address:{address}")
         hypr.dispatch("movewindowpixel", "exact", f"{move_to},address:{address}")
