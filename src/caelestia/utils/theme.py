@@ -1,9 +1,17 @@
+import json
 import re
 import subprocess
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
-from caelestia.utils.paths import c_state_dir, config_dir, templates_dir, theme_dir, user_templates_dir
+from caelestia.utils.paths import (
+    c_state_dir,
+    config_dir,
+    templates_dir,
+    theme_dir,
+    user_config_path,
+    user_templates_dir,
+)
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -174,12 +182,28 @@ def apply_user_templates(colours: dict[str, str]) -> None:
 
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
-    apply_terms(gen_sequences(colours))
-    apply_hypr(gen_conf(colours))
-    apply_discord(gen_scss(colours))
-    apply_spicetify(colours, mode)
-    apply_fuzzel(colours)
-    apply_btop(colours)
-    apply_gtk(colours, mode)
-    apply_qt(colours, mode)
+    try:
+        cfg = json.loads(user_config_path.read_text())["theme"]
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        cfg = {}
+
+    def check(key: str) -> bool:
+        return cfg[key] if key in cfg else True
+
+    if check("enableTerm"):
+        apply_terms(gen_sequences(colours))
+    if check("enableHypr"):
+        apply_hypr(gen_conf(colours))
+    if check("enableDiscord"):
+        apply_discord(gen_scss(colours))
+    if check("enableSpicetify"):
+        apply_spicetify(colours, mode)
+    if check("enableFuzzel"):
+        apply_fuzzel(colours)
+    if check("enableBtop"):
+        apply_btop(colours)
+    if check("enableGtk"):
+        apply_gtk(colours, mode)
+    if check("enableQt"):
+        apply_qt(colours, mode)
     apply_user_templates(colours)
