@@ -1,4 +1,4 @@
-class Color:
+class Colour:
     _rgb_vals: tuple[int, ...]
     _hex_vals: tuple[str, ...]
 
@@ -17,12 +17,12 @@ class Color:
 
     @property
     def rgb(self) -> str:
-        return f"rgb({','.join(map(str,self._rgb_vals[:-1]))})"
+        return f"rgb({','.join(map(str, self._rgb_vals[:-1]))})"
 
     @property
     def rgbalpha(self) -> str:
-        return f"rgba({','.join(map(str,self._rgb_vals))})"
+        return f"rgba({','.join(map(str, self._rgb_vals))})"
 
 
-def get_dynamic_colours(colours: dict[str, str]) -> dict[str, Color]:
-    return {name: Color(code) for name, code in colours.items()}
+def get_dynamic_colours(colours: dict[str, str]) -> dict[str, Colour]:
+    return {name: Colour(code) for name, code in colours.items()}
