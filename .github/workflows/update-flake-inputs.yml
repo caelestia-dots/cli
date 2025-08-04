@@ -60,7 +60,6 @@ jobs:
           result/bin/caelestia scheme list
           result/bin/caelestia scheme get
           result/bin/caelestia scheme set -n gruvbox -f hard -m dark -v content
-          result/bin/caelestia scheme set -r
           result/bin/caelestia screenshot -h
           result/bin/caelestia record -h
           result/bin/caelestia clipboard -h
