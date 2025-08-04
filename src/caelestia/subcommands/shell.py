@@ -17,6 +17,9 @@ class Command:
         elif self.args.log:
             # Print the log
             self.print_log()
+        elif self.args.kill:
+            # Kill the shell
+            self.shell("kill")
         elif self.args.message:
             # Send a message
             self.message(*self.args.message)

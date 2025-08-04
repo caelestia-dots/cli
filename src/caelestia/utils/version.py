@@ -1,30 +1,42 @@
+import shutil
 import subprocess
 
 from caelestia.utils.paths import config_dir
 
 
 def print_version() -> None:
-    print("Packages:")
-    pkgs = ["caelestia-shell-git", "caelestia-cli-git", "caelestia-meta"]
-    versions = subprocess.run(
-        ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
-    ).stdout
+    if shutil.which("pacman"):
+        print("Packages:")
+        pkgs = ["caelestia-shell-git", "caelestia-cli-git", "caelestia-meta"]
+        versions = subprocess.run(
+            ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+        ).stdout
 
-    for pkg in pkgs:
-        if pkg not in versions:
-            print(f"    {pkg} not installed")
-    print("\n".join(f"    {pkg}" for pkg in versions.splitlines()))
+        for pkg in pkgs:
+            if pkg not in versions:
+                print(f"    {pkg} not installed")
+        print("\n".join(f"    {pkg}" for pkg in versions.splitlines()))
+    else:
+        print("Packages: not on Arch")
 
-    caelestia_dir = (config_dir / "hypr").resolve().parent
-    print("\nCaelestia:")
-    caelestia_ver = subprocess.check_output(
-        ["git", "--git-dir", caelestia_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"], text=True
-    )
-    print("    Last commit:", caelestia_ver.split()[1])
-    print("    Commit message:", *caelestia_ver.splitlines()[1:])
+    print()
+    try:
+        caelestia_dir = (config_dir / "hypr").resolve().parent
+        caelestia_ver = subprocess.check_output(
+            ["git", "--git-dir", caelestia_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"], text=True
+        )
+        print("Caelestia:")
+        print("    Last commit:", caelestia_ver.split()[1])
+        print("    Commit message:", *caelestia_ver.splitlines()[1:])
+    except subprocess.CalledProcessError:
+        print("Caelestia: not installed")
 
-    print("\nQuickshell:")
-    print("   ", subprocess.check_output(["qs", "--version"], text=True).strip())
+    print()
+    if shutil.which("qs"):
+        print("Quickshell:")
+        print("   ", subprocess.check_output(["qs", "--version"], text=True).strip())
+    else:
+        print("Quickshell: not in PATH")
 
     local_shell_dir = config_dir / "quickshell/caelestia"
     if local_shell_dir.exists():
