@@ -9,6 +9,8 @@ config_dir = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
 data_dir = Path(os.getenv("XDG_DATA_HOME", Path.home() / ".local/share"))
 state_dir = Path(os.getenv("XDG_STATE_HOME", Path.home() / ".local/state"))
 cache_dir = Path(os.getenv("XDG_CACHE_HOME", Path.home() / ".cache"))
+pictures_dir = Path(os.getenv("XDG_PICTURES_DIR", Path.home() / "Pictures"))
+videos_dir = Path(os.getenv("XDG_VIDEOS_DIR", Path.home() / "Videos"))
 
 c_config_dir = config_dir / "caelestia"
 c_data_dir = data_dir / "caelestia"
@@ -25,16 +27,16 @@ scheme_path = c_state_dir / "scheme.json"
 scheme_data_dir = cli_data_dir / "schemes"
 scheme_cache_dir = c_cache_dir / "schemes"
 
-wallpapers_dir = Path.home() / "Pictures/Wallpapers"
+wallpapers_dir = pictures_dir / "Wallpapers"
 wallpaper_path_path = c_state_dir / "wallpaper/path.txt"
 wallpaper_link_path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path = c_state_dir / "wallpaper/thumbnail.jpg"
 wallpapers_cache_dir = c_cache_dir / "wallpapers"
 
-screenshots_dir = Path.home() / "Pictures/Screenshots"
+screenshots_dir = pictures_dir / "Screenshots"
 screenshots_cache_dir = c_cache_dir / "screenshots"
 
-recordings_dir = Path.home() / "Videos/Recordings"
+recordings_dir = videos_dir / "Recordings"
 recording_path = c_state_dir / "record/recording.mp4"
 recording_notif_path = c_state_dir / "record/notifid.txt"
 
