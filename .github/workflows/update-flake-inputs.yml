@@ -49,7 +49,7 @@ jobs:
         run: nix flake update
 
       - name: Attempt to build flake
-        run: nix build
+        run: nix build '.#with-shell'
 
       - name: Test modules
         run: |

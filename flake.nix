@@ -35,12 +35,13 @@
         app2unit = inputs.app2unit.packages.${pkgs.system}.default;
         caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
       };
+      with-shell = caelestia-cli.override {withShell = true;};
       default = caelestia-cli;
     });
 
     devShells = forAllSystems (pkgs: {
       default = pkgs.mkShellNoCC {
-        packages = [(self.packages.${pkgs.system}.caelestia-cli.override {withShell = true;})];
+        packages = [self.packages.${pkgs.system}.with-shell];
       };
     });
   };
