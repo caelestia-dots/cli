@@ -1,7 +1,9 @@
+import re
 import subprocess
 from pathlib import Path
 
-from caelestia.utils.paths import c_state_dir, config_dir, templates_dir
+from caelestia.utils.colour import get_dynamic_colours
+from caelestia.utils.paths import c_state_dir, config_dir, templates_dir, theme_dir, user_templates_dir
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -23,6 +25,25 @@ def gen_replace(colours: dict[str, str], template: Path, hash: bool = False) -> 
     for name, colour in colours.items():
         template = template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
     return template
+
+
+def gen_replace_dynamic(colours: dict[str, str], template: Path) -> str:
+    def fill_colour(match: re.Match) -> str:
+        data = match.group(1).strip().split(".")
+        if len(data) != 2:
+            return match.group()
+        col, form = data
+        if col not in colours_dyn or not hasattr(colours_dyn[col], form):
+            return match.group()
+        return getattr(colours_dyn[col], form)
+
+    # match atomic {{ . }} pairs
+    field = r"\{\{((?:(?!\{\{|\}\}).)*)\}\}"
+    colours_dyn = get_dynamic_colours(colours)
+    template_content = template.read_text()
+    template_filled = re.sub(field, fill_colour, template_content)
+
+    return template_filled
 
 
 def c2s(c: str, *i: list[int]) -> str:
@@ -142,6 +163,16 @@ def apply_qt(colours: dict[str, str], mode: str) -> None:
         write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
 
 
+def apply_user_templates(colours: dict[str, str]) -> None:
+    if not user_templates_dir.is_dir():
+        return
+
+    for file in user_templates_dir.iterdir():
+        if file.is_file():
+            content = gen_replace_dynamic(colours, file)
+            write_file(theme_dir / file.name, content)
+
+
 def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_terms(gen_sequences(colours))
     apply_hypr(gen_conf(colours))
@@ -151,3 +182,4 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     apply_btop(colours)
     apply_gtk(colours, mode)
     apply_qt(colours, mode)
+    apply_user_templates(colours)
