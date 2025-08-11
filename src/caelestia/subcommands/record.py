@@ -32,6 +32,20 @@ class Command:
                 region = self.args.region
             args += ["-g", region.strip()]
 
+        monitors = subprocess.check_output(["hyprctl", "monitors"], text=True).splitlines()
+        focused_monitor = None
+        for i, line in enumerate(monitors):
+            if "focused: yes" in line:
+                # Look backwards for the monitor name
+                for j in range(i, -1, -1):
+                    if "Monitor" in monitors[j]:
+                        focused_monitor = monitors[j].split()[1]
+                        break
+                break
+
+        if focused_monitor:
+            args += ["-o", focused_monitor]
+
         if self.args.sound:
             sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
             for source in sources:
