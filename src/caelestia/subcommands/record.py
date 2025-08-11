@@ -1,4 +1,6 @@
-import subprocess
+import shutil, os, errno
+import subprocess, time
+from pathlib import Path
 import time
 from argparse import Namespace
 from datetime import datetime
@@ -56,12 +58,26 @@ class Command:
             notify("Recording failed", f"Recording failed to start: {proc.communicate()[1]}")
 
     def stop(self) -> None:
+        # Start killing recording process
         subprocess.run(["pkill", "wl-screenrec"])
 
         # Move to recordings folder
         new_path = recordings_dir / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
         recordings_dir.mkdir(exist_ok=True, parents=True)
-        recording_path.rename(new_path)
+
+        # Wait for recording to finish to avoid corrupted video file
+        while subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0:
+            time.sleep(0.1)
+
+        # Move by renaming
+        try:
+            recording_path.rename(new_path)
+        except OSError as e:
+            # If the destination is on a different filesystem, use robust shutil move function
+            if e.errno == errno.EXDEV:
+                shutil.move(recording_path, new_path)
+            else:
+                raise
 
         # Close start notification
         try:
