@@ -1,6 +1,6 @@
-import shutil, os, errno
+import shutil
+import json
 import subprocess, time
-from pathlib import Path
 import time
 from argparse import Namespace
 from datetime import datetime
@@ -84,14 +84,7 @@ class Command:
             time.sleep(0.1)
 
         # Move by renaming
-        try:
-            recording_path.rename(new_path)
-        except OSError as e:
-            # If the destination is on a different filesystem, use robust shutil move function
-            if e.errno == errno.EXDEV:
-                shutil.move(recording_path, new_path)
-            else:
-                raise
+        shutil.move(recording_path, new_path)
 
         # Close start notification
         try:
