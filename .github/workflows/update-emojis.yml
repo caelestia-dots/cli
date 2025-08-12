@@ -32,7 +32,7 @@ jobs:
 
             - name: Check for changes
               id: check
-              run: echo modified=$(git diff --exit-code src/caelestia/data/emojis.txt && echo 'false' || echo 'true') >> $GITHUB_OUTPUT
+              run: echo modified=$(git diff --exit-code src/caelestia/data/emojis.txt &>/dev/null && echo 'false' || echo 'true') >> $GITHUB_OUTPUT
 
             - name: Commit and push changes
               if: steps.check.outputs.modified == 'true'
