@@ -1,6 +1,6 @@
-import shutil
 import json
-import subprocess, time
+import shutil
+import subprocess
 import time
 from argparse import Namespace
 from datetime import datetime
@@ -16,11 +16,13 @@ class Command:
         self.args = args
 
     def run(self) -> None:
-        proc = subprocess.run(["pidof", "wl-screenrec"])
-        if proc.returncode == 0:
+        if self.proc_running():
             self.stop()
         else:
             self.start()
+
+    def proc_running(self) -> bool:
+        return subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0
 
     def start(self) -> None:
         args = []
@@ -33,7 +35,7 @@ class Command:
             args += ["-g", region.strip()]
 
         monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
-        focused_monitor = [monitor for monitor in monitors if monitor["focused"]][0]
+        focused_monitor = next(monitor for monitor in monitors if monitor["focused"])
         if focused_monitor:
             args += ["-o", focused_monitor["name"]]
 
@@ -66,15 +68,13 @@ class Command:
         # Start killing recording process
         subprocess.run(["pkill", "wl-screenrec"])
 
+        # Wait for recording to finish to avoid corrupted video file
+        while self.proc_running():
+            time.sleep(0.1)
+
         # Move to recordings folder
         new_path = recordings_dir / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
         recordings_dir.mkdir(exist_ok=True, parents=True)
-
-        # Wait for recording to finish to avoid corrupted video file
-        while subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0:
-            time.sleep(0.1)
-
-        # Move by renaming
         shutil.move(recording_path, new_path)
 
         # Close start notification
@@ -89,7 +89,8 @@ class Command:
                     "--object-path=/org/freedesktop/Notifications",
                     "--method=org.freedesktop.Notifications.CloseNotification",
                     notif,
-                ]
+                ],
+                stdout=subprocess.DEVNULL,
             )
         except IOError:
             pass
