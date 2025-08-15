@@ -92,6 +92,14 @@ dark_catppuccin = [
     hex_to_hct("b4befe"),
 ]
 
+kcolours = [
+    {"name": "klink", "hct": hex_to_hct("2980b9")},
+    {"name": "kvisited", "hct": hex_to_hct("9b59b6")},
+    {"name": "knegative", "hct": hex_to_hct("da4453")},
+    {"name": "kneutral", "hct": hex_to_hct("f67400")},
+    {"name": "kpositive", "hct": hex_to_hct("27ae60")},
+]
+
 colour_names = [
     "rosewater",
     "flamingo",
@@ -184,6 +192,14 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
             colours[colour_names[i]] = grayscale(hct, light)
         else:
             colours[colour_names[i]] = harmonize(hct, colours["primary_paletteKeyColor"], (-0.2 if light else 0.05))
+
+    # KColours
+    for colour in kcolours:
+        colours[colour["name"]] = harmonize(colour["hct"], colours["primary"], 0.1)
+        colours[f"{colour['name']}Selection"] = harmonize(colour["hct"], colours["onPrimaryFixedVariant"], 0.1)
+        if scheme.variant == "monochrome":
+            colours[colour["name"]] = grayscale(colours[colour["name"]], light)
+            colours[f"{colour['name']}Selection"] = grayscale(colours[f"{colour['name']}Selection"], light)
 
     if scheme.variant == "neutral":
         for name, hct in colours.items():

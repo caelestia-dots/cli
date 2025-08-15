@@ -1,0 +1,149 @@
+[ColorEffects:Disabled]
+Color={{ $surfaceContainer }}
+ColorAmount=0.5
+ColorEffect=3
+ContrastAmount=0
+ContrastEffect=0
+IntensityAmount=0
+IntensityEffect=0
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color={{ $surfaceContainerLowest }}
+ColorAmount=0.025
+ColorEffect=0
+ContrastAmount=0.1
+ContrastEffect=0
+Enable=false
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Button]
+BackgroundAlternate={{ $surfaceVariant }}
+BackgroundNormal={{ $surfaceContainerHigh }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $onSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurface }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:Complementary]
+BackgroundAlternate={{ $surface }}
+BackgroundNormal={{ $surfaceContainer }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $inverseSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurfaceVariant }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:Header]
+BackgroundAlternate={{ $surfaceContainer }}
+BackgroundNormal={{ $surfaceContainer }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $inverseSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurfaceVariant }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:Header][Inactive]
+BackgroundAlternate={{ $surfaceContainer }}
+BackgroundNormal={{ $surfaceContainer }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $inverseSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurfaceVariant }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:Selection]
+BackgroundAlternate={{ $primary }}
+BackgroundNormal={{ $primary }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $secondary }}
+ForegroundActive={{ $onPrimary }}
+ForegroundInactive={{ $onPrimary }}
+ForegroundLink={{ $klinkSelection }}
+ForegroundNegative={{ $knegativeSelection }}
+ForegroundNeutral={{ $kneutralSelection }}
+ForegroundNormal={{ $onPrimary }}
+ForegroundPositive={{ $kpositiveSelection }}
+ForegroundVisited={{ $kvisitedSelection }}
+
+[Colors:Tooltip]
+BackgroundAlternate={{ $surfaceVariant }}
+BackgroundNormal={{ $surfaceContainer }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $onSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurface }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:View]
+BackgroundAlternate={{ $surfaceContainer }}
+BackgroundNormal={{ $surfaceBright }}
+DecorationFocus={{ $primary }}
+#-----------------------------------------------
+DecorationHover={{ $secondaryFixed }}
+ForegroundActive={{ $inverseSurface }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+ForegroundNormal={{ $onSurface }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[Colors:Window]
+BackgroundAlternate={{ $surfaceVariant }}
+BackgroundNormal={{ $surfaceContainer }}
+DecorationFocus={{ $primary }}
+DecorationHover={{ $primary }}
+ForegroundActive={{ $klink }}
+ForegroundInactive={{ $outline }}
+ForegroundLink={{ $klink }}
+ForegroundNegative={{ $knegative }}
+ForegroundNeutral={{ $kneutral }}
+#--- Window titles, context icons
+ForegroundNormal={{ $onSurfaceVariant }}
+ForegroundPositive={{ $kpositive }}
+ForegroundVisited={{ $kvisited }}
+
+[General]
+ColorScheme=Caelestia
+Name=Caelestia
+shadeSortColumn=true
+
+[KDE]
+contrast=4
+
+[WM]
+activeBackground={{ $surfaceContainerHighest }}
+activeBlend=227,229,231
+activeForeground={{ $onSurface }}
+inactiveBackground={{ $secondaryContainer }}
+inactiveBlend=239,240,241
+inactiveForeground={{ $onSurfaceVariant }}
