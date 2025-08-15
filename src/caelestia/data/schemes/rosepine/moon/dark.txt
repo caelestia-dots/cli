@@ -82,6 +82,16 @@ sky d2d9ff
 sapphire bbc4ff
 blue b5b6ff
 lavender cbc7ff
+klink 7880d1
+klinkSelection 7881d1
+kvisited 8770d8
+kvisitedSelection 8770d8
+knegative a964fd
+knegativeSelection a864fd
+kneutral d08fff
+kneutralSelection d090ff
+kpositive 60adff
+kpositiveSelection 60adff
 text e5e1e7
 subtext1 c9c5d0
 subtext0 928f9a
