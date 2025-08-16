@@ -147,13 +147,5 @@ class Command:
             self.move_client(selector, self.args.workspace)
 
     def specialws(self) -> None:
-        workspaces = hypr.message("workspaces")
-        on_special_ws = any(ws["name"] == "special:special" for ws in workspaces)
-        toggle_ws = "special"
-
-        if not on_special_ws:
-            active_ws = hypr.message("activewindow")["workspace"]["name"]
-            if active_ws.startswith("special:"):
-                toggle_ws = active_ws[8:]
-
-        hypr.dispatch("togglespecialworkspace", toggle_ws)
+        special = next(m for m in hypr.message("monitors") if m["focused"])["specialWorkspace"]["name"]
+        hypr.dispatch("togglespecialworkspace", special[8:] or "special")
