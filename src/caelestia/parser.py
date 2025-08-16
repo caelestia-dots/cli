@@ -28,9 +28,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     # Create parser for toggle opts
     toggle_parser = command_parser.add_parser("toggle", help="toggle a special workspace")
     toggle_parser.set_defaults(cls=toggle.Command)
-    toggle_parser.add_argument(
-        "workspace", choices=["communication", "music", "sysmon", "specialws", "todo"], help="the workspace to toggle"
-    )
+    toggle_parser.add_argument("workspace", help="the workspace to toggle")
 
     # Create parser for scheme opts
     scheme_parser = command_parser.add_parser("scheme", help="manage the colour scheme")
