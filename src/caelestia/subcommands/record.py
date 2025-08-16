@@ -58,11 +58,11 @@ class Command:
             else:
                 region = self.args.region
             args += ["-g", region.strip()]
-
-        monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
-        focused_monitor = next(monitor for monitor in monitors if monitor["focused"])
-        if focused_monitor:
-            args += ["-o", focused_monitor["name"]]
+        else:
+            monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
+            focused_monitor = next(monitor for monitor in monitors if monitor["focused"])
+            if focused_monitor:
+                args += ["-o", focused_monitor["name"]]
 
         if self.args.sound:
             sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
