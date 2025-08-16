@@ -11,9 +11,34 @@ from caelestia.utils.paths import recording_notif_path, recording_path, recordin
 
 class Command:
     args: Namespace
+    recorder: str
 
     def __init__(self, args: Namespace) -> None:
         self.args = args
+        self.recorder = self._detect_recorder()
+
+    def _detect_recorder(self) -> str:
+        """Detect which screen recorder to use based on GPU."""
+        try:
+            # Check for NVIDIA GPU
+            lspci_output = subprocess.check_output(["lspci"], text=True)
+            if "nvidia" in lspci_output.lower():
+                # Check if wf-recorder is available
+                if shutil.which("wf-recorder"):
+                    return "wf-recorder"
+
+            # Default to wl-screenrec if available
+            if shutil.which("wl-screenrec"):
+                return "wl-screenrec"
+
+            # Fallback to wf-recorder if wl-screenrec is not available
+            if shutil.which("wf-recorder"):
+                return "wf-recorder"
+
+            raise RuntimeError("No compatible screen recorder found")
+        except subprocess.CalledProcessError:
+            # If lspci fails, default to wl-screenrec
+            return "wl-screenrec" if shutil.which("wl-screenrec") else "wf-recorder"
 
     def run(self) -> None:
         if self.proc_running():
@@ -22,9 +47,20 @@ class Command:
             self.start()
 
     def proc_running(self) -> bool:
-        return subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0
+        return (
+            subprocess.run(
+                ["pidof", self.recorder], stdout=subprocess.DEVNULL
+            ).returncode
+            == 0
+        )
 
     def start(self) -> None:
+        if self.recorder == "wf-recorder":
+            self._start_wf_recorder()
+        else:
+            self._start_wl_screenrec()
+
+    def _start_wl_screenrec(self) -> None:
         args = []
 
         if self.args.region:
@@ -40,7 +76,9 @@ class Command:
             args += ["-o", focused_monitor["name"]]
 
         if self.args.sound:
-            sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
+            sources = subprocess.check_output(
+                ["pactl", "list", "short", "sources"], text=True
+            ).splitlines()
             for source in sources:
                 if "RUNNING" in source:
                     args += ["--audio", "--audio-device", source.split()[1]]
@@ -55,25 +93,68 @@ class Command:
             text=True,
             start_new_session=True,
         )
+        self._handle_recording_start(proc)
 
+    def _start_wf_recorder(self) -> None:
+        args = ["-f", str(recording_path)]
+
+        if self.args.region:
+            if self.args.region == "slurp":
+                region = subprocess.check_output(["slurp"], text=True)
+            else:
+                region = self.args.region
+            args += ["-g", region.strip()]
+
+        monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
+        focused_monitor = next(monitor for monitor in monitors if monitor["focused"])
+        if focused_monitor:
+            args += ["-o", focused_monitor["name"]]
+
+        if self.args.sound:
+            sources = subprocess.check_output(
+                ["pactl", "list", "short", "sources"], text=True
+            ).splitlines()
+            for source in sources:
+                if "RUNNING" in source:
+                    args += ["-a", source.split()[1]]
+                    break
+            else:
+                raise ValueError("No audio source found")
+
+        recording_path.parent.mkdir(parents=True, exist_ok=True)
+        proc = subprocess.Popen(
+            ["wf-recorder", *args],
+            stderr=subprocess.PIPE,
+            text=True,
+            start_new_session=True,
+        )
+        self._handle_recording_start(proc)
+
+    def _handle_recording_start(self, proc: subprocess.Popen) -> None:
         # Send notif if proc hasn't ended after a small delay
         time.sleep(0.1)
         if proc.poll() is None:
             notif = notify("-p", "Recording started", "Recording...")
             recording_notif_path.write_text(notif)
         else:
-            notify("Recording failed", f"Recording failed to start: {proc.communicate()[1]}")
+            notify(
+                "Recording failed",
+                f"Recording failed to start: {proc.communicate()[1]}",
+            )
 
     def stop(self) -> None:
         # Start killing recording process
-        subprocess.run(["pkill", "wl-screenrec"])
+        subprocess.run(["pkill", self.recorder])
 
         # Wait for recording to finish to avoid corrupted video file
         while self.proc_running():
             time.sleep(0.1)
 
         # Move to recordings folder
-        new_path = recordings_dir / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
+        new_path = (
+            recordings_dir
+            / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
+        )
         recordings_dir.mkdir(exist_ok=True, parents=True)
         shutil.move(recording_path, new_path)
 
@@ -119,6 +200,8 @@ class Command:
                 ]
             )
             if p.returncode != 0:
-                subprocess.Popen(["app2unit", "-O", new_path.parent], start_new_session=True)
+                subprocess.Popen(
+                    ["app2unit", "-O", new_path.parent], start_new_session=True
+                )
         elif action == "delete":
             new_path.unlink()

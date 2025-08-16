@@ -11,7 +11,8 @@ The main control script for the Caelestia dotfiles.
 -   [`app2unit`](https://github.com/Vladimir-csp/app2unit) - launching apps
 -   [`wl-clipboard`](https://github.com/bugaevc/wl-clipboard) - copying to clipboard
 -   [`slurp`](https://github.com/emersion/slurp) - selecting an area
--   [`wl-screenrec`](https://github.com/russelltg/wl-screenrec) - screen recording
+-   [`wl-screenrec`](https://github.com/russelltg/wl-screenrec) - screen recording (default)
+-   [`wf-recorder`](https://github.com/ammen99/wf-recorder) - screen recording (for NVIDIA GPUs)
 -   `glib2` - closing notifications
 -   `libpulse` - getting audio device
 -   [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
@@ -44,7 +45,7 @@ Install all [dependencies](#dependencies), then install
 e.g. via an AUR helper (yay)
 
 ```sh
-yay -S libnotify swappy grim dart-sass app2unit wl-clipboard slurp wl-screenrec glib2 libpulse cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
+yay -S libnotify swappy grim dart-sass app2unit wl-clipboard slurp wl-screenrec wf-recorder glib2 libpulse cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
 ```
 
 Now, clone the repo, `cd` into it, build the wheel via `python -m build --wheel`
