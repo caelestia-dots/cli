@@ -11,9 +11,34 @@ from caelestia.utils.paths import recording_notif_path, recording_path, recordin
 
 class Command:
     args: Namespace
+    recorder: str
 
     def __init__(self, args: Namespace) -> None:
         self.args = args
+        self.recorder = self._detect_recorder()
+
+    def _detect_recorder(self) -> str:
+        """Detect which screen recorder to use based on GPU."""
+        try:
+            # Check for NVIDIA GPU
+            lspci_output = subprocess.check_output(["lspci"], text=True)
+            if "nvidia" in lspci_output.lower():
+                # Check if wf-recorder is available
+                if shutil.which("wf-recorder"):
+                    return "wf-recorder"
+
+            # Default to wl-screenrec if available
+            if shutil.which("wl-screenrec"):
+                return "wl-screenrec"
+
+            # Fallback to wf-recorder if wl-screenrec is not available
+            if shutil.which("wf-recorder"):
+                return "wf-recorder"
+
+            raise RuntimeError("No compatible screen recorder found")
+        except subprocess.CalledProcessError:
+            # If lspci fails, default to wl-screenrec
+            return "wl-screenrec" if shutil.which("wl-screenrec") else "wf-recorder"
 
     def run(self) -> None:
         if self.proc_running():
@@ -22,7 +47,7 @@ class Command:
             self.start()
 
     def proc_running(self) -> bool:
-        return subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0
+        return subprocess.run(["pidof", self.recorder], stdout=subprocess.DEVNULL).returncode == 0
 
     def start(self) -> None:
         args = []
@@ -43,7 +68,10 @@ class Command:
             sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
             for source in sources:
                 if "RUNNING" in source:
-                    args += ["--audio", "--audio-device", source.split()[1]]
+                    if self.recorder == "wf-recorder":
+                        args += ["-a", source.split()[1]]
+                    else:
+                        args += ["--audio", "--audio-device", source.split()[1]]
                     break
             else:
                 raise ValueError("No audio source found")
@@ -66,7 +94,7 @@ class Command:
 
     def stop(self) -> None:
         # Start killing recording process
-        subprocess.run(["pkill", "wl-screenrec"])
+        subprocess.run(["pkill", self.recorder])
 
         # Wait for recording to finish to avoid corrupted video file
         while self.proc_running():
