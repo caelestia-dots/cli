@@ -27,16 +27,16 @@ scheme_path = c_state_dir / "scheme.json"
 scheme_data_dir = cli_data_dir / "schemes"
 scheme_cache_dir = c_cache_dir / "schemes"
 
-wallpapers_dir = pictures_dir / os.getenv("CAELESTIA_WALLPAPERS_DIR", "Wallpapers")
+wallpapers_dir = os.getenv("CAELESTIA_WALLPAPERS_DIR", pictures_dir / "Wallpapers")
 wallpaper_path_path = c_state_dir / "wallpaper/path.txt"
 wallpaper_link_path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path = c_state_dir / "wallpaper/thumbnail.jpg"
 wallpapers_cache_dir = c_cache_dir / "wallpapers"
 
-screenshots_dir = pictures_dir / os.getenv("CAELESTIA_SCREENSHOTS_DIR", "Screenshots")
+screenshots_dir = os.getenv("CAELESTIA_SCREENSHOTS_DIR", pictures_dir / "Screenshots")
 screenshots_cache_dir = c_cache_dir / "screenshots"
 
-recordings_dir = videos_dir / os.getenv("CAELESTIA_RECORDINGS_DIR", "Recordings")
+recordings_dir = os.getenv("CAELESTIA_RECORDINGS_DIR", videos_dir / "Recordings")
 recording_path = c_state_dir / "record/recording.mp4"
 recording_notif_path = c_state_dir / "record/notifid.txt"
 
