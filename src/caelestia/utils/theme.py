@@ -184,6 +184,15 @@ general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
         write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
 
 
+def apply_warp(colours: dict[str, str], mode: str) -> None:
+    warp_mode = "darker" if mode == "dark" else "lighter"
+    colours_with_mode = colours.copy()
+    colours_with_mode["warp_mode"] = warp_mode
+    
+    template = gen_replace(colours_with_mode, templates_dir / "warp.yaml")
+    write_file(Path.home() / ".local/share/warp-terminal/themes/caelestia.yaml", template)
+
+
 def apply_user_templates(colours: dict[str, str]) -> None:
     if not user_templates_dir.is_dir():
         return
@@ -219,4 +228,6 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
         apply_gtk(colours, mode)
     if check("enableQt"):
         apply_qt(colours, mode)
+    if check("enableWarp"):
+        apply_warp(colours, mode)
     apply_user_templates(colours)
