@@ -2,7 +2,9 @@ import json as j
 import os
 import socket
 
-socket_base = f"{os.getenv('XDG_RUNTIME_DIR')}/hypr/{os.getenv('HYPRLAND_INSTANCE_SIGNATURE')}"
+socket_base = (
+    f"{os.getenv('XDG_RUNTIME_DIR')}/hypr/{os.getenv('HYPRLAND_INSTANCE_SIGNATURE')}"
+)
 socket_path = f"{socket_base}/.socket.sock"
 socket2_path = f"{socket_base}/.socket2.sock"
 
@@ -26,4 +28,9 @@ def message(msg: str, json: bool = True) -> str | dict[str, any]:
 
 
 def dispatch(dispatcher: str, *args: list[any]) -> bool:
-    return message(f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), json=False) == "ok"
+    return (
+        message(
+            f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), json=False
+        )
+        == "ok"
+    )

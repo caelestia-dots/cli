@@ -13,7 +13,11 @@ from materialyoucolor.scheme.scheme_neutral import SchemeNeutral
 from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow
 from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot
 from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant
-from materialyoucolor.utils.math_utils import difference_degrees, rotation_direction, sanitize_degrees_double
+from materialyoucolor.utils.math_utils import (
+    difference_degrees,
+    rotation_direction,
+    sanitize_degrees_double,
+)
 
 
 def hex_to_hct(hex: str) -> Hct:
@@ -131,7 +135,9 @@ def mix(a: Hct, b: Hct, w: float) -> Hct:
 def harmonize(from_hct: Hct, to_hct: Hct, tone_boost: float) -> Hct:
     difference_degrees_ = difference_degrees(from_hct.hue, to_hct.hue)
     rotation_degrees = min(difference_degrees_ * 0.8, 100)
-    output_hue = sanitize_degrees_double(from_hct.hue + rotation_degrees * rotation_direction(from_hct.hue, to_hct.hue))
+    output_hue = sanitize_degrees_double(
+        from_hct.hue + rotation_degrees * rotation_direction(from_hct.hue, to_hct.hue)
+    )
     return Hct.from_hct(output_hue, from_hct.chroma, from_hct.tone * (1 + tone_boost))
 
 
@@ -183,7 +189,9 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
             colours[f"term{i}"] = grayscale(hct, light)
         else:
             colours[f"term{i}"] = harmonize(
-                hct, colours["primary_paletteKeyColor"], (0.35 if i < 8 else 0.2) * (-1 if light else 1)
+                hct,
+                colours["primary_paletteKeyColor"],
+                (0.35 if i < 8 else 0.2) * (-1 if light else 1),
             )
 
     # Harmonize named colours
@@ -191,15 +199,21 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
         if scheme.variant == "monochrome":
             colours[colour_names[i]] = grayscale(hct, light)
         else:
-            colours[colour_names[i]] = harmonize(hct, colours["primary_paletteKeyColor"], (-0.2 if light else 0.05))
+            colours[colour_names[i]] = harmonize(
+                hct, colours["primary_paletteKeyColor"], (-0.2 if light else 0.05)
+            )
 
     # KColours
     for colour in kcolours:
         colours[colour["name"]] = harmonize(colour["hct"], colours["primary"], 0.1)
-        colours[f"{colour['name']}Selection"] = harmonize(colour["hct"], colours["onPrimaryFixedVariant"], 0.1)
+        colours[f"{colour['name']}Selection"] = harmonize(
+            colour["hct"], colours["onPrimaryFixedVariant"], 0.1
+        )
         if scheme.variant == "monochrome":
             colours[colour["name"]] = grayscale(colours[colour["name"]], light)
-            colours[f"{colour['name']}Selection"] = grayscale(colours[f"{colour['name']}Selection"], light)
+            colours[f"{colour['name']}Selection"] = grayscale(
+                colours[f"{colour['name']}Selection"], light
+            )
 
     if scheme.variant == "neutral":
         for name, hct in colours.items():

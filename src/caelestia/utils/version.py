@@ -9,7 +9,10 @@ def print_version() -> None:
         print("Packages:")
         pkgs = ["caelestia-shell-git", "caelestia-cli-git", "caelestia-meta"]
         versions = subprocess.run(
-            ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+            ["pacman", "-Q", *pkgs],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
         ).stdout
 
         for pkg in pkgs:
@@ -23,7 +26,16 @@ def print_version() -> None:
     try:
         caelestia_dir = (config_dir / "hypr").resolve().parent
         caelestia_ver = subprocess.check_output(
-            ["git", "--git-dir", caelestia_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"], text=True
+            [
+                "git",
+                "--git-dir",
+                caelestia_dir / ".git",
+                "rev-list",
+                "--format=%B",
+                "--max-count=1",
+                "HEAD",
+            ],
+            text=True,
         )
         print("Caelestia:")
         print("    Last commit:", caelestia_ver.split()[1])
@@ -62,7 +74,15 @@ def print_version() -> None:
             print("    Unable to determine last merged upstream commit.")
 
         shell_ver = subprocess.check_output(
-            ["git", "--git-dir", local_shell_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"],
+            [
+                "git",
+                "--git-dir",
+                local_shell_dir / ".git",
+                "rev-list",
+                "--format=%B",
+                "--max-count=1",
+                "HEAD",
+            ],
             text=True,
         )
         print("\n    Last commit:", shell_ver.split()[1])

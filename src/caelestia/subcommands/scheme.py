@@ -38,7 +38,9 @@ class Set:
                 scheme.variant = self.args.variant
             apply_colours(scheme.colours, scheme.mode)
         else:
-            print("No args given. Use --name, --flavour, --mode, --variant or --random to set a scheme")
+            print(
+                "No args given. Use --name, --flavour, --mode, --variant or --random to set a scheme"
+            )
 
 
 class Get:
@@ -70,9 +72,19 @@ class List:
         self.args = args
 
     def run(self) -> None:
-        multiple = [self.args.names, self.args.flavours, self.args.modes, self.args.variants].count(True) > 1
+        multiple = [
+            self.args.names,
+            self.args.flavours,
+            self.args.modes,
+            self.args.variants,
+        ].count(True) > 1
 
-        if self.args.names or self.args.flavours or self.args.modes or self.args.variants:
+        if (
+            self.args.names
+            or self.args.flavours
+            or self.args.modes
+            or self.args.variants
+        ):
             if self.args.names:
                 if multiple:
                     print("Names:", *get_scheme_names())

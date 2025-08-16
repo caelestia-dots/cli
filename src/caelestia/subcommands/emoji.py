@@ -16,7 +16,9 @@ class Command:
         if self.args.picker:
             emojis = (cli_data_dir / "emojis.txt").read_text()
             chosen = subprocess.check_output(
-                ["fuzzel", "--dmenu", "--placeholder=Type to search emojis"], input=emojis, text=True
+                ["fuzzel", "--dmenu", "--placeholder=Type to search emojis"],
+                input=emojis,
+                text=True,
             )
             subprocess.run(["wl-copy"], input=chosen.split()[0], text=True)
         elif self.args.fetch:
@@ -74,7 +76,9 @@ class Command:
             data.append(" ".join(line))
 
         # Fetch nerd font glyphs
-        with urlopen("https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/glyphnames.json") as f:
+        with urlopen(
+            "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/glyphnames.json"
+        ) as f:
             glyphs = json.load(f)
 
         buckets = {}

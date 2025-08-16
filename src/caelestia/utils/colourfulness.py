@@ -8,7 +8,11 @@ def mean(values: list[float]) -> float:
 
 
 def stddev(values: list[float], mean_val: float) -> float:
-    return math.sqrt(sum((x - mean_val) ** 2 for x in values) / len(values)) if values else 0
+    return (
+        math.sqrt(sum((x - mean_val) ** 2 for x in values) / len(values))
+        if values
+        else 0
+    )
 
 
 def calc_colourfulness(image: Image) -> float:

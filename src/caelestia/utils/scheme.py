@@ -72,7 +72,9 @@ class Scheme:
                     f'"{flavour}" is not a valid flavour of scheme "{self.name}".\n'
                     f"Valid flavours are: {get_scheme_flavours()}",
                 )
-            raise ValueError(f'Invalid scheme flavour: "{flavour}". Valid flavours: {get_scheme_flavours()}')
+            raise ValueError(
+                f'Invalid scheme flavour: "{flavour}". Valid flavours: {get_scheme_flavours()}'
+            )
 
         self._flavour = flavour
         self._check_mode()
@@ -95,7 +97,9 @@ class Scheme:
                     "Unable to set scheme mode",
                     f'Scheme "{self.name} {self.flavour}" does not have a {mode} mode.',
                 )
-            raise ValueError(f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}')
+            raise ValueError(
+                f'Invalid scheme mode: "{mode}". Valid modes: {get_scheme_modes()}'
+            )
 
         self._mode = mode
         self.update_colours()
@@ -117,7 +121,9 @@ class Scheme:
         return self._colours
 
     def get_colours_path(self) -> Path:
-        return (scheme_data_dir / self.name / self.flavour / self.mode).with_suffix(".txt")
+        return (scheme_data_dir / self.name / self.flavour / self.mode).with_suffix(
+            ".txt"
+        )
 
     def save(self) -> None:
         scheme_path.parent.mkdir(parents=True, exist_ok=True)
@@ -200,7 +206,10 @@ scheme: Scheme = None
 
 
 def read_colours_from_file(path: Path) -> dict[str, str]:
-    return {k.strip(): v.strip() for k, v in (line.split(" ") for line in path.read_text().splitlines())}
+    return {
+        k.strip(): v.strip()
+        for k, v in (line.split(" ") for line in path.read_text().splitlines())
+    }
 
 
 def get_scheme_path() -> Path:
@@ -229,7 +238,11 @@ def get_scheme_flavours(name: str = None) -> list[str]:
     if name is None:
         name = get_scheme().name
 
-    return ["default"] if name == "dynamic" else [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
+    return (
+        ["default"]
+        if name == "dynamic"
+        else [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
+    )
 
 
 def get_scheme_modes(name: str = None, flavour: str = None) -> list[str]:
@@ -241,4 +254,6 @@ def get_scheme_modes(name: str = None, flavour: str = None) -> list[str]:
     if name == "dynamic":
         return ["light", "dark"]
     else:
-        return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
+        return [
+            f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()
+        ]

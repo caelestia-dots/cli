@@ -21,13 +21,22 @@ from caelestia.utils.theme import apply_colours
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]
+    return path.is_file() and path.suffix in [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".tif",
+        ".tiff",
+    ]
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
     with Image.open(wall) as img:
         width, height = img.size
-        return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+        return (
+            width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+        )
 
 
 def get_wallpaper() -> str:

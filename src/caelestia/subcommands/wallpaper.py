@@ -1,7 +1,12 @@
 import json
 from argparse import Namespace
 
-from caelestia.utils.wallpaper import get_colours_for_wall, get_wallpaper, set_random, set_wallpaper
+from caelestia.utils.wallpaper import (
+    get_colours_for_wall,
+    get_wallpaper,
+    set_random,
+    set_wallpaper,
+)
 
 
 class Command:

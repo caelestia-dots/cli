@@ -42,11 +42,18 @@ class Score:
             hue = int(sanitize_degrees_int(round(hct.hue)))
             proportion = hue_excited_proportions[hue]
 
-            if filter_enabled and (hct.chroma < Score.CUTOFF_CHROMA or proportion <= Score.CUTOFF_EXCITED_PROPORTION):
+            if filter_enabled and (
+                hct.chroma < Score.CUTOFF_CHROMA
+                or proportion <= Score.CUTOFF_EXCITED_PROPORTION
+            ):
                 continue
 
             proportion_score = proportion * 100.0 * Score.WEIGHT_PROPORTION
-            chroma_weight = Score.WEIGHT_CHROMA_BELOW if hct.chroma < Score.TARGET_CHROMA else Score.WEIGHT_CHROMA_ABOVE
+            chroma_weight = (
+                Score.WEIGHT_CHROMA_BELOW
+                if hct.chroma < Score.TARGET_CHROMA
+                else Score.WEIGHT_CHROMA_ABOVE
+            )
             chroma_score = (hct.chroma - Score.TARGET_CHROMA) * chroma_weight
             score = proportion_score + chroma_score
             scored_hct.append({"hct": hct, "score": score})
@@ -63,7 +70,11 @@ class Score:
             if primary:
                 break
 
-        return DislikeAnalyzer.fix_if_disliked(primary) if primary else Score.score(colors_to_population, False)
+        return (
+            DislikeAnalyzer.fix_if_disliked(primary)
+            if primary
+            else Score.score(colors_to_population, False)
+        )
 
 
 def score(image: str) -> Hct:

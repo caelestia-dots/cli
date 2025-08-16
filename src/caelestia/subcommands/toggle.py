@@ -2,7 +2,6 @@ import json
 import shutil
 import subprocess
 from argparse import Namespace
-from collections import ChainMap
 
 from caelestia.utils import hypr
 from caelestia.utils.paths import user_config_path
@@ -35,86 +34,57 @@ def is_subset(superset, subset):
     return True
 
 
-class DeepChainMap(ChainMap):
-    def __getitem__(self, key):
-        values = (mapping[key] for mapping in self.maps if key in mapping)
-        try:
-            first = next(values)
-        except StopIteration:
-            return self.__missing__(key)
-        if isinstance(first, dict):
-            return self.__class__(first, *values)
-        return first
-
-    def __repr__(self):
-        return repr(dict(self))
-
-
 class Command:
     args: Namespace
-    cfg: dict[str, dict[str, dict[str, any]]] | DeepChainMap
+    cfg: dict[str, dict[str, dict[str, any]]]
     clients: list[dict[str, any]] = None
 
     def __init__(self, args: Namespace) -> None:
         self.args = args
+        self.cfg = {}
 
-        self.cfg = {
-            "communication": {
-                "discord": {
-                    "enable": True,
-                    "match": [{"class": "discord"}],
-                    "command": ["discord"],
-                    "move": True,
-                },
-                "whatsapp": {
-                    "enable": True,
-                    "match": [{"class": "whatsapp"}],
-                    "move": True,
-                },
-            },
-            "music": {
-                "spotify": {
-                    "enable": True,
-                    "match": [{"class": "Spotify"}, {"initialTitle": "Spotify"}, {"initialTitle": "Spotify Free"}],
-                    "command": ["spicetify", "watch", "-s"],
-                    "move": True,
-                },
-                "feishin": {
-                    "enable": True,
-                    "match": [{"class": "feishin"}],
-                    "move": True,
-                },
-            },
-            "sysmon": {
-                "btop": {
-                    "enable": True,
-                    "match": [{"class": "btop", "title": "btop", "workspace": {"name": "special:sysmon"}}],
-                    "command": ["foot", "-a", "btop", "-T", "btop", "fish", "-C", "exec btop"],
-                },
-            },
-            "todo": {
-                "todoist": {
-                    "enable": True,
-                    "match": [{"class": "Todoist"}],
-                    "command": ["todoist"],
-                    "move": True,
-                },
-            },
-        }
         try:
-            self.cfg = DeepChainMap(json.loads(user_config_path.read_text())["toggles"], self.cfg)
+            self.cfg = json.loads(user_config_path.read_text())["toggles"]
         except (FileNotFoundError, json.JSONDecodeError, KeyError):
             pass
 
     def run(self) -> None:
-        if self.args.workspace == "specialws":
+        workspace_name = self.args.workspace
+
+        if workspace_name == "specialws":
             self.specialws()
             return
 
-        for client in self.cfg[self.args.workspace].values():
-            if "enable" in client and client["enable"]:
-                self.handle_client_config(client)
-        hypr.dispatch("togglespecialworkspace", self.args.workspace)
+        # Workspace toggle mode with configuration
+        workspaces = hypr.message("workspaces")
+        workspace_status = next(
+            (
+                ws["windows"]
+                for ws in workspaces
+                if ws["name"] == f"special:{workspace_name}"
+            ),
+            0,
+        )
+
+        if workspace_status == 0 and workspace_name in self.cfg:
+            # Workspace is empty, launch configured app in the workspace
+            client = self.cfg[workspace_name]
+            if "enable" in client and client["enable"] and "command" in client:
+                # Apply permanent window rule if specified
+                if "window_rule" in client:
+                    hypr.dispatch("keyword", f"windowrulev2 {client['window_rule']}")
+
+                # Launch app in the special workspace using hyprctl
+                app_command = " ".join(client["command"])
+                hypr.dispatch(
+                    "exec", f"[workspace special:{workspace_name}] {app_command}"
+                )
+
+                # Don't toggle immediately, let the app launch and show the workspace
+                return
+
+        # Only toggle if workspace already exists with windows
+        hypr.dispatch("togglespecialworkspace", workspace_name)
 
     def get_clients(self) -> list[dict[str, any]]:
         if self.clients is None:
@@ -124,8 +94,14 @@ class Command:
 
     def move_client(self, selector: callable, workspace: str) -> None:
         for client in self.get_clients():
-            if selector(client) and client["workspace"]["name"] != f"special:{workspace}":
-                hypr.dispatch("movetoworkspacesilent", f"special:{workspace},address:{client['address']}")
+            if (
+                selector(client)
+                and client["workspace"]["name"] != f"special:{workspace}"
+            ):
+                hypr.dispatch(
+                    "movetoworkspacesilent",
+                    f"special:{workspace},address:{client['address']}",
+                )
 
     def spawn_client(self, selector: callable, spawn: list[str]) -> None:
         if (spawn[0].endswith(".desktop") or shutil.which(spawn[0])) and not any(

@@ -22,7 +22,12 @@ class Command:
             self.start()
 
     def proc_running(self) -> bool:
-        return subprocess.run(["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL).returncode == 0
+        return (
+            subprocess.run(
+                ["pidof", "wl-screenrec"], stdout=subprocess.DEVNULL
+            ).returncode
+            == 0
+        )
 
     def start(self) -> None:
         args = []
@@ -40,7 +45,9 @@ class Command:
             args += ["-o", focused_monitor["name"]]
 
         if self.args.sound:
-            sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
+            sources = subprocess.check_output(
+                ["pactl", "list", "short", "sources"], text=True
+            ).splitlines()
             for source in sources:
                 if "RUNNING" in source:
                     args += ["--audio", "--audio-device", source.split()[1]]
@@ -62,7 +69,10 @@ class Command:
             notif = notify("-p", "Recording started", "Recording...")
             recording_notif_path.write_text(notif)
         else:
-            notify("Recording failed", f"Recording failed to start: {proc.communicate()[1]}")
+            notify(
+                "Recording failed",
+                f"Recording failed to start: {proc.communicate()[1]}",
+            )
 
     def stop(self) -> None:
         # Start killing recording process
@@ -73,7 +83,10 @@ class Command:
             time.sleep(0.1)
 
         # Move to recordings folder
-        new_path = recordings_dir / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
+        new_path = (
+            recordings_dir
+            / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
+        )
         recordings_dir.mkdir(exist_ok=True, parents=True)
         shutil.move(recording_path, new_path)
 
@@ -119,6 +132,8 @@ class Command:
                 ]
             )
             if p.returncode != 0:
-                subprocess.Popen(["app2unit", "-O", new_path.parent], start_new_session=True)
+                subprocess.Popen(
+                    ["app2unit", "-O", new_path.parent], start_new_session=True
+                )
         elif action == "delete":
             new_path.unlink()

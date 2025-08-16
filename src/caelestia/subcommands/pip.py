@@ -20,16 +20,22 @@ class Command:
                 self.handle_window(win["address"], win["workspace"]["name"])
 
     def handle_window(self, address: str, ws: str) -> None:
-        mon_id = next(w for w in hypr.message("workspaces") if w["name"] == ws)["monitorID"]
+        mon_id = next(w for w in hypr.message("workspaces") if w["name"] == ws)[
+            "monitorID"
+        ]
         mon = next(m for m in hypr.message("monitors") if m["id"] == mon_id)
-        width, height = next(c for c in hypr.message("clients") if c["address"] == address)["size"]
+        width, height = next(
+            c for c in hypr.message("clients") if c["address"] == address
+        )["size"]
 
         scale_factor = mon["height"] / 4 / height
         scaled_win_size = f"{int(width * scale_factor)} {int(height * scale_factor)}"
         off = min(mon["width"], mon["height"]) * 0.03
         move_to = f"{int(mon['x']) + int(mon['width'] - off - width * scale_factor)} {int(mon['y']) + int(mon['height'] - off - height * scale_factor)}"
 
-        hypr.dispatch("resizewindowpixel", "exact", f"{scaled_win_size},address:{address}")
+        hypr.dispatch(
+            "resizewindowpixel", "exact", f"{scaled_win_size},address:{address}"
+        )
         hypr.dispatch("movewindowpixel", "exact", f"{move_to},address:{address}")
 
     def daemon(self) -> None:
