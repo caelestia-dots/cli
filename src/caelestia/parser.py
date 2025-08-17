@@ -74,8 +74,13 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     # Create parser for clipboard opts
     clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
     clipboard_parser.set_defaults(cls=clipboard.Command)
-    clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
-
+    clipboard_parser.add_argument(
+        "-d", "--delete", action="store_true", help="delete one item from clipboard history"
+    )
+    clipboard_parser.add_argument(
+        "-r", "--reset", action="store_true", help="clear entire clipboard history"
+    )
+    
     # Create parser for emoji-picker opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
     emoji_parser.set_defaults(cls=emoji.Command)
