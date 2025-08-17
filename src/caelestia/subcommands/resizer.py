@@ -226,7 +226,14 @@ class Command:
 
     def _handle_title_event(self, event: str) -> None:
         try:
-            window_id = event.split(">>")[1].split(",")[0]
+            # Handle both >> and >>> separators (different Hyprland versions)
+            if ">>>" in event:
+                window_id = event.split(">>>")[1].split(",")[0]
+            else:
+                window_id = event.split(">>")[1].split(",")[0]
+            
+            # Remove any leading > characters
+            window_id = window_id.lstrip(">")
 
             if not all(c in "0123456789abcdefABCDEF" for c in window_id):
                 self._log_message(f"ERROR: Invalid window ID format: {window_id}")
@@ -255,8 +262,16 @@ class Command:
 
     def _handle_open_event(self, event: str) -> None:
         try:
-            data = event[11:]  # Remove "openwindow>>"
+            # Handle both >> and >>> separators
+            if "openwindow>>>" in event:
+                data = event[13:]  # Remove "openwindow>>>"
+            else:
+                data = event[12:]  # Remove "openwindow>>"
+            
             window_id, workspace, window_class, title = data.split(",", 3)
+            
+            # Remove any leading > characters
+            window_id = window_id.lstrip(">")
 
             if not all(c in "0123456789abcdefABCDEF" for c in window_id):
                 self._log_message(f"ERROR: Invalid window ID format: {window_id}")
