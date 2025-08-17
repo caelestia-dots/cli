@@ -27,3 +27,9 @@ def message(msg: str, json: bool = True) -> str | dict[str, any]:
 
 def dispatch(dispatcher: str, *args: list[any]) -> bool:
     return message(f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), json=False) == "ok"
+
+
+def batch(*msgs: list[str], json: bool = False) -> str | dict[str, any]:
+    if json:
+        msgs = (f"j/{m.strip()}" for m in msgs)
+    return message(f"[[BATCH]]{';'.join(msgs)}", json=False)
