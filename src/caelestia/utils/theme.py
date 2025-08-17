@@ -7,6 +7,7 @@ from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.paths import (
     c_state_dir,
     config_dir,
+    data_dir,
     templates_dir,
     theme_dir,
     user_config_path,
@@ -184,6 +185,14 @@ general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
         write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
 
 
+def apply_warp(colours: dict[str, str], mode: str) -> None:
+    warp_mode = "darker" if mode == "dark" else "lighter"
+    
+    template = gen_replace(colours, templates_dir / "warp.yaml", hash=True)
+    template = template.replace("{{ $warp_mode }}", warp_mode)
+    write_file(data_dir / "warp-terminal/themes/caelestia.yaml", template)
+
+
 def apply_user_templates(colours: dict[str, str]) -> None:
     if not user_templates_dir.is_dir():
         return
@@ -219,4 +228,6 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
         apply_gtk(colours, mode)
     if check("enableQt"):
         apply_qt(colours, mode)
+    if check("enableWarp"):
+        apply_warp(colours, mode)
     apply_user_templates(colours)

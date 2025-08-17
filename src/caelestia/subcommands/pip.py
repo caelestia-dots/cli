@@ -29,8 +29,10 @@ class Command:
         off = min(mon["width"], mon["height"]) * 0.03
         move_to = f"{int(mon['x']) + int(mon['width'] - off - width * scale_factor)} {int(mon['y']) + int(mon['height'] - off - height * scale_factor)}"
 
-        hypr.dispatch("resizewindowpixel", "exact", f"{scaled_win_size},address:{address}")
-        hypr.dispatch("movewindowpixel", "exact", f"{move_to},address:{address}")
+        hypr.batch(
+            f"dispatch resizewindowpixel exact {scaled_win_size},address:{address}",
+            f"dispatch movewindowpixel exact {move_to},address:{address}",
+        )
 
     def daemon(self) -> None:
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
