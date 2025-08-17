@@ -191,7 +191,7 @@ class Command:
             dispatch_commands.append("dispatch centerwindow")
 
         try:
-            hypr.batch(dispatch_commands)
+            hypr.batch(*dispatch_commands)
             self._log_message(f"Applied actions to window 0x{window_id}: {width} x {height} ({', '.join(actions)})")
             return True
         except Exception as e:
