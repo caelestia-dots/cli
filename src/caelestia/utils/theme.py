@@ -157,6 +157,7 @@ def apply_nvtop(colours: dict[str, str]) -> None:
 def apply_htop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "htop.theme", hash=True)
     write_file(config_dir / "htop/htoprc", template)
+    subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
@@ -206,6 +207,7 @@ def apply_warp(colours: dict[str, str], mode: str) -> None:
 def apply_cava(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "cava.conf", hash=True)
     write_file(config_dir / "cava/config", template)
+    subprocess.run(["killall", "-USR2", "cava"], stderr=subprocess.DEVNULL)
 
 
 def apply_user_templates(colours: dict[str, str]) -> None:
