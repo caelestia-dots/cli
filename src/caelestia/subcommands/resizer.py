@@ -336,58 +336,104 @@ class Command:
 
     def _run_active_mode(self) -> None:
         try:
+            # Create a temporary rule from command line arguments
+            actions = self.args.actions.split(",") if self.args.actions else []
+            temp_rule = WindowRule(self.args.pattern, self.args.match_type, self.args.width, self.args.height, actions)
+
+            # Special case: "active" pattern means only target the currently active window
+            if temp_rule.name.lower() == "active":
+                self._apply_to_active_window(temp_rule)
+                return
+
+            # Find all windows that match the pattern
+            matching_windows = self._find_matching_windows(temp_rule)
+            
+            if not matching_windows:
+                print(f"No windows found matching pattern '{temp_rule.name}' with match type '{temp_rule.match_type}'")
+                return
+
+            print(f"Found {len(matching_windows)} matching window(s)")
+            
+            # Apply rule to all matching windows
+            success_count = 0
+            for window in matching_windows:
+                window_id = window["address"][2:]  # Remove "0x" prefix
+                window_title = window.get("title", "")
+                
+                print(f"Applying rule to window 0x{window_id}: '{window_title}'")
+                success = self._apply_window_actions(window_id, temp_rule.width, temp_rule.height, temp_rule.actions)
+                if success:
+                    success_count += 1
+
+            print(f"Successfully applied rule to {success_count}/{len(matching_windows)} windows")
+
+        except Exception as e:
+            print(f"ERROR: Failed to apply rule: {e}")
+
+    def _apply_to_active_window(self, temp_rule: WindowRule) -> None:
+        """Apply rule only to the currently active window"""
+        try:
             active_window_result = hypr.message("activewindow")
             if not isinstance(active_window_result, dict) or not active_window_result.get("address"):
                 print("ERROR: No active window found")
                 return
 
             window_title = active_window_result.get("title", "")
-            initial_title = active_window_result.get("initialTitle", "")
-
             address = active_window_result.get("address", "")
             if not isinstance(address, str) or not address.startswith("0x"):
                 print("ERROR: Invalid window address")
                 return
 
             window_id = address[2:]  # Remove "0x" prefix
-
-            # Create a temporary rule from command line arguments
-            actions = self.args.actions.split(",") if self.args.actions else []
-            temp_rule = WindowRule(self.args.pattern, self.args.match_type, self.args.width, self.args.height, actions)
-
-            # Check if the active window matches the pattern
-            if temp_rule.match_type == "initialTitle":
-                matches = initial_title == temp_rule.name
-            elif temp_rule.match_type == "titleContains":
-                matches = temp_rule.name in window_title
-            elif temp_rule.match_type == "titleExact":
-                matches = window_title == temp_rule.name
-            elif temp_rule.match_type == "titleRegex":
-                try:
-                    matches = bool(re.search(temp_rule.name, window_title))
-                except re.error:
-                    print(f"ERROR: Invalid regex pattern '{temp_rule.name}'")
-                    return
+            
+            print(f"Applying rule to active window 0x{window_id}: '{window_title}'")
+            success = self._apply_window_actions(window_id, temp_rule.width, temp_rule.height, temp_rule.actions)
+            if success:
+                print("Rule applied successfully")
             else:
-                print(f"ERROR: Unknown match type '{temp_rule.match_type}'")
-                return
-
-            if matches:
-                print(f"Applying rule to active window 0x{window_id}: '{window_title}'")
-                success = self._apply_window_actions(window_id, temp_rule.width, temp_rule.height, temp_rule.actions)
-                if success:
-                    print("Rule applied successfully")
-                else:
-                    print("Failed to apply rule")
-            else:
-                print(
-                    f"Active window does not match pattern '{temp_rule.name}' with match type '{temp_rule.match_type}'"
-                )
-                print(f"Window title: '{window_title}'")
-                print(f"Initial title: '{initial_title}'")
+                print("Failed to apply rule")
 
         except Exception as e:
             print(f"ERROR: Failed to apply rule to active window: {e}")
+
+    def _find_matching_windows(self, temp_rule: WindowRule) -> list:
+        """Find all windows that match the given rule pattern"""
+        try:
+            clients_result = hypr.message("clients")
+            if not isinstance(clients_result, list):
+                return []
+
+            matching_windows = []
+            for window in clients_result:
+                if not isinstance(window, dict):
+                    continue
+
+                window_title = window.get("title", "")
+                initial_title = window.get("initialTitle", "")
+                
+                # Check if window matches the pattern
+                matches = False
+                if temp_rule.match_type == "initialTitle":
+                    matches = initial_title == temp_rule.name
+                elif temp_rule.match_type == "titleContains":
+                    matches = temp_rule.name in window_title
+                elif temp_rule.match_type == "titleExact":
+                    matches = window_title == temp_rule.name
+                elif temp_rule.match_type == "titleRegex":
+                    try:
+                        matches = bool(re.search(temp_rule.name, window_title))
+                    except re.error:
+                        print(f"ERROR: Invalid regex pattern '{temp_rule.name}'")
+                        return []
+
+                if matches:
+                    matching_windows.append(window)
+
+            return matching_windows
+
+        except Exception as e:
+            print(f"ERROR: Failed to find matching windows: {e}")
+            return []
 
     def _run_daemon(self) -> None:
         self._log_message("Hyprland window resizer started")

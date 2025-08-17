@@ -110,7 +110,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     resizer_parser = command_parser.add_parser("resizer", help="window resizer daemon")
     resizer_parser.set_defaults(cls=resizer.Command)
     resizer_parser.add_argument("-d", "--daemon", action="store_true", help="start the resizer daemon")
-    resizer_parser.add_argument("pattern", nargs="?", help="pattern to match against the active window, or 'pip' for quick pip mode")
+    resizer_parser.add_argument("pattern", nargs="?", help="pattern to match against windows ('active' for current window only, 'pip' for quick pip mode)")
     resizer_parser.add_argument("match_type", nargs="?", choices=["titleContains", "titleExact", "titleRegex", "initialTitle", "title_contains", "title_exact", "title_regex", "initial_title"], help="type of pattern matching")
     resizer_parser.add_argument("width", nargs="?", help="width to resize to")
     resizer_parser.add_argument("height", nargs="?", help="height to resize to")
