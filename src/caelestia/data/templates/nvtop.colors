@@ -1,0 +1,53 @@
+# NVTOP Color Configuration Template
+# Format: color_name = RGB_HEX_VALUE
+# Colors must be specified as 6-digit hex values without # prefix
+
+# Background colors
+background = {{ $surface }}
+selected_bg = {{ $surfaceContainer }}
+header_bg = {{ $surfaceVariant }}
+
+# Text colors
+text = {{ $onSurface }}
+selected_text = {{ $primary }}
+header_text = {{ $onSurfaceVariant }}
+inactive_text = {{ $outline }}
+
+# GPU utilization colors (gradient from low to high)
+gpu_util_low = {{ $green }}
+gpu_util_med = {{ $yellow }}
+gpu_util_high = {{ $red }}
+
+# Memory usage colors
+memory_low = {{ $teal }}
+memory_med = {{ $sapphire }}
+memory_high = {{ $blue }}
+
+# Temperature colors (cool to hot)
+temp_cool = {{ $green }}
+temp_warm = {{ $yellow }}
+temp_hot = {{ $red }}
+
+# Power usage colors
+power_low = {{ $green }}
+power_med = {{ $peach }}
+power_high = {{ $maroon }}
+
+# Process list colors
+process_normal = {{ $onSurface }}
+process_highlight = {{ $primary }}
+process_killed = {{ $red }}
+
+# Border and separator colors
+border = {{ $outline }}
+separator = {{ $outlineVariant }}
+
+# Chart and graph colors
+chart_line = {{ $tertiary }}
+chart_fill = {{ $surfaceContainer }}
+
+# Status indicators
+status_ok = {{ $green }}
+status_warning = {{ $yellow }}
+status_error = {{ $red }}
+status_info = {{ $blue }}

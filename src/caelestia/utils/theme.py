@@ -149,6 +149,17 @@ def apply_btop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "btop"], stderr=subprocess.DEVNULL)
 
 
+def apply_nvtop(colours: dict[str, str]) -> None:
+    template = gen_replace(colours, templates_dir / "nvtop.colors", hash=True)
+    write_file(config_dir / "nvtop/nvtop.colors", template)
+
+
+def apply_htop(colours: dict[str, str]) -> None:
+    template = gen_replace(colours, templates_dir / "htop.theme", hash=True)
+    write_file(config_dir / "htop/htoprc", template)
+    subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
+
+
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     write_file(config_dir / "gtk-3.0/gtk.css", template)
@@ -187,10 +198,16 @@ general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 
 def apply_warp(colours: dict[str, str], mode: str) -> None:
     warp_mode = "darker" if mode == "dark" else "lighter"
-    
+
     template = gen_replace(colours, templates_dir / "warp.yaml", hash=True)
     template = template.replace("{{ $warp_mode }}", warp_mode)
     write_file(data_dir / "warp-terminal/themes/caelestia.yaml", template)
+
+
+def apply_cava(colours: dict[str, str]) -> None:
+    template = gen_replace(colours, templates_dir / "cava.conf", hash=True)
+    write_file(config_dir / "cava/config", template)
+    subprocess.run(["killall", "-USR2", "cava"], stderr=subprocess.DEVNULL)
 
 
 def apply_user_templates(colours: dict[str, str]) -> None:
@@ -224,10 +241,16 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
         apply_fuzzel(colours)
     if check("enableBtop"):
         apply_btop(colours)
+    if check("enableNvtop"):
+        apply_nvtop(colours)
+    if check("enableHtop"):
+        apply_htop(colours)
     if check("enableGtk"):
         apply_gtk(colours, mode)
     if check("enableQt"):
         apply_qt(colours, mode)
     if check("enableWarp"):
         apply_warp(colours, mode)
+    if check("enableCava"):
+        apply_cava(colours)
     apply_user_templates(colours)

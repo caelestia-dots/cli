@@ -1,0 +1,95 @@
+# HTOP Color Configuration Template
+# This template generates a custom htoprc configuration with themed colors
+# Colors are defined using terminal color codes (0-255) or RGB hex values
+
+# htoprc configuration with custom colors
+fields=0 48 17 18 38 39 40 2 46 47 49 1
+sort_key=46
+sort_direction=-1
+tree_sort_key=0
+tree_sort_direction=1
+hide_kernel_threads=1
+hide_userland_threads=0
+shadow_other_users=0
+show_thread_names=0
+show_program_path=1
+highlight_base_name=0
+highlight_deleted_exe=1
+highlight_megabytes=1
+highlight_threads=1
+highlight_changes=0
+highlight_changes_delay_secs=5
+find_comm_in_cmdline=1
+strip_exe_from_cmdline=1
+show_merged_command=0
+tree_view=0
+tree_view_always_by_pid=0
+all_branches_collapsed=0
+header_margin=1
+detailed_cpu_time=0
+cpu_count_from_one=0
+show_cpu_usage=1
+show_cpu_frequency=0
+show_cpu_temperature=0
+degree_fahrenheit=0
+update_process_names=0
+account_guest_in_cpu_meter=0
+color_scheme=6
+
+# Custom color definitions using template variables
+# Main interface colors
+color_background={{ $surface }}
+color_text={{ $onSurface }}
+color_highlight={{ $primary }}
+color_selected={{ $surfaceContainer }}
+
+# CPU meter colors (gradient)
+color_cpu_low={{ $green }}
+color_cpu_med={{ $yellow }}
+color_cpu_high={{ $red }}
+
+# Memory meter colors
+color_mem_used={{ $blue }}
+color_mem_buffers={{ $teal }}
+color_mem_cache={{ $sapphire }}
+color_mem_available={{ $green }}
+
+# Process list colors
+color_process_normal={{ $onSurface }}
+color_process_running={{ $green }}
+color_process_sleeping={{ $outline }}
+color_process_zombie={{ $red }}
+color_process_stopped={{ $yellow }}
+
+# Header and border colors
+color_header={{ $onSurfaceVariant }}
+color_border={{ $outline }}
+color_separator={{ $outlineVariant }}
+
+# Function key colors
+color_function_key={{ $tertiary }}
+color_function_desc={{ $onSurface }}
+
+# Tree view colors
+color_tree_line={{ $outline }}
+color_tree_collapsed={{ $primary }}
+color_tree_expanded={{ $secondary }}
+
+# Load average colors
+color_load_low={{ $green }}
+color_load_med={{ $yellow }}
+color_load_high={{ $red }}
+
+# Priority colors
+color_priority_high={{ $red }}
+color_priority_normal={{ $onSurface }}
+color_priority_low={{ $outline }}
+
+# Swap meter colors
+color_swap_used={{ $maroon }}
+color_swap_cache={{ $peach }}
+
+# Temperature colors (if enabled)
+color_temp_cool={{ $green }}
+color_temp_warm={{ $yellow }}
+color_temp_hot={{ $red }}
