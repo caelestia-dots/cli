@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper pip
+set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -19,7 +19,7 @@ complete -c caelestia -n $not_seen -a 'record' -d 'Start a screen recording'
 complete -c caelestia -n $not_seen -a 'clipboard' -d 'Open clipboard history'
 complete -c caelestia -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
-complete -c caelestia -n $not_seen -a 'pip' -d 'Picture in picture utilities'
+complete -c caelestia -n $not_seen -a 'resizer' -d 'Window resizer'
 
 # Shell
 set -l commands mpris drawers wallpaper notifs
@@ -121,5 +121,7 @@ complete -c caelestia -n "$seen wallpaper" -s 'N' -l 'no-smart' -d 'Disable smar
 complete -c caelestia -n "$seen emoji" -s 'p' -l 'picker' -d 'Open emoji/glyph picker'
 complete -c caelestia -n "$seen emoji" -s 'f' -l 'fetch' -d 'Fetch emoji/glyph data from remote'
 
-# Pip
-complete -c caelestia -n "$seen pip" -s 'd' -l 'daemon' -d 'Start in daemon mode'
+# Resizer
+complete -c caelestia -n "$seen resizer" -s 'd' -l 'daemon' -d 'Start in daemon mode'
+complete -c caelestia -n "$seen resizer" -a 'pip' -d 'Quick pip mode'
+complete -c caelestia -n "$seen resizer" -a 'active' -d 'Select the active window'
