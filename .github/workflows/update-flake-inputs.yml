@@ -66,7 +66,7 @@ jobs:
                   result/bin/caelestia emoji -h
                   result/bin/caelestia emoji
                   result/bin/caelestia wallpaper -h
-                  result/bin/caelestia pip -h
+                  result/bin/caelestia resizer -h
 
             - name: Test graphical stuff
               env:
