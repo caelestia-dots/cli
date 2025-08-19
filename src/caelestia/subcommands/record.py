@@ -78,7 +78,7 @@ class Command:
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         proc = subprocess.Popen(
-            ["wl-screenrec", *args, "-f", recording_path],
+            [self.recorder, *args, "-f", recording_path],
             stderr=subprocess.PIPE,
             text=True,
             start_new_session=True,
