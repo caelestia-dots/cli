@@ -67,26 +67,27 @@ All subcommands/options can be explored via the help flag.
 
 ```
 $ caelestia -h
-usage: caelestia [-h] COMMAND ...
+usage: caelestia [-h] [-v] COMMAND ...
 
 Main control script for the Caelestia dotfiles
 
 options:
-  -h, --help    show this help message and exit
+  -h, --help     show this help message and exit
+  -v, --version  print the current version
 
 subcommands:
   valid subcommands
 
-  COMMAND       the subcommand to run
-    shell       start or message the shell
-    toggle      toggle a special workspace
-    scheme      manage the colour scheme
-    screenshot  take a screenshot
-    record      start a screen recording
-    clipboard   open clipboard history
-    emoji       emoji/glyph utilities
-    wallpaper   manage the wallpaper
-    pip         picture in picture utilities
+  COMMAND        the subcommand to run
+    shell        start or message the shell
+    toggle       toggle a special workspace
+    scheme       manage the colour scheme
+    screenshot   take a screenshot
+    record       start a screen recording
+    clipboard    open clipboard history
+    emoji        emoji/glyph utilities
+    wallpaper    manage the wallpaper
+    resizer      window resizer daemon
 ```
 
 ## Configuring

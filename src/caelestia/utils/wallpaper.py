@@ -160,4 +160,18 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
 
 
 def set_random(args: Namespace) -> None:
-    set_wallpaper(random.choice(get_wallpapers(args)), args.no_smart)
+    wallpapers = get_wallpapers(args)
+
+    if not wallpapers:
+        raise ValueError("No valid wallpapers found")
+
+    try:
+        last_wall = wallpaper_path_path.read_text()
+        wallpapers.remove(Path(last_wall))
+
+        if not wallpapers:
+            raise ValueError("Only valid wallpaper is current")
+    except (FileNotFoundError, ValueError):
+        pass
+
+    set_wallpaper(random.choice(wallpapers), args.no_smart)
