@@ -1,4 +1,3 @@
-import os
 import subprocess
 from argparse import Namespace
 
@@ -33,12 +32,7 @@ class Command:
                 args.append("-d")
                 subprocess.run(args)
             else:
-                shell = subprocess.Popen(
-                    args,
-                    stdout=subprocess.PIPE,
-                    universal_newlines=True,
-                    env=dict(os.environ, QT_QPA_PLATFORMTHEME="gtk3"),
-                )
+                shell = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
                 for line in shell.stdout:
                     if self.filter_log(line):
                         print(line, end="")
