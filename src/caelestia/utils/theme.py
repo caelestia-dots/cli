@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
+from caelestia.utils.logging import log_exception
 from caelestia.utils.paths import (
     c_state_dir,
     config_dir,
@@ -103,6 +104,7 @@ def write_file(path: Path, content: str) -> None:
     path.write_text(content)
 
 
+@log_exception
 def apply_terms(sequences: str) -> None:
     state = c_state_dir / "sequences.txt"
     state.parent.mkdir(parents=True, exist_ok=True)
@@ -118,10 +120,12 @@ def apply_terms(sequences: str) -> None:
                 pass
 
 
+@log_exception
 def apply_hypr(conf: str) -> None:
     write_file(config_dir / "hypr/scheme/current.conf", conf)
 
 
+@log_exception
 def apply_discord(scss: str) -> None:
     import tempfile
 
@@ -133,33 +137,39 @@ def apply_discord(scss: str) -> None:
         write_file(config_dir / client / "themes/caelestia.theme.css", conf)
 
 
+@log_exception
 def apply_spicetify(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / f"spicetify-{mode}.ini")
     write_file(config_dir / "spicetify/Themes/caelestia/color.ini", template)
 
 
+@log_exception
 def apply_fuzzel(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "fuzzel.ini")
     write_file(config_dir / "fuzzel/fuzzel.ini", template)
 
 
+@log_exception
 def apply_btop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "btop.theme", hash=True)
     write_file(config_dir / "btop/themes/caelestia.theme", template)
     subprocess.run(["killall", "-USR2", "btop"], stderr=subprocess.DEVNULL)
 
 
+@log_exception
 def apply_nvtop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "nvtop.colors", hash=True)
     write_file(config_dir / "nvtop/nvtop.colors", template)
 
 
+@log_exception
 def apply_htop(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "htop.theme", hash=True)
     write_file(config_dir / "htop/htoprc", template)
     subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
+@log_exception
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     write_file(config_dir / "gtk-3.0/gtk.css", template)
@@ -170,6 +180,7 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
 
 
+@log_exception
 def apply_qt(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
     write_file(config_dir / "qt5ct/colors/caelestia.colors", template)
@@ -196,6 +207,7 @@ general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
         write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
 
 
+@log_exception
 def apply_warp(colours: dict[str, str], mode: str) -> None:
     warp_mode = "darker" if mode == "dark" else "lighter"
 
@@ -204,12 +216,14 @@ def apply_warp(colours: dict[str, str], mode: str) -> None:
     write_file(data_dir / "warp-terminal/themes/caelestia.yaml", template)
 
 
+@log_exception
 def apply_cava(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "cava.conf", hash=True)
     write_file(config_dir / "cava/config", template)
     subprocess.run(["killall", "-USR2", "cava"], stderr=subprocess.DEVNULL)
 
 
+@log_exception
 def apply_user_templates(colours: dict[str, str]) -> None:
     if not user_templates_dir.is_dir():
         return

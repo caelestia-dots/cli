@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from caelestia.utils import hypr
+from caelestia.utils.logging import log_message
 from caelestia.utils.paths import user_config_path
 
 
@@ -49,15 +50,11 @@ class Command:
                     )
                 return rules
         except (json.JSONDecodeError, KeyError):
-            self._log_message("ERROR: invalid config")
+            log_message("ERROR: invalid config")
         except FileNotFoundError:
             pass
 
         return default_rules
-
-    def _log_message(self, message: str) -> None:
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] {message}")
 
     def _is_rate_limited(self, key: str) -> bool:
         current_time = time.time()
@@ -170,12 +167,12 @@ class Command:
             command2 = f"dispatch movewindowpixel exact {int(move_x)} {int(move_y)},address:{address}"
             hypr.batch(command1, command2)
 
-            self._log_message(
+            log_message(
                 f"Applied PiP action to window {address}: {scaled_width}x{scaled_height} at ({move_x}, {move_y})"
             )
 
         except Exception as e:
-            self._log_message(f"ERROR: Failed to apply PiP action to window 0x{window_id}: {e}")
+            log_message(f"ERROR: Failed to apply PiP action to window 0x{window_id}: {e}")
 
     def _apply_window_actions(self, window_id: str, width: str, height: str, actions: list[str]) -> bool:
         dispatch_commands = []
@@ -196,10 +193,10 @@ class Command:
 
         try:
             hypr.batch(*dispatch_commands)
-            self._log_message(f"Applied actions to window 0x{window_id}: {width} x {height} ({', '.join(actions)})")
+            log_message(f"Applied actions to window 0x{window_id}: {width} x {height} ({', '.join(actions)})")
             return True
         except Exception as e:
-            self._log_message(f"ERROR: Failed to apply window actions for window 0x{window_id}: {e}")
+            log_message(f"ERROR: Failed to apply window actions for window 0x{window_id}: {e}")
             return False
 
     def _match_window_rule(self, window_title: str, initial_title: str) -> WindowRule | None:
@@ -218,7 +215,7 @@ class Command:
                     if re.search(rule.name, window_title):
                         return rule
                 except re.error:
-                    self._log_message(f"ERROR: Invalid regex pattern in rule '{rule.name}'")
+                    log_message(f"ERROR: Invalid regex pattern in rule '{rule.name}'")
 
         return None
 
@@ -240,7 +237,7 @@ class Command:
             window_id = window_id.lstrip(">")
 
             if not all(c in "0123456789abcdefABCDEF" for c in window_id):
-                self._log_message(f"ERROR: Invalid window ID format: {window_id}")
+                log_message(f"ERROR: Invalid window ID format: {window_id}")
                 return
 
             window_info = self._get_window_info(window_id)
@@ -250,19 +247,19 @@ class Command:
             window_title = window_info.get("title", "")
             initial_title = window_info.get("initialTitle", "")
 
-            self._log_message(f"DEBUG: Window 0x{window_id} - Title: '{window_title}' | Initial: '{initial_title}'")
+            log_message(f"DEBUG: Window 0x{window_id} - Title: '{window_title}' | Initial: '{initial_title}'")
 
             rule = self._match_window_rule(window_title, initial_title)
             if rule:
                 if self._is_rate_limited(window_id):
-                    self._log_message(f"Rate limited: skipping window 0x{window_id}")
+                    log_message(f"Rate limited: skipping window 0x{window_id}")
                     return
 
-                self._log_message(f"Matched rule '{rule.name}' for window 0x{window_id}")
+                log_message(f"Matched rule '{rule.name}' for window 0x{window_id}")
                 self._apply_window_actions(window_id, rule.width, rule.height, rule.actions)
 
         except (IndexError, ValueError) as e:
-            self._log_message(f"ERROR: Failed to parse window title event: {e}")
+            log_message(f"ERROR: Failed to parse window title event: {e}")
 
     def _handle_open_event(self, event: str) -> None:
         try:
@@ -278,22 +275,22 @@ class Command:
             window_id = window_id.lstrip(">")
 
             if not all(c in "0123456789abcdefABCDEF" for c in window_id):
-                self._log_message(f"ERROR: Invalid window ID format: {window_id}")
+                log_message(f"ERROR: Invalid window ID format: {window_id}")
                 return
 
-            self._log_message(f"DEBUG: New window 0x{window_id} - Title: '{title}' | Class: '{window_class}'")
+            log_message(f"DEBUG: New window 0x{window_id} - Title: '{title}' | Class: '{window_class}'")
 
             rule = self._match_window_rule(title, title)
             if rule:
                 if self._is_rate_limited(window_id):
-                    self._log_message(f"Rate limited: skipping window 0x{window_id}")
+                    log_message(f"Rate limited: skipping window 0x{window_id}")
                     return
 
-                self._log_message(f"Matched rule '{rule.name}' for new window 0x{window_id}")
+                log_message(f"Matched rule '{rule.name}' for new window 0x{window_id}")
                 self._apply_window_actions(window_id, rule.width, rule.height, rule.actions)
 
         except (IndexError, ValueError) as e:
-            self._log_message(f"ERROR: Failed to parse window open event: {e}")
+            log_message(f"ERROR: Failed to parse window open event: {e}")
 
     def run(self) -> None:
         if self.args.daemon:
@@ -440,19 +437,19 @@ class Command:
             return []
 
     def _run_daemon(self) -> None:
-        self._log_message("Hyprland window resizer started")
-        self._log_message(f"Loaded {len(self.window_rules)} window rules")
+        log_message("Hyprland window resizer started")
+        log_message(f"Loaded {len(self.window_rules)} window rules")
 
         socket_path = Path(hypr.socket2_path)
         if not socket_path.exists():
-            self._log_message(f"ERROR: Hyprland socket not found at {socket_path}")
+            log_message(f"ERROR: Hyprland socket not found at {socket_path}")
             return
 
         try:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
                 sock.connect(hypr.socket2_path)
 
-                self._log_message("Connected to Hyprland socket, listening for events...")
+                log_message("Connected to Hyprland socket, listening for events...")
 
                 while True:
                     data = sock.recv(4096).decode()
@@ -462,6 +459,6 @@ class Command:
                                 self._handle_window_event(line)
 
         except KeyboardInterrupt:
-            self._log_message("Resizer daemon stopped")
+            log_message("Resizer daemon stopped")
         except Exception as e:
-            self._log_message(f"ERROR: {e}")
+            log_message(f"ERROR: {e}")
