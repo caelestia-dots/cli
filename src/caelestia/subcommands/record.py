@@ -5,7 +5,7 @@ import time
 from argparse import Namespace
 from datetime import datetime
 
-from caelestia.utils.notify import notify
+from caelestia.utils.notify import close_notification, notify
 from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir
 
 
@@ -66,15 +66,27 @@ class Command:
 
         if self.args.sound:
             sources = subprocess.check_output(["pactl", "list", "short", "sources"], text=True).splitlines()
+            audio_source = None
+
             for source in sources:
                 if "RUNNING" in source:
-                    if self.recorder == "wf-recorder":
-                        args += ["-a", source.split()[1]]
-                    else:
-                        args += ["--audio", "--audio-device", source.split()[1]]
+                    audio_source = source.split()[1]
                     break
-            else:
+
+            # Fallback to IDLE source if no RUNNING source
+            if not audio_source:
+                for source in sources:
+                    if "IDLE" in source:
+                        audio_source = source.split()[1]
+                        break
+
+            if not audio_source:
                 raise ValueError("No audio source found")
+
+            if self.recorder == "wf-recorder":
+                args += [f"--audio={audio_source}"]
+            else:
+                args += ["--audio", "--audio-device", audio_source]
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         proc = subprocess.Popen(
@@ -84,13 +96,16 @@ class Command:
             start_new_session=True,
         )
 
-        # Send notif if proc hasn't ended after a small delay
-        time.sleep(0.1)
-        if proc.poll() is None:
-            notif = notify("-p", "Recording started", "Recording...")
-            recording_notif_path.write_text(notif)
-        else:
-            notify("Recording failed", f"Recording failed to start: {proc.communicate()[1]}")
+        notif = notify("-p", "Recording started", "Recording...")
+        recording_notif_path.write_text(notif)
+
+        for _ in range(5):
+            if proc.poll() is not None:
+                if proc.returncode != 0:
+                    close_notification(notif)
+                    notify("Recording failed", f"Recording error: {proc.communicate()[1]}")
+                return
+            time.sleep(0.2)
 
     def stop(self) -> None:
         # Start killing recording process
@@ -107,19 +122,7 @@ class Command:
 
         # Close start notification
         try:
-            notif = recording_notif_path.read_text()
-            subprocess.run(
-                [
-                    "gdbus",
-                    "call",
-                    "--session",
-                    "--dest=org.freedesktop.Notifications",
-                    "--object-path=/org/freedesktop/Notifications",
-                    "--method=org.freedesktop.Notifications.CloseNotification",
-                    notif,
-                ],
-                stdout=subprocess.DEVNULL,
-            )
+            close_notification(recording_notif_path.read_text())
         except IOError:
             pass
 
