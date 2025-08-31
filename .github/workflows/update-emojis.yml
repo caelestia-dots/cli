@@ -28,7 +28,7 @@ jobs:
                   pip install .
 
             - name: Fetch emojis
-              run: ./run.sh emoji -f
+              run: ./bin/caelestia emoji -f
 
             - name: Check for changes
               id: check
