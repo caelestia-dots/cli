@@ -139,11 +139,15 @@ class Command:
 
             monitor_height = monitor.get("height")
             monitor_width = monitor.get("width")
+            monitor_scale = monitor.get("scale")
             monitor_x = monitor.get("x")
             monitor_y = monitor.get("y")
 
-            if not all(isinstance(x, (int, float)) for x in [monitor_height, monitor_width, monitor_x, monitor_y]):
+            if not all(isinstance(x, (int, float)) for x in [monitor_height, monitor_width, monitor_scale, monitor_x, monitor_y]):
                 return
+            
+            monitor_height = monitor_height / monitor_scale
+            monitor_width = monitor_width / monitor_scale
 
             scale_factor = monitor_height / 4 / height
             scaled_width = int(width * scale_factor)
