@@ -1,6 +1,6 @@
 import argparse
 
-from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, timer, toggle, wallpaper
+from caelestia.subcommands import clipboard, emoji, record, resizer, rshell, scheme, screenshot, shell, timer, toggle, wallpaper
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
@@ -133,5 +133,9 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     timer_parser.add_argument("-l", "--list", action="store_true", help="list all running timers")
     timer_parser.add_argument("-s", "--show", type=int, metavar="INDEX", help="show remaining time for timer at INDEX")
     timer_parser.add_argument("-q", "--quit", type=int, metavar="INDEX", help="quit timer at INDEX")
+
+    # Create parser for rshell opts
+    rshell_parser = command_parser.add_parser("rshell", help="restart the caelestia shell")
+    rshell_parser.set_defaults(cls=rshell.Command)
 
     return parser, parser.parse_args()

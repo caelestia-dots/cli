@@ -16,16 +16,14 @@ class Command:
         cmd = [script_path]
         
         # Pass through all arguments from argparse to the script
-        if hasattr(self.args, 'help') and self.args.help:
-            cmd.extend(['-h'])
-        elif hasattr(self.args, 'list') and self.args.list:
+        if hasattr(self.args, 'list') and self.args.list:
             cmd.extend(['-l'])
         elif hasattr(self.args, 'show') and self.args.show is not None:
             cmd.extend(['-s', str(self.args.show)])
         elif hasattr(self.args, 'quit') and self.args.quit is not None:
             cmd.extend(['-q', str(self.args.quit)])
-        elif hasattr(self.args, 'minutes') and self.args.minutes is not None:
-            cmd.append(str(self.args.minutes))
+        elif hasattr(self.args, 'duration') and self.args.duration is not None:
+            cmd.append(str(self.args.duration))
         
         # Execute the timer script
         try:
