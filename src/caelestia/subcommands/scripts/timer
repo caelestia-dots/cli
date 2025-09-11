@@ -1,0 +1,192 @@
+#!/bin/bash
+
+# Directory to store timer information
+TIMER_DIR="$HOME/.timers"
+mkdir -p "$TIMER_DIR"
+
+# File to store timer PIDs, start times, and durations
+TIMER_FILE="$TIMER_DIR/timers"
+
+# Function to display help message
+show_help() {
+  echo "Usage: ti [OPTION] [ARGUMENT]"
+  echo "A simple timer script that sets timers and sends notifications."
+  echo ""
+  echo "Options:"
+  echo "  -h, --help          Display this help message and exit"
+  echo "  -l, --list          List all running timers"
+  echo "  -s, --show INDEX    Show remaining time for timer at INDEX"
+  echo "  -q, --quit INDEX    Quit timer at INDEX"
+  echo "  MINUTES             Set a timer for MINUTES"
+  echo ""
+  echo "Examples:"
+  echo "  ti 30             Set a 30-minute timer"
+  echo "  ti -l             List all running timers"
+  echo "  ti -s 0           Show remaining time for timer at index 0"
+  echo "  ti -q 0           Quit timer at index 0"
+  echo "  ti                Display this help message"
+  exit 0
+}
+
+# Function to clean up finished timers
+clean_timers() {
+  if [ ! -s "$TIMER_FILE" ]; then
+    return
+  fi
+
+  # Create a temporary file for active timers
+  temp_file=$(mktemp)
+  while IFS=: read -r pid start duration; do
+    if ps -p "$pid" > /dev/null; then
+      echo "$pid:$start:$duration" >> "$temp_file"
+    fi
+  done < "$TIMER_FILE"
+
+  # Replace the original file with the cleaned-up version
+  mv "$temp_file" "$TIMER_FILE"
+}
+
+# Function to quit a specific timer
+quit_timer() {
+  local index="$1"
+  local count=0
+  local found=0
+  local temp_file=$(mktemp)
+
+  # Clean up finished timers before quitting
+  clean_timers
+
+  # Read the timer file and process the specified index
+  while IFS=: read -r pid start duration; do
+    if [ "$count" -eq "$index" ] && ps -p "$pid" > /dev/null; then
+      found=1
+      kill "$pid" 2>/dev/null
+      echo "Timer $index has been terminated."
+    else
+      echo "$pid:$start:$duration" >> "$temp_file"
+    fi
+    ((count++))
+  done < "$TIMER_FILE"
+
+  # Update the timer file
+  mv "$temp_file" "$TIMER_FILE"
+
+  if [ "$found" -eq 0 ]; then
+    echo "Error: No timer found at index $index or timer has already finished."
+    exit 1
+  fi
+}
+
+# Function to display remaining time for a specific timer
+show_timer() {
+  local index="$1"
+  local count=0
+  local found=0
+
+  # Clean up finished timers before showing
+  clean_timers
+
+  # Read the timer file and process the specified index
+  while IFS=: read -r pid start duration; do
+    if [ "$count" -eq "$index" ] && ps -p "$pid" > /dev/null; then
+      found=1
+      current_time=$(date +%s)
+      elapsed=$(echo "$current_time - $start" | bc -l)
+      remaining=$(echo "$duration - $elapsed" | bc -l)
+      if [ "$(echo "$remaining > 0" | bc -l)" -eq 1 ]; then
+        minutes=$(echo "$remaining / 60" | bc -l | awk '{printf "%.2f", $0}')
+        echo "Timer $index: $minutes minutes remaining"
+      else
+        echo "Timer $index: Already finished"
+      fi
+      break
+    fi
+    ((count++))
+  done < "$TIMER_FILE"
+
+  if [ "$found" -eq 0 ]; then
+    echo "Error: No timer found at index $index or timer has already finished."
+    exit 1
+  fi
+}
+
+# Function to list all running timers
+list_timers() {
+  # Clean up finished timers before listing
+  clean_timers
+
+  if [ ! -s "$TIMER_FILE" ]; then
+    echo "No timers are currently running."
+    exit 0
+  fi
+
+  local count=0
+  while IFS=: read -r pid start duration; do
+    if ps -p "$pid" > /dev/null; then
+      minutes=$(echo "$duration / 60" | bc -l | awk '{printf "%.2f", $0}')
+      echo "Timer $count: Set for $minutes minutes"
+    fi
+    ((count++))
+  done < "$TIMER_FILE"
+}
+
+# Check for flags or no arguments
+case "$1" in
+  -h|--help)
+    show_help
+    ;;
+  -l|--list)
+    list_timers
+    ;;
+  -s|--show)
+    if [ -z "$2" ]; then
+      echo "Error: Please provide a timer index with -s or --show."
+      exit 1
+    fi
+    if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+      echo "Error: Timer index must be a non-negative integer."
+      exit 1
+    fi
+    show_timer "$2"
+    ;;
+  -q|--quit)
+    if [ -z "$2" ]; then
+      echo "Error: Please provide a timer index with -q or --quit."
+      exit 1
+    fi
+    if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+      echo "Error: Timer index must be a non-negative integer."
+      exit 1
+    fi
+    quit_timer "$2"
+    ;;
+  "")
+    show_help
+    ;;
+  *)
+    # Validate input is a positive number (integer or float)
+    minutes="$1"
+    if ! [[ "$minutes" =~ ^[0-9]*\.?[0-9]+$ ]] || [ "$(echo "$minutes <= 0" | bc -l)" -eq 1 ]; then
+      echo "Error: Please provide a positive number for minutes (e.g., 60 or 0.5)."
+      exit 1
+    fi
+
+    # Convert minutes to seconds for sleep (handles floats)
+    seconds=$(echo "$minutes * 60" | bc -l)
+
+    # Command to execute when timer finishes
+    notify_cmd="notify-send -u low -i dialog-information-symbolic 'Timer' '$minutes minute timer done!'"
+    sound_cmd="paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+
+    # Get current timestamp
+    start_time=$(date +%s)
+
+    # Run sleep in the background and trigger notification and sound
+    (sleep "$seconds" && eval "$notify_cmd" && eval "$sound_cmd") &
+
+    # Store PID, start time, and duration in the timer file
+    echo "$!:$start_time:$seconds" >> "$TIMER_FILE"
+
+    echo "Timer set for $minutes minutes ($seconds seconds). Notification and sound will trigger when done."
+    ;;
+esac

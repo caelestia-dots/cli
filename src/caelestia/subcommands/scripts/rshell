@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "Starting shell restart"
+qs -c caelestia kill
+sleep 3
+caelestia shell -d
