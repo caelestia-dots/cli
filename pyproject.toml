@@ -17,5 +17,12 @@ caelestia = "caelestia:main"
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.build.targets.sdist]
+only-include = [
+    "src",
+    "completions",
+    "README.md"
+]
+
 [tool.ruff]
 line-length = 120
