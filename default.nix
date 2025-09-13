@@ -12,7 +12,7 @@
   dart-sass,
   grim,
   fuzzel,
-  wl-screenrec,
+  gpu-screen-recorder,
   dconf,
   killall,
   caelestia-shell,
@@ -50,7 +50,7 @@ python3.pkgs.buildPythonApplication {
       dart-sass
       grim
       fuzzel
-      wl-screenrec
+      gpu-screen-recorder
       dconf
       killall
     ]

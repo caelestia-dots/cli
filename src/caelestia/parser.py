@@ -70,6 +70,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     record_parser.set_defaults(cls=record.Command)
     record_parser.add_argument("-r", "--region", nargs="?", const="slurp", help="record a region")
     record_parser.add_argument("-s", "--sound", action="store_true", help="record audio")
+    record_parser.add_argument("-p", "--pause", action="store_true", help="pause/resume the recording")
 
     # Create parser for clipboard opts
     clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
