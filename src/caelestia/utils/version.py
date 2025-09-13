@@ -7,7 +7,7 @@ from caelestia.utils.paths import config_dir
 def print_version() -> None:
     if shutil.which("pacman"):
         print("Packages:")
-        pkgs = ["caelestia-shell-git", "caelestia-cli-git", "caelestia-meta"]
+        pkgs = ["caelestia-shell", "caelestia-cli", "caelestia-meta"]
         versions = subprocess.run(
             ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
         ).stdout
@@ -30,6 +30,14 @@ def print_version() -> None:
         print("    Commit message:", *caelestia_ver.splitlines()[1:])
     except subprocess.CalledProcessError:
         print("Caelestia: not installed")
+
+    print()
+    try:
+        shell_ver = subprocess.check_output(["/usr/lib/caelestia/version", "-s"], text=True).strip()
+        print("Shell:")
+        print("    ", shell_ver)
+    except subprocess.CalledProcessError:
+        print("Shell: version helper not available")
 
     print()
     if shutil.which("qs"):
