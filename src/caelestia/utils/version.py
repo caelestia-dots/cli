@@ -36,7 +36,7 @@ def print_version() -> None:
         shell_ver = subprocess.check_output(["/usr/lib/caelestia/version", "-s"], text=True).strip()
         print("Shell:")
         print("    ", shell_ver)
-    except subprocess.CalledProcessError:
+    except FileNotFoundError:
         print("Shell: version helper not available")
 
     print()
