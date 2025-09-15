@@ -7,7 +7,7 @@ from argparse import Namespace
 from datetime import datetime
 
 from caelestia.utils.notify import close_notification, notify
-from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir
+from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir, user_config_path
 
 RECORDER = "gpu-screen-recorder"
 
@@ -62,6 +62,15 @@ class Command:
 
         if self.args.sound:
             args += ["-a", "default_output"]
+
+        try:
+            config = json.loads(user_config_path.read_text())
+            if "record" in config and "extraArgs" in config["record"]:
+                args += config["record"]["extraArgs"]
+        except (json.JSONDecodeError, FileNotFoundError):
+            pass
+        except TypeError as e:
+            raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], start_new_session=True)

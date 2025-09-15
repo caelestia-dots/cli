@@ -130,6 +130,9 @@ All configuration options are in `~/.config/caelestia/cli.json`.
 
 ```json
 {
+    "record": {
+        "extraArgs": []
+    },
     "theme": {
         "enableTerm": true,
         "enableHypr": true,
