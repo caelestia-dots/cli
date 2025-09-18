@@ -2,10 +2,11 @@
   description = "CLI for Caelestia dots";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     caelestia-shell = {
-      url = "github:caelestia-dots/shell";
+      url = "github:Av3lle/shell";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.caelestia-cli.follows = "";
     };
@@ -14,6 +15,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-unstable,
     ...
   } @ inputs: let
     forAllSystems = fn:
@@ -27,6 +29,7 @@
       caelestia-cli = pkgs.callPackage ./default.nix {
         rev = self.rev or self.dirtyRev;
         caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
+        pkgs = unstablePkgs;
       };
       with-shell = caelestia-cli.override {withShell = true;};
       default = caelestia-cli;
