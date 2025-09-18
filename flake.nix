@@ -30,7 +30,7 @@
         rev = self.rev or self.dirtyRev;
         caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
         app2unit = pkgs.callPackage "${inputs.caelestia-shell}/nix/app2unit.nix" {
-          pkgs = nixpkgs-unstable;
+          pkgs = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
         };
       };
       with-shell = caelestia-cli.override {withShell = true;};
