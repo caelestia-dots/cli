@@ -29,7 +29,7 @@
       caelestia-cli = pkgs.callPackage ./default.nix {
         rev = self.rev or self.dirtyRev;
         caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
-        pkgs = unstablePkgs;
+        pkgs = nixpkgs-unstable;
       };
       with-shell = caelestia-cli.override {withShell = true;};
       default = caelestia-cli;
