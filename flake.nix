@@ -6,10 +6,16 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     caelestia-shell = {
-      url = "github:Av3lle/shell";
+      url = "github:caelestia-dots/shell";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.caelestia-cli.follows = "";
     };
+
+    #caelestia-shell = {
+    #  url = "github:Av3lle/shell";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #  inputs.caelestia-cli.follows = "";
+    #};
   };
 
   outputs = {
