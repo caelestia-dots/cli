@@ -32,6 +32,53 @@ class Command:
     def intersects(self, a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
         return a[0] < b[0] + b[2] and a[0] + a[2] > b[0] and a[1] < b[1] + b[3] and a[1] + a[3] > b[1]
 
+    def _convert_to_physical_pixels(self, log_x: int, log_y: int, log_w: int, log_h: int, monitors: list) -> str:
+        """Convert logical coordinates to physical pixels for gpu-screen-recorder.
+        
+        This handles fractional scaling by:
+        1. Finding the minimum physical origin across all monitors
+        2. Converting logical coordinates to physical coordinates using monitor scale
+        """
+        # Find minimum physical origin (top-left across all monitors)
+        min_phys_x = 0
+        min_phys_y = 0
+        have_any = False
+        
+        for monitor in monitors:
+            scale = monitor.get("scale", 1.0)
+            phys_x = monitor["x"] * scale
+            phys_y = monitor["y"] * scale
+            
+            if not have_any:
+                min_phys_x = phys_x
+                min_phys_y = phys_y  
+                have_any = True
+            else:
+                min_phys_x = min(min_phys_x, phys_x)
+                min_phys_y = min(min_phys_y, phys_y)
+        
+        # Find the monitor containing this region to get its scale
+        region_monitor = None
+        for monitor in monitors:
+            mon_x, mon_y = monitor["x"], monitor["y"] 
+            mon_w, mon_h = monitor["width"], monitor["height"]
+            
+            # Check if region intersects with this monitor
+            if self.intersects((log_x, log_y, log_w, log_h), (mon_x, mon_y, mon_w, mon_h)):
+                region_monitor = monitor
+                break
+        
+        # Use scale from the monitor containing the region, fallback to 1.0
+        scale = region_monitor.get("scale", 1.0) if region_monitor else 1.0
+        
+        # Convert to physical coordinates
+        phys_x = max(0, round(log_x * scale - min_phys_x))
+        phys_y = max(0, round(log_y * scale - min_phys_y))
+        phys_w = max(1, round(log_w * scale))
+        phys_h = max(1, round(log_h * scale))
+        
+        return f"{phys_w}x{phys_h}+{phys_x}+{phys_y}"
+
     def start(self) -> None:
         args = ["-w"]
 
@@ -41,14 +88,21 @@ class Command:
                 region = subprocess.check_output(["slurp", "-f", "%wx%h+%x+%y"], text=True)
             else:
                 region = self.args.region.strip()
-            args += ["region", "-region", region]
-
+            
+            # Parse region coordinates (logical pixels from area picker)
             m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region)
             if not m:
                 raise ValueError(f"Invalid region: {region}")
 
-            w, h, x, y = map(int, m.groups())
-            r = x, y, w, h
+            log_w, log_h, log_x, log_y = map(int, m.groups())
+            
+            # Convert logical coordinates to physical pixels for gpu-screen-recorder
+            # This handles fractional scaling correctly
+            phys_region = self._convert_to_physical_pixels(log_x, log_y, log_w, log_h, monitors)
+            args += ["region", "-region", phys_region]
+
+            # Find refresh rate for the region
+            r = log_x, log_y, log_w, log_h
             max_rr = 0
             for monitor in monitors:
                 if self.intersects((monitor["x"], monitor["y"], monitor["width"], monitor["height"]), r):
@@ -109,14 +163,15 @@ class Command:
             pass
 
         action = notify(
-            "--action=watch=Watch",
+            "-t", "0",  # No timeout, no close button
+            "--action=play=Play",
             "--action=open=Open",
             "--action=delete=Delete",
             "Recording stopped",
             f"Recording saved in {new_path}",
         )
 
-        if action == "watch":
+        if action == "play":
             subprocess.Popen(["app2unit", "-O", new_path], start_new_session=True)
         elif action == "open":
             p = subprocess.run(
