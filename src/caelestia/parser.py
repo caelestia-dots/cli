@@ -1,6 +1,6 @@
 import argparse
 
-from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
+from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper, neovim
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
@@ -126,5 +126,9 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     resizer_parser.add_argument("width", nargs="?", help="width to resize to")
     resizer_parser.add_argument("height", nargs="?", help="height to resize to")
     resizer_parser.add_argument("actions", nargs="?", help="comma-separated actions to apply (float,center,pip)")
+
+    # Create parser for neovim opts
+    neovim_parser = command_parser.add_parser("neovim", help="generate a neovim colorscheme")
+    neovim_parser.set_defaults(cls=neovim.Command)
 
     return parser, parser.parse_args()
