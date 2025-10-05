@@ -40,11 +40,6 @@ recordings_dir = os.getenv("CAELESTIA_RECORDINGS_DIR", videos_dir / "Recordings"
 recording_path = c_state_dir / "record/recording.mp4"
 recording_notif_path = c_state_dir / "record/notifid.txt"
 
-neovim_config_path = config_dir / "nvim"
-neovim_colors_path = neovim_config_path / "colors"
-neovim_colorscheme_file = neovim_colors_path / "caelestia.lua"
-neovim_template_path = templates_dir / "neovim.lua"
-
 
 def compute_hash(path: Path | str) -> str:
     sha = hashlib.sha256()
