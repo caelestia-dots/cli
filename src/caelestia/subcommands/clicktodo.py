@@ -121,11 +121,14 @@ class Command:
             warm_up_ocr(client, fast=fast_mode, debug=debug)
 
             # Capture fullscreen
-            image_path = capture_fullscreen(debug=debug)
+            image_path, monitor_geometry = capture_fullscreen(debug=debug)
             debug_log(debug, f"Screenshot captured to {image_path}")
+            if monitor_geometry:
+                debug_log(debug, f"Monitor geometry: x={monitor_geometry[0]}, y={monitor_geometry[1]}, w={monitor_geometry[2]}, h={monitor_geometry[3]}")
 
             selected_text, region_count, cancelled = launch_overlay(
                 image_path,
+                monitor_geometry=monitor_geometry,
                 fast=fast_mode,
                 debug=debug,
                 live=live_mode,
@@ -163,21 +166,101 @@ class Command:
 
 # ------------------------------- Capture --------------------------------
 
-def capture_fullscreen(debug: bool = False) -> str:
+def get_active_monitor_on_hyprland(debug: bool = False) -> tuple[str, int, int, int, int] | None:
+    """Get the active monitor output name and geometry where the cursor is located.
+    
+    Returns:
+        Tuple of (monitor_name, x, y, width, height) or None
+    """
+    try:
+        from caelestia.utils.hypr import message
+        
+        # Get cursor position
+        cursor_data = message("cursorpos", json=True)
+        if not cursor_data or "x" not in cursor_data or "y" not in cursor_data:
+            debug_log(debug, "Failed to get cursor position from Hyprland")
+            return None
+        
+        cursor_x = cursor_data["x"]
+        cursor_y = cursor_data["y"]
+        debug_log(debug, f"Cursor position: ({cursor_x}, {cursor_y})")
+        
+        # Get all monitors
+        monitors = message("monitors", json=True)
+        if not monitors:
+            debug_log(debug, "Failed to get monitors from Hyprland")
+            return None
+        
+        # Find which monitor contains the cursor
+        for monitor in monitors:
+            mon_x = monitor.get("x", 0)
+            mon_y = monitor.get("y", 0)
+            mon_width = monitor.get("width", 0)
+            mon_height = monitor.get("height", 0)
+            mon_name = monitor.get("name", "")
+            
+            # Check if cursor is within this monitor's bounds
+            if (mon_x <= cursor_x < mon_x + mon_width and 
+                mon_y <= cursor_y < mon_y + mon_height):
+                debug_log(debug, f"Cursor is on monitor: {mon_name} ({mon_x},{mon_y} {mon_width}x{mon_height})")
+                return (mon_name, mon_x, mon_y, mon_width, mon_height)
+        
+        debug_log(debug, "Cursor not found on any monitor, using focused monitor")
+        # Fallback: use the focused monitor
+        for monitor in monitors:
+            if monitor.get("focused", False):
+                mon_name = monitor.get("name", "")
+                mon_x = monitor.get("x", 0)
+                mon_y = monitor.get("y", 0)
+                mon_width = monitor.get("width", 0)
+                mon_height = monitor.get("height", 0)
+                return (mon_name, mon_x, mon_y, mon_width, mon_height)
+        
+        return None
+        
+    except Exception as e:
+        debug_log(debug, f"Error getting active monitor: {e}")
+        return None
+
+
+def capture_fullscreen(debug: bool = False) -> tuple[str, tuple[int, int, int, int] | None]:
+    """Capture screenshot, preferring current monitor on Hyprland.
+    
+    Returns:
+        Tuple of (image_path, monitor_geometry) where monitor_geometry is (x, y, width, height) or None
+    """
     # JPEG @ q=90 is generally fastest with grim while keeping size small
     tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
     tmp_path = tmp.name
     tmp.close()
 
-    cmd = ["grim", "-t", "jpeg", "-q", "90", tmp_path]
-    debug_log(debug, f"Capturing fullscreen via: {' '.join(cmd)}")
+    # Try to detect Hyprland and capture only the active monitor
+    is_hyprland = os.getenv("HYPRLAND_INSTANCE_SIGNATURE") is not None
+    monitor_info = None
+    monitor_geometry = None
+    
+    if is_hyprland:
+        monitor_info = get_active_monitor_on_hyprland(debug=debug)
+        if monitor_info:
+            monitor_name, mon_x, mon_y, mon_width, mon_height = monitor_info
+            monitor_geometry = (mon_x, mon_y, mon_width, mon_height)
+    
+    # Build grim command
+    if monitor_info:
+        monitor_name = monitor_info[0]
+        cmd = ["grim", "-o", monitor_name, "-t", "jpeg", "-q", "90", tmp_path]
+        debug_log(debug, f"Capturing monitor {monitor_name} via: {' '.join(cmd)}")
+    else:
+        cmd = ["grim", "-t", "jpeg", "-q", "90", tmp_path]
+        debug_log(debug, f"Capturing fullscreen via: {' '.join(cmd)}")
+    
     t0 = time.perf_counter()
     result = subprocess.run(cmd, capture_output=True)
     t1 = (time.perf_counter() - t0) * 1000
     if result.returncode != 0:
         raise RuntimeError(result.stderr)
     debug_log(debug, f"Screenshot done in {t1:.1f} ms")
-    return tmp_path
+    return tmp_path, monitor_geometry
 
 
 # ------------------------------ OCR runner ------------------------------
@@ -229,11 +312,20 @@ def run_ocr_on_image(image_path: str, fast: bool = False, debug: bool = False) -
 
 def launch_overlay(
     image_path: str,
+    monitor_geometry: tuple[int, int, int, int] | None = None,
     fast: bool = False,
     debug: bool = False,
     live: bool = False,
 ) -> tuple[str | None, int, bool]:
-    """Combined scanning animation + interaction UI with subtle transitions."""
+    """Combined scanning animation + interaction UI with subtle transitions.
+    
+    Args:
+        image_path: Path to the screenshot image
+        monitor_geometry: (x, y, width, height) of the monitor where screenshot was taken, or None for fullscreen
+        fast: Enable fast mode
+        debug: Enable debug logging
+        live: Enable live streaming mode
+    """
     try:
         from PyQt6.QtWidgets import QApplication, QMainWindow
         from PyQt6.QtCore import Qt, QRectF, QPointF, QTimer, QElapsedTimer, QThread, pyqtSignal
@@ -634,13 +726,16 @@ def launch_overlay(
                 hit = rounded.intersected(self.path)
                 return hit if not hit.isEmpty() else rounded
 
-        def __init__(self, bg_image_path: str, fast: bool, debug: bool, live: bool):
+        def __init__(self, bg_image_path: str, monitor_geometry: tuple[int, int, int, int] | None, fast: bool, debug: bool, live: bool):
             super().__init__()
             self.bg_image_path = bg_image_path
+            self.monitor_geometry = monitor_geometry
             self.fast = fast
             self.debug = debug
             self.live = live
             debug_log(self.debug, f"Live mode {'enabled' if self.live else 'disabled'}")
+            if monitor_geometry:
+                debug_log(self.debug, f"Monitor geometry: {monitor_geometry}")
 
             # Selection state
             self.hovered_index: int | None = None
@@ -723,7 +818,15 @@ def launch_overlay(
             self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
             self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
             self.setMouseTracking(True)
-            self.setGeometry(0, 0, self.screen_width, self.screen_height)
+            
+            # Position overlay on the correct monitor
+            if self.monitor_geometry:
+                mon_x, mon_y, mon_w, mon_h = self.monitor_geometry
+                debug_log(self.debug, f"Positioning overlay at ({mon_x}, {mon_y}) with size {self.screen_width}x{self.screen_height}")
+                self.setGeometry(mon_x, mon_y, self.screen_width, self.screen_height)
+            else:
+                self.setGeometry(0, 0, self.screen_width, self.screen_height)
+            
             self.setFixedSize(self.screen_width, self.screen_height)
 
             # Precompute one paint before showing (prevents flash)
@@ -1248,7 +1351,7 @@ def launch_overlay(
 
     app = QApplication.instance() or QApplication(sys.argv)
     debug_log(debug, "Launching overlay UI")
-    overlay = OverlayWindow(image_path, fast, debug, live)
+    overlay = OverlayWindow(image_path, monitor_geometry, fast, debug, live)
     overlay.show()
     app.exec()
     debug_log(debug, f"Overlay session complete (regions={overlay.total_regions})")
