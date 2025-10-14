@@ -134,7 +134,7 @@ All configuration options are in `~/.config/caelestia/cli.json`.
         "extraArgs": []
     },
     "wallpaper": {
-        "postHook": ""  // Shell command to run after wallpaper changes. $WALLPAPER_PATH is available.
+        "postHook": "echo $WALLPAPER_PATH"  
     },
     "theme": {
         "enableTerm": true,
