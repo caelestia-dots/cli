@@ -51,12 +51,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
         return walls
 
     monitors = message("monitors")
-    filter_size = monitors[0]["width"], monitors[0]["height"]
-    for monitor in monitors[1:]:
-        if filter_size[0] > monitor["width"]:
-            filter_size[0] = monitor["width"]
-        if filter_size[1] > monitor["height"]:
-            filter_size[1] = monitor["height"]
+    filter_size = min(m["width"] for m in monitors), min(m["height"] for m in monitors)
 
     return [f for f in walls if check_wall(f, filter_size, args.threshold)]
 
