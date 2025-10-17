@@ -1,12 +1,12 @@
 import argparse
 
-from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
+from caelestia.subcommands import clipboard, clicktodo, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
 
 
-def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
+def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     parser = argparse.ArgumentParser(prog="caelestia", description="Main control script for the Caelestia dotfiles")
     parser.add_argument("-v", "--version", action="store_true", help="print the current version")
 
@@ -126,5 +126,16 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     resizer_parser.add_argument("width", nargs="?", help="width to resize to")
     resizer_parser.add_argument("height", nargs="?", help="height to resize to")
     resizer_parser.add_argument("actions", nargs="?", help="comma-separated actions to apply (float,center,pip)")
+
+    # Create parser for clicktodo (OCR click-to-copy) opts
+    clicktodo_parser = command_parser.add_parser("clicktodo", help="OCR-based click-to-copy from screen")
+    clicktodo_parser.set_defaults(cls=clicktodo.Command)
+    clicktodo_parser.add_argument("-f", "--fast", action="store_true", help="enable fast mode with aggressive optimizations")
+    clicktodo_parser.add_argument("--debug", action="store_true", help="show verbose debug output for troubleshooting")
+    clicktodo_parser.add_argument(
+        "--live",
+        action="store_true",
+        help="stream OCR results as they are recognized",
+    )
 
     return parser, parser.parse_args()
