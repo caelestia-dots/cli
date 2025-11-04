@@ -27,7 +27,7 @@ class Command:
             # Start the shell
             args = ["qs", "-c", "caelestia", "-n"]
             if self.args.log_rules:
-                args.append("--log-rules", self.args.log_rules)
+                args.extend(["--log-rules", self.args.log_rules])
             if self.args.daemon:
                 args.append("-d")
                 subprocess.run(args)
