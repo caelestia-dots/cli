@@ -27,14 +27,6 @@ def is_valid_image(path: Path) -> bool:
     return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
 
 
-def is_animated_image(path: Path) -> bool:
-    try:
-        with Image.open(path) as img:
-            return getattr(img, "is_animated", False)
-    except Exception:
-        return False
-
-
 def _extract_animated_metadata(path: Path) -> dict:
     """
     Detects animated image and its metadata from 'path'
