@@ -1,4 +1,5 @@
 import argparse
+from typing import Tuple
 
 from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
 from caelestia.utils.paths import wallpapers_dir
@@ -6,7 +7,7 @@ from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
 
 
-def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
+def parse_args() -> Tuple[argparse.ArgumentParser, argparse.Namespace]:
     parser = argparse.ArgumentParser(prog="caelestia", description="Main control script for the Caelestia dotfiles")
     parser.add_argument("-v", "--version", action="store_true", help="print the current version")
 
@@ -97,6 +98,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     wallpaper_parser.add_argument(
         "-t",
         "--threshold",
+        type=float,
         default=0.8,
         help="the minimum percentage of the largest monitor size the image must be greater than to be selected",
     )
