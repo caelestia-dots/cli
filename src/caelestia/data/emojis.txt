@@ -132,6 +132,7 @@
 😯 hushed face epic face hushed omg stunned surprised whoa woah
 😲 :o :O astonished face astonished cost face no omg shocked totally way
 😳 :$ flushed face amazed awkward crazy dazed dead disbelief embarrassed face flushed geez heat hot impressed jeez what wow
+🫪 distorted face anxiety bloated panic shocked surprised vulnerable
 🥺 pleading face begging big eyes face mercy not pleading please pretty puppy sad why
 🥹 face holding back tears admiration aww back cry embarrassed face feelings grateful gratitude holding joy please proud resist sad tears
 😦 frowning face with open mouth caught face frown frowning guard mouth open scared scary surprise what wow
@@ -205,6 +206,7 @@
 💋 kiss mark dating emotion heart kiss kissing lips mark romance sexy
 💯 hundred points 100 a+ agree clearly definitely faithful fleek full hundred keep perfect point score true truth yup
 💢 anger symbol anger angry comic mad symbol upset
+🫯 fight cloud argument brawl debate disagreement fight ruckus wrestle
 💥 collision bomb boom collide comic explode
 💫 dizzy comic shining shooting star stars
 💦 sweat droplets comic drip droplet droplets drops splashing squirt sweat water wet work workout
@@ -449,6 +451,7 @@
 🧟‍♂️ man zombie apocalypse dead halloween horror man scary undead walking zombie
 🧟‍♀️ woman zombie apocalypse dead halloween horror scary undead walking woman zombie
 🧌 troll fairy fantasy monster tale trolling
+🫈 hairy creature bigfoot cryptid forest giant hairy sasquatch woodwose yeti
 💆 person getting massage face getting headache massage person relax relaxing salon soothe spa tension therapy treatment
 💆‍♂️ man getting massage face getting headache man massage relax relaxing salon soothe spa tension therapy treatment
 💆‍♀️ woman getting massage face getting headache massage relax relaxing salon soothe spa tension therapy treatment woman
@@ -458,42 +461,43 @@
 🚶 person walking amble gait hike man pace pedestrian person stride stroll walk walking
 🚶‍♂️ man walking amble gait hike man pace pedestrian stride stroll walk walking
 🚶‍♀️ woman walking amble gait hike man pace pedestrian stride stroll walk walking woman
-🚶‍➡️ person walking facing right amble gait hike man pace pedestrian person stride stroll walk walking
-🚶‍♀️‍➡️ woman walking facing right amble gait hike man pace pedestrian stride stroll walk walking woman
-🚶‍♂️‍➡️ man walking facing right amble gait hike man pace pedestrian stride stroll walk walking
+🚶‍➡️ person walking: facing right amble facing gait hike man pace pedestrian person right stride stroll walk walking
+🚶‍♀️‍➡️ woman walking: facing right amble facing gait hike man pace pedestrian right stride stroll walk walking woman
+🚶‍♂️‍➡️ man walking: facing right amble facing gait hike man pace pedestrian right stride stroll walk walking
 🧍 person standing person stand standing
 🧍‍♂️ man standing man stand standing
 🧍‍♀️ woman standing stand standing woman
 🧎 person kneeling kneel kneeling knees person
 🧎‍♂️ man kneeling kneel kneeling knees man
 🧎‍♀️ woman kneeling kneel kneeling knees woman
-🧎‍➡️ person kneeling facing right kneel kneeling knees person
-🧎‍♀️‍➡️ woman kneeling facing right kneel kneeling knees woman
-🧎‍♂️‍➡️ man kneeling facing right kneel kneeling knees man
+🧎‍➡️ person kneeling: facing right facing kneel kneeling knees person right
+🧎‍♀️‍➡️ woman kneeling: facing right facing kneel kneeling knees right woman
+🧎‍♂️‍➡️ man kneeling: facing right facing kneel kneeling knees man right
 🧑‍🦯 person with white cane accessibility blind cane person probing white
-🧑‍🦯‍➡️ person with white cane facing right accessibility blind cane person probing white
+🧑‍🦯‍➡️ person with white cane: facing right accessibility blind cane facing person probing right white
 👨‍🦯 man with white cane accessibility blind cane man probing white
-👨‍🦯‍➡️ man with white cane facing right accessibility blind cane man probing white
+👨‍🦯‍➡️ man with white cane: facing right accessibility blind cane facing man probing right white
 👩‍🦯 woman with white cane accessibility blind cane probing white woman
-👩‍🦯‍➡️ woman with white cane facing right accessibility blind cane probing white woman
+👩‍🦯‍➡️ woman with white cane: facing right accessibility blind cane facing probing right white woman
 🧑‍🦼 person in motorized wheelchair accessibility motorized person wheelchair
-🧑‍🦼‍➡️ person in motorized wheelchair facing right accessibility motorized person wheelchair
+🧑‍🦼‍➡️ person in motorized wheelchair: facing right accessibility facing motorized person right wheelchair
 👨‍🦼 man in motorized wheelchair accessibility man motorized wheelchair
-👨‍🦼‍➡️ man in motorized wheelchair facing right accessibility man motorized wheelchair
+👨‍🦼‍➡️ man in motorized wheelchair: facing right accessibility facing man motorized right wheelchair
 👩‍🦼 woman in motorized wheelchair accessibility motorized wheelchair woman
-👩‍🦼‍➡️ woman in motorized wheelchair facing right accessibility motorized wheelchair woman
+👩‍🦼‍➡️ woman in motorized wheelchair: facing right accessibility facing motorized right wheelchair woman
 🧑‍🦽 person in manual wheelchair accessibility manual person wheelchair
-🧑‍🦽‍➡️ person in manual wheelchair facing right accessibility manual person wheelchair
+🧑‍🦽‍➡️ person in manual wheelchair: facing right accessibility facing manual person right wheelchair
 👨‍🦽 man in manual wheelchair accessibility man manual wheelchair
-👨‍🦽‍➡️ man in manual wheelchair facing right accessibility man manual wheelchair
+👨‍🦽‍➡️ man in manual wheelchair: facing right accessibility facing man manual right wheelchair
 👩‍🦽 woman in manual wheelchair accessibility manual wheelchair woman
-👩‍🦽‍➡️ woman in manual wheelchair facing right accessibility manual wheelchair woman
+👩‍🦽‍➡️ woman in manual wheelchair: facing right accessibility facing manual right wheelchair woman
 🏃 person running fast hurry marathon move person quick race racing run rush speed
 🏃‍♂️ man running fast hurry man marathon move quick race racing run rush speed
 🏃‍♀️ woman running fast hurry marathon move quick race racing run rush speed woman
-🏃‍➡️ person running facing right fast hurry marathon move person quick race racing run rush speed
-🏃‍♀️‍➡️ woman running facing right fast hurry marathon move quick race racing run rush speed woman
-🏃‍♂️‍➡️ man running facing right fast hurry man marathon move quick race racing run rush speed
+🏃‍➡️ person running: facing right facing fast hurry marathon move person quick race racing right run rush speed
+🏃‍♀️‍➡️ woman running: facing right facing fast hurry marathon move quick race racing right run rush speed woman
+🏃‍♂️‍➡️ man running: facing right facing fast hurry man marathon move quick race racing right run rush speed
+🧑‍🩰 ballet dancer ballet dancer
 💃 woman dancing dance dancer dancing elegant festive flair flamenco groove let’s salsa tango woman
 🕺 man dancing dance dancer dancing elegant festive flair flamenco groove let’s man salsa tango
 🕴️ person in suit levitating business levitating person suit
@@ -711,6 +715,7 @@
 🐳 spouting whale animal beach face ocean spouting whale
 🐋 whale animal beach ocean
 🐬 dolphin animal beach flipper ocean
+🫍 orca marine ocean whale
 🦭 seal animal lion ocean sea
 🐟️ fish animal dinner fishes fishing pisces zodiac
 🐠 tropical fish animal fish fishes tropical
@@ -910,6 +915,7 @@
 🧭 compass direction magnetic navigation orienteering
 🏔️ snow-capped mountain cold mountain snow snow-capped
 ⛰️ mountain mountain
+🛘 landslide avalanche danger disaster earthquake mountain mudslide rocks
 🌋 volcano eruption mountain nature
 🗻 mount fuji fuji mount mountain nature
 🏕️ camping camping
@@ -1270,10 +1276,11 @@
 🎧️ headphone earbud sound
 📻️ radio entertainment tbt video
 🎷 saxophone instrument music sax
+🎺 trumpet instrument music
+🪊 trombone brass instrument jazz music sad slide
 🪗 accordion box concertina instrument music squeeze squeezebox
 🎸 guitar instrument music strat
 🎹 musical keyboard instrument keyboard music musical piano
-🎺 trumpet instrument music
 🎻 violin instrument music
 🪕 banjo music stringed
 🥁 drum drumsticks music
@@ -1334,8 +1341,9 @@
 📑 bookmark tabs bookmark mark marker tabs
 🔖 bookmark mark
 🏷️ label tag
-💰️ money bag bag bank bet billion cash cost dollar gold million money moneybag paid paying pot rich win
 🪙 coin dollar euro gold metal money rich silver treasure
+💰️ money bag bag bank bet billion cash cost dollar gold million money moneybag paid paying pot rich win
+🪎 treasure chest gem gold jewels loot money prize silver valuables wealth
 💴 yen banknote bank banknote bill currency money note yen
 💵 dollar banknote bank banknote bill currency dollar money note
 💶 euro banknote 100 bank banknote bill currency euro money note rich
@@ -1608,16 +1616,16 @@
 🫟 splatter drip holi ink liquid mess paint spill stain
 #️⃣ keycap: # keycap
 *️⃣ keycap: * keycap
-0️⃣ keycap: 0 keycap
-1️⃣ keycap: 1 keycap
-2️⃣ keycap: 2 keycap
-3️⃣ keycap: 3 keycap
-4️⃣ keycap: 4 keycap
-5️⃣ keycap: 5 keycap
-6️⃣ keycap: 6 keycap
-7️⃣ keycap: 7 keycap
-8️⃣ keycap: 8 keycap
-9️⃣ keycap: 9 keycap
+0️⃣ keycap: 0 0 keycap zero
+1️⃣ keycap: 1 1 keycap one
+2️⃣ keycap: 2 2 keycap two
+3️⃣ keycap: 3 3 keycap three
+4️⃣ keycap: 4 4 four keycap
+5️⃣ keycap: 5 5 five keycap
+6️⃣ keycap: 6 6 keycap six
+7️⃣ keycap: 7 7 keycap seven
+8️⃣ keycap: 8 8 eight keycap
+9️⃣ keycap: 9 9 keycap nine
 🔟 keycap: 10 keycap
 🔠 input latin uppercase abcd input latin letters uppercase
 🔡 input latin lowercase abcd input latin letters lowercase
