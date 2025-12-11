@@ -101,6 +101,7 @@ complete -c caelestia -n "$seen scheme && $seen set" -s 'v' -l 'variant' -d 'Set
 # Screenshot
 complete -c caelestia -n "$seen screenshot" -s 'r' -l 'region' -d 'Capture region'
 complete -c caelestia -n "$seen screenshot" -s 'f' -l 'freeze' -d 'Freeze while selecting region'
+complete -c caelestia -n "$seen screenshot" -s 'c' -l 'clipboard' -d 'Copy region and open in editor'
 
 # Record
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
