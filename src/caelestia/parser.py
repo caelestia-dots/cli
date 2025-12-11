@@ -64,6 +64,12 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     screenshot_parser.add_argument(
         "-f", "--freeze", action="store_true", help="freeze the screen while selecting a region"
     )
+    screenshot_parser.add_argument(
+        "-c",
+        "--clipboard",
+        action="store_true",
+        help="copy region capture to clipboard and open it in the editor",
+    )
 
     # Create parser for record opts
     record_parser = command_parser.add_parser("record", help="start a screen recording")
