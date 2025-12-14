@@ -68,8 +68,8 @@ class Command:
 
     def get_audio_device(self, audio_mode: str) -> str:
         """Get the appropriate audio device for the given mode with fallback handling."""
-        if audio_mode == "none" or not audio_mode:
-            return ""
+        if  not audio_mode:
+            return "none"
 
         device = AUDIO_MODES.get(audio_mode, "")
 
@@ -195,7 +195,7 @@ class Command:
         if audio_device:
             args += ["-a", audio_device, "-ac", "opus", "-ab", "192k"]
             print(f"Recording with audio: {audio_device} ({audio_mode})")
-        elif self.args.sound:  # Legacy support for --sound flag
+        elif hasattr(self.args, "sound") and self.args.sound:  # Legacy support for --sound flag
             args += ["-a", "default_output"]
         else:
             print("Recording without audio")
