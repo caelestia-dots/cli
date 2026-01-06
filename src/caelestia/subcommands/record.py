@@ -19,7 +19,7 @@ RECORDER = "gpu-screen-recorder"
 AUDIO_MODES = {
     "mic": "default_input",
     "system": "default_output",
-    "combined": "CombinedSink.monitor",
+    "combined": "default_output|default_input",
 }
 
 
