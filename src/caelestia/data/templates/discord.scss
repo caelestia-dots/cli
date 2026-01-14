@@ -15,8 +15,10 @@
 @import url("https://refact0r.github.io/midnight-discord/build/midnight.css");
 
 body {
-    /* font, change to '' for default discord font */
-    --font: "figtree";
+    /* font options */
+    --font: "figtree"; /* change to '' for default discord font */
+    --code-font: "JetBrainsMono NF"; /* change to '' for default discord font */
+    font-weight: 400; /* normal text font weight. DOES NOT AFFECT BOLD TEXT */
 
     /* sizes */
     --gap: 12px; /* spacing between panels */
@@ -27,13 +29,14 @@ body {
     --animations: on; /* turn off to disable all midnight animations/transitions */
     --list-item-transition: 0.2s ease; /* transition for list items */
     --dms-icon-svg-transition: 0.4s ease; /* transition for the dms icon */
+    --border-hover-transition: 0.2s ease; /* transition for borders when hovered */
 
     /* top bar options */
     --top-bar-height: var(
         --gap
     ); /* height of the titlebar/top bar (discord default is 36px, 24px recommended if moving/hiding top bar buttons) */
-    --top-bar-button-position: hide; /* off: default position, hide: hide inbox/support buttons completely, serverlist: move inbox button to server list, titlebar: move inbox button to titlebar (will hide title) */
-    --top-bar-title-position: hide; /* off: default centered position, hide: hide title completely, left: left align title (like old discord) */
+    --top-bar-button-position: titlebar; /* off: default position, hide: hide inbox/support buttons completely, serverlist: move inbox button to server list, titlebar: move inbox button to titlebar (will hide title) */
+    --top-bar-title-position: off; /* off: default centered position, hide: hide title completely, left: left align title (like old discord) */
     --subtle-top-bar-title: off; /* off: default, on: hide the icon and use subtle text color (like old discord) */
 
     /* window controls */
@@ -42,9 +45,9 @@ body {
 
     /* dms button icon options */
     --custom-dms-icon: custom; /* off: use default discord icon, hide: remove icon entirely, custom: use custom icon */
-    --dms-icon-svg-url: url("https://upload.wikimedia.org/wikipedia/commons/c/c4/Font_Awesome_5_solid_moon.svg"); /* icon svg url. MUST BE A SVG. */
+    --dms-icon-svg-url: url("https://refact0r.github.io/midnight-discord/assets/Font_Awesome_5_solid_moon.svg"); /* icon svg url. MUST BE A SVG. */
     --dms-icon-svg-size: 90%; /* size of the svg (css mask-size) */
-    --dms-icon-color-before: var(--icon-secondary); /* normal icon color */
+    --dms-icon-color-before: var(--icon-subtle); /* normal icon color */
     --dms-icon-color-after: var(--white); /* icon color when button is hovered/selected */
 
     /* dms button background options */
@@ -71,12 +74,11 @@ body {
     --bg-floating: #{c.$surface}; /* you can set this to a more opaque color if floating panels look too transparent */
 
     /* chatbar options */
-    --custom-chatbar: aligned; /* off: default chatbar, aligned: chatbar aligned with the user panel, separated: chatbar separated from chat */
-    --chatbar-height: 47px; /* height of the chatbar (52px by default, 47px recommended for aligned, 56px recommended for separated) */
-    --chatbar-padding: 8px; /* padding of the chatbar. only applies in aligned mode. */
+    --custom-chatbar: off; /* off: default chatbar, separated: chatbar separated from chat */
+    --chatbar-height: 47px; /* height of the chatbar (56px by default, 47px to align with user panel, 56px recommended for separated) */
 
     /* other options */
-    --small-user-panel: off; /* turn on to make the user panel smaller like in old discord */
+    --small-user-panel: off; /* off: default user panel, on: smaller user panel like in old discord */
 }
 
 /* color options */
