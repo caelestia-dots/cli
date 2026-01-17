@@ -2,6 +2,8 @@ import json
 import re
 import subprocess
 from pathlib import Path
+import tempfile
+import shutil
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.logging import log_exception
@@ -101,8 +103,11 @@ def gen_sequences(colours: dict[str, str]) -> str:
 
 def write_file(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content)
 
+    with tempfile.NamedTemporaryFile("w") as f:
+        f.write(content)
+        f.flush()
+        shutil.move(f.name, path)
 
 @log_exception
 def apply_terms(sequences: str) -> None:
