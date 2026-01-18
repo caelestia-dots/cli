@@ -229,13 +229,14 @@ def apply_cava(colours: dict[str, str]) -> None:
 
 
 @log_exception
-def apply_user_templates(colours: dict[str, str]) -> None:
+def apply_user_templates(colours: dict[str, str], mode: str) -> None:
     if not user_templates_dir.is_dir():
         return
 
     for file in user_templates_dir.iterdir():
         if file.is_file():
             content = gen_replace_dynamic(colours, file)
+            content = re.sub(r"\{\{\s*mode\s*\}\}", mode, content)
             write_file(theme_dir / file.name, content)
 
 
@@ -272,4 +273,4 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
         apply_warp(colours, mode)
     if check("enableCava"):
         apply_cava(colours)
-    apply_user_templates(colours)
+    apply_user_templates(colours, mode)
