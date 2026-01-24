@@ -52,7 +52,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     # match atomic {{ . }} pairs
     dotField = r"\{\{((?:(?!\{\{|\}\}).)*)\}\}"
 
-    #matches {{ mode }}
+    # match {{ mode }}
     modeField = r"\{\{\s*mode\s*\}\}"
 
     colours_dyn = get_dynamic_colours(colours)
