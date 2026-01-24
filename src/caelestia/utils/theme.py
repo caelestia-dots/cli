@@ -39,7 +39,7 @@ def gen_replace(colours: dict[str, str], template: Path, hash: bool = False) -> 
     return template
 
 
-def gen_replace_dynamic(colours: dict[str, str], template: Path) -> str:
+def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> str:
     def fill_colour(match: re.Match) -> str:
         data = match.group(1).strip().split(".")
         if len(data) != 2:
@@ -50,10 +50,16 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path) -> str:
         return getattr(colours_dyn[col], form)
 
     # match atomic {{ . }} pairs
-    field = r"\{\{((?:(?!\{\{|\}\}).)*)\}\}"
+    dotField = r"\{\{((?:(?!\{\{|\}\}).)*)\}\}"
+
+    # match {{ mode }}
+    modeField = r"\{\{\s*mode\s*\}\}"
+
     colours_dyn = get_dynamic_colours(colours)
     template_content = template.read_text()
-    template_filled = re.sub(field, fill_colour, template_content)
+
+    template_filled = re.sub(dotField, fill_colour, template_content) 
+    template_filled = re.sub(modeField, mode, template_content)
 
     return template_filled
 
@@ -229,13 +235,13 @@ def apply_cava(colours: dict[str, str]) -> None:
 
 
 @log_exception
-def apply_user_templates(colours: dict[str, str]) -> None:
+def apply_user_templates(colours: dict[str, str], mode: str) -> None:
     if not user_templates_dir.is_dir():
         return
 
     for file in user_templates_dir.iterdir():
         if file.is_file():
-            content = gen_replace_dynamic(colours, file)
+            content = gen_replace_dynamic(colours, file, mode)
             write_file(theme_dir / file.name, content)
 
 
@@ -272,4 +278,4 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
         apply_warp(colours, mode)
     if check("enableCava"):
         apply_cava(colours)
-    apply_user_templates(colours)
+    apply_user_templates(colours, mode)
