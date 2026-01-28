@@ -180,15 +180,217 @@ def apply_htop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
+def process_app_themes(colours: dict[str, str]) -> None:
+    """Process app theme files by replacing colors based on inline comment markers."""
+    import re
+    
+    color_map = {
+        "accent-color": colours["primary"],
+        "accent-fg-color": colours["onPrimary"],
+        "accent-bg-color": colours["primary"],
+        "window-bg-color": colours["background"],
+        "window-fg-color": colours["onBackground"],
+        "headerbar-bg-color": colours["surfaceDim"],
+        "headerbar-fg-color": colours["onSurface"],
+        "popover-bg-color": colours["surfaceDim"],
+        "popover-fg-color": colours["onSurface"],
+        "view-bg-color": colours["surface"],
+        "view-fg-color": colours["onSurface"],
+        "card-bg-color": colours["surface"],
+        "card-fg-color": colours["onSurface"],
+    }
+    
+    for gtk_version in ["gtk-3.0", "gtk-4.0"]:
+        custom_css_path = config_dir / gtk_version / "custom.css"
+        
+        if not custom_css_path.exists():
+            continue
+        
+        custom_css_content = custom_css_path.read_text()
+        
+        # Find all @import statements
+        import_pattern = r'@import\s+["\']([^"\']+)["\'];'
+        imports = re.findall(import_pattern, custom_css_content)
+        
+        for import_file in imports:
+            theme_file_path = custom_css_path.parent / import_file
+            
+            if not theme_file_path.exists():
+                continue
+            
+            content = theme_file_path.read_text()
+            
+            # Replace colors based on inline comment markers
+            # Pattern: #hexvalue; /* variable-name */
+            # Also handles opacity: rgba(R, G, B, A); /* variable-name with XX% opacity */
+            for marker, color_value in color_map.items():
+                # Match solid colors: #RRGGBB; /* marker */
+                pattern = rf'#[0-9A-Fa-f]{{6}}\s*;\s*/\*\s*{re.escape(marker)}\s*\*/'
+                replacement = f'#{color_value}; /* {marker} */'
+                content = re.sub(pattern, replacement, content)
+                
+                # Match colors with opacity: rgba(R, G, B, opacity); /* marker with XX% opacity */
+                opacity_pattern = rf'rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([\d.]+)\s*\)\s*;\s*/\*\s*{re.escape(marker)}\s+with\s+(\d+)%\s+opacity\s*\*/'
+                
+                def replace_with_opacity(match):
+                    opacity_value = match.group(1)
+                    opacity_percent = match.group(2)
+
+                    r = int(color_value[0:2], 16)
+                    g = int(color_value[2:4], 16)
+                    b = int(color_value[4:6], 16)
+                    return f'rgba({r}, {g}, {b}, {opacity_value}); /* {marker} with {opacity_percent}% opacity */'
+                
+                content = re.sub(opacity_pattern, replace_with_opacity, content)
+            
+            # Write back the updated content
+            theme_file_path.write_text(content)
+
+
+def sync_papirus_colors(hex_color: str) -> None:
+    """Sync Papirus folder icon colors using hue/saturation analysis"""
+    # Check if papirus-folders command exists
+    try:
+        result = subprocess.run(
+            ["which", "papirus-folders"],
+            capture_output=True,
+            check=False
+        )
+        if result.returncode != 0:
+            return
+    except Exception:
+        return
+    
+    papirus_paths = [
+        Path("/usr/share/icons/Papirus"),
+        Path("/usr/share/icons/Papirus-Dark"),
+        Path.home() / ".local/share/icons/Papirus",
+        Path.home() / ".icons/Papirus",
+    ]
+    
+    if not any(p.exists() for p in papirus_paths):
+        return
+    
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    
+    # Brightness and saturation
+    max_val = max(r, g, b)
+    min_val = min(r, g, b)
+    brightness = max_val
+    saturation = 0 if max_val == 0 else ((max_val - min_val) * 100) // max_val
+    
+    # Low saturation = grayscale
+    if saturation < 20:
+        if brightness < 85:
+            color = "black"
+        elif brightness < 170:
+            color = "grey"
+        else:
+            color = "white"
+    # Medium-low saturation with high brightness = pale variants
+    elif saturation < 60 and brightness > 180:
+        use_pale = True
+        color = _determine_hue_color(r, g, b, brightness, use_pale)
+    else:
+        color = _determine_hue_color(r, g, b, brightness, False)
+    
+    try:
+        subprocess.run(
+            ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            check=False
+        )
+    except Exception:
+        pass
+
+
+def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool) -> str:
+    if b > r and b > g:
+        # Blue dominant
+        r_ratio = (r * 100) // b if b > 0 else 0
+        g_ratio = (g * 100) // b if b > 0 else 0
+        rg_diff = abs(r - g)
+        
+        if r_ratio > 70 and g_ratio > 70:
+            # Both R and G high relative to B = light blue/periwinkle
+            if rg_diff < 15:
+                return "blue"
+            elif r > g:
+                return "violet"
+            else:
+                return "cyan"
+        elif r_ratio > 60 and r > g:
+            return "violet"
+        elif g_ratio > 60 and g > r:
+            return "cyan"
+        else:
+            return "blue"
+    elif r > g and r > b:
+        # Red dominant
+        if g > b + 30:
+            # Orange/yellow-ish/brown
+            rg_ratio = (g * 100) // r if r > 0 else 0
+            if use_pale:
+                if rg_ratio > 70 and brightness < 220:
+                    return "palebrown"
+                else:
+                    return "paleorange"
+            else:
+                if rg_ratio > 70 and brightness < 180:
+                    return "brown"
+                else:
+                    return "orange"
+        elif b > g + 20:
+            return "pink"
+        else:
+            return "pink" if use_pale else "red"
+    elif g > r and g > b:
+        # Green dominant
+        if r > b + 30:
+            return "yellow"
+        else:
+            return "green"
+    else:
+        return "grey"
+
+
 @log_exception
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
-    write_file(config_dir / "gtk-3.0/gtk.css", template)
-    write_file(config_dir / "gtk-4.0/gtk.css", template)
+    
+    gtk3_path = config_dir / "gtk-3.0/gtk.css"
+    gtk4_path = config_dir / "gtk-4.0/gtk.css"
+    
+    if gtk3_path.is_symlink():
+        gtk3_path.unlink()
+    if gtk4_path.is_symlink():
+        gtk4_path.unlink()
+    
+    write_file(gtk3_path, template)
+    write_file(gtk4_path, template)
+
+    # Ensure custom.css exists for user-managed app theming
+    custom_css_3 = config_dir / "gtk-3.0/custom.css"
+    custom_css_4 = config_dir / "gtk-4.0/custom.css"
+    
+    if not custom_css_3.exists():
+        custom_css_3.parent.mkdir(parents=True, exist_ok=True)
+        custom_css_3.write_text('/* Custom app theming - add @import statements here */\n')
+    
+    if not custom_css_4.exists():
+        custom_css_4.parent.mkdir(parents=True, exist_ok=True)
+        custom_css_4.write_text('/* Custom app theming - add @import statements here */\n')
+
+    process_app_themes(colours)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
+    
+    sync_papirus_colors(colours["primary"])
 
 
 @log_exception
