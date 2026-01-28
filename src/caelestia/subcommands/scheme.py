@@ -1,4 +1,5 @@
 import json
+import random
 from argparse import Namespace
 
 from caelestia.utils.scheme import (
@@ -18,6 +19,19 @@ class Set:
     def __init__(self, args: Namespace) -> None:
         self.args = args
 
+    def _apply_and_save(self, scheme: Scheme, snapshot: dict) -> None:
+        try:
+            apply_colours(scheme.colours, scheme.mode)
+            scheme.save()
+        except Exception:
+            scheme._name = snapshot["name"]
+            scheme._flavour = snapshot["flavour"]
+            scheme._mode = snapshot["mode"]
+            scheme._variant = snapshot["variant"]
+            if "colours" in snapshot:
+                scheme._colours = snapshot["colours"]
+            raise
+
     def run(self) -> None:
         scheme = get_scheme()
 
@@ -25,18 +39,42 @@ class Set:
             scheme.notify = True
 
         if self.args.random:
-            scheme.set_random()
-            apply_colours(scheme.colours, scheme.mode)
+            snapshot = {
+                "name": scheme._name,
+                "flavour": scheme._flavour,
+                "mode": scheme._mode,
+                "variant": scheme._variant,
+                "colours": scheme._colours,
+            }
+            
+            scheme._name = random.choice(get_scheme_names())
+            scheme._flavour = random.choice(get_scheme_flavours(scheme._name))
+            scheme._mode = random.choice(get_scheme_modes(scheme._name, scheme._flavour))
+            scheme._update_colours()
+            
+            self._apply_and_save(scheme, snapshot)
         elif self.args.name or self.args.flavour or self.args.mode or self.args.variant:
+            snapshot = {
+                "name": scheme._name,
+                "flavour": scheme._flavour,
+                "mode": scheme._mode,
+                "variant": scheme._variant,
+            }
+            
             if self.args.name:
-                scheme.name = self.args.name
+                scheme._name = self.args.name
+                scheme._check_flavour()
+                scheme._check_mode()
             if self.args.flavour:
-                scheme.flavour = self.args.flavour
+                scheme._flavour = self.args.flavour
+                scheme._check_mode()
             if self.args.mode:
-                scheme.mode = self.args.mode
+                scheme._mode = self.args.mode
             if self.args.variant:
-                scheme.variant = self.args.variant
-            apply_colours(scheme.colours, scheme.mode)
+                scheme._variant = self.args.variant
+            
+            scheme._update_colours()
+            self._apply_and_save(scheme, snapshot)
         else:
             print("No args given. Use --name, --flavour, --mode, --variant or --random to set a scheme")
 

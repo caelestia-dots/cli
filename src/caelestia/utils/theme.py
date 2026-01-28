@@ -4,6 +4,9 @@ import subprocess
 from pathlib import Path
 import tempfile
 import shutil
+import fcntl
+import time
+import sys
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.logging import log_exception
@@ -125,9 +128,15 @@ def apply_terms(sequences: str) -> None:
     for pt in pts_path.iterdir():
         if pt.name.isdigit():
             try:
-                with pt.open("a") as f:
-                    f.write(sequences)
-            except PermissionError:
+                # Use non-blocking write with timeout to prevent hangs
+                import os
+                fd = os.open(str(pt), os.O_WRONLY | os.O_NONBLOCK | os.O_NOCTTY)
+                try:
+                    os.write(fd, sequences.encode())
+                finally:
+                    os.close(fd)
+            except (PermissionError, OSError, BlockingIOError):
+                # Skip terminals that are busy, closed, or inaccessible
                 pass
 
 
@@ -180,7 +189,7 @@ def apply_htop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
-def process_app_themes(colours: dict[str, str]) -> None:
+def process_app_themes(colours: dict[str, str], mode: str) -> None:
     """Process app theme files by replacing colors based on inline comment markers."""
     import re
     
@@ -218,7 +227,44 @@ def process_app_themes(colours: dict[str, str]) -> None:
             if not theme_file_path.exists():
                 continue
             
+            # Read the theme file
             content = theme_file_path.read_text()
+            
+            # Reorder mode-specific lines so active mode is last (takes precedence in CSS)
+            def reorder_mode_lines(content):
+                lines = content.split('\n')
+                result = []
+                i = 0
+                
+                while i < len(lines):
+                    line = lines[i]
+                    has_light = '/* mode-light */' in line
+                    has_dark = '/* mode-dark */' in line
+                    
+                    # Check if next line has opposite mode marker
+                    if i + 1 < len(lines):
+                        next_line = lines[i + 1]
+                        next_has_light = '/* mode-light */' in next_line
+                        next_has_dark = '/* mode-dark */' in next_line
+                        
+                        # Found consecutive mode-light and mode-dark lines
+                        if (has_light and next_has_dark) or (has_dark and next_has_light):
+                            # Active mode goes last (CSS cascade)
+                            active_marker = '/* mode-dark */' if mode == "dark" else '/* mode-light */'
+                            inactive_line = line if active_marker in next_line else next_line
+                            active_line = next_line if active_marker in next_line else line
+                            
+                            result.append(inactive_line)
+                            result.append(active_line)
+                            i += 2
+                            continue
+                    
+                    result.append(line)
+                    i += 1
+                
+                return '\n'.join(result)
+            
+            content = reorder_mode_lines(content)
             
             # Replace colors based on inline comment markers
             # Pattern: #hexvalue; /* variable-name */
@@ -297,11 +343,12 @@ def sync_papirus_colors(hex_color: str) -> None:
         color = _determine_hue_color(r, g, b, brightness, False)
     
     try:
-        subprocess.run(
+        # Run in background to avoid blocking theme changes
+        subprocess.Popen(
             ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
             stderr=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
-            check=False
+            start_new_session=True
         )
     except Exception:
         pass
@@ -384,7 +431,7 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
         custom_css_4.parent.mkdir(parents=True, exist_ok=True)
         custom_css_4.write_text('/* Custom app theming - add @import statements here */\n')
 
-    process_app_themes(colours)
+    process_app_themes(colours, mode)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
@@ -448,36 +495,58 @@ def apply_user_templates(colours: dict[str, str], mode: str) -> None:
 
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
+    # Use file-based lock to prevent concurrent theme changes
+    lock_file = c_state_dir / "theme.lock"
+    c_state_dir.mkdir(parents=True, exist_ok=True)
+    
     try:
-        cfg = json.loads(user_config_path.read_text())["theme"]
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        cfg = {}
+        with open(lock_file, 'w') as lock_fd:
+            # Try to acquire exclusive lock with timeout
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                # Another instance is running, exit silently
+                print("Another theme change is in progress, skipping...", file=sys.stderr)
+                return
+            
+            try:
+                cfg = json.loads(user_config_path.read_text())["theme"]
+            except (FileNotFoundError, json.JSONDecodeError, KeyError):
+                cfg = {}
 
-    def check(key: str) -> bool:
-        return cfg[key] if key in cfg else True
+            def check(key: str) -> bool:
+                return cfg[key] if key in cfg else True
 
-    if check("enableTerm"):
-        apply_terms(gen_sequences(colours))
-    if check("enableHypr"):
-        apply_hypr(gen_conf(colours))
-    if check("enableDiscord"):
-        apply_discord(gen_scss(colours))
-    if check("enableSpicetify"):
-        apply_spicetify(colours, mode)
-    if check("enableFuzzel"):
-        apply_fuzzel(colours)
-    if check("enableBtop"):
-        apply_btop(colours)
-    if check("enableNvtop"):
-        apply_nvtop(colours)
-    if check("enableHtop"):
-        apply_htop(colours)
-    if check("enableGtk"):
-        apply_gtk(colours, mode)
-    if check("enableQt"):
-        apply_qt(colours, mode)
-    if check("enableWarp"):
-        apply_warp(colours, mode)
-    if check("enableCava"):
-        apply_cava(colours)
-    apply_user_templates(colours, mode)
+            if check("enableTerm"):
+                apply_terms(gen_sequences(colours))
+            if check("enableHypr"):
+                apply_hypr(gen_conf(colours))
+            if check("enableDiscord"):
+                apply_discord(gen_scss(colours))
+            if check("enableSpicetify"):
+                apply_spicetify(colours, mode)
+            if check("enableFuzzel"):
+                apply_fuzzel(colours)
+            if check("enableBtop"):
+                apply_btop(colours)
+            if check("enableNvtop"):
+                apply_nvtop(colours)
+            if check("enableHtop"):
+                apply_htop(colours)
+            if check("enableGtk"):
+                apply_gtk(colours, mode)
+            if check("enableQt"):
+                apply_qt(colours, mode)
+            if check("enableWarp"):
+                apply_warp(colours, mode)
+            if check("enableCava"):
+                apply_cava(colours)
+            apply_user_templates(colours, mode)
+            
+            # Lock is automatically released when file is closed
+    finally:
+        # Clean up lock file
+        try:
+            lock_file.unlink()
+        except FileNotFoundError:
+            pass
