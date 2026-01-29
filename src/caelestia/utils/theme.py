@@ -207,6 +207,8 @@ def process_app_themes(colours: dict[str, str], mode: str) -> None:
         "view-fg-color": colours["onSurface"],
         "card-bg-color": colours["surface"],
         "card-fg-color": colours["onSurface"],
+        "surfaceDim": colours["surfaceDim"],
+        "surfaceContainerLow": colours["surfaceContainerLow"],
     }
     
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:

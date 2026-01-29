@@ -4,7 +4,7 @@ tertiary_paletteKeyColor 376942
 neutral_paletteKeyColor 1E1E26
 neutral_variant_paletteKeyColor 23252D
 background 23262D
-onBackground 02200B
+onBackground F5F5F6
 surface 1E1E24
 surfaceDim 1E1E24
 surfaceBright 1E1E24
@@ -82,6 +82,16 @@ sky cefb97
 sapphire 85ef77
 blue 65eea0
 lavender 90f79e
+klink 65eea0
+klinkSelection 65eea0
+kvisited 73fa90
+kvisitedSelection 73fa90
+knegative 8affab
+knegativeSelection 8affab
+kneutral d0f9f4
+kneutralSelection d0f9f4
+kpositive 8af797
+kpositiveSelection 8af797
 text e0e3e4
 subtext1 bec8cc
 subtext0 889296
