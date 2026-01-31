@@ -413,9 +413,22 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
 
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         custom_css = config_dir / gtk_version / "custom.css"
+        thunar_css = config_dir / gtk_version / "thunar.css"
+        
         if not custom_css.exists():
             custom_css.parent.mkdir(parents=True, exist_ok=True)
-            custom_css.write_text('/* Custom app theming - add @import statements here */\n')
+            custom_css.write_text('/* Custom app theming - add @import statements here */\n@import "thunar.css";\n')
+        else:
+            content = custom_css.read_text()
+            if '@import "thunar.css"' not in content and "@import 'thunar.css'" not in content:
+                if not content.strip().endswith('\n'):
+                    content += '\n'
+                content += '@import "thunar.css";\n'
+                custom_css.write_text(content)
+        
+        if not thunar_css.exists():
+            thunar_template = (templates_dir / "thunar.css").read_text()
+            write_file(thunar_css, thunar_template)
 
     process_app_themes(colours, mode)
 
