@@ -5,7 +5,6 @@ from pathlib import Path
 import tempfile
 import shutil
 import fcntl
-import time
 import sys
 
 from caelestia.utils.colour import get_dynamic_colours
@@ -62,7 +61,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     template_content = template.read_text()
 
     template_filled = re.sub(dotField, fill_colour, template_content) 
-    template_filled = re.sub(modeField, mode, template_content)
+    template_filled = re.sub(modeField, mode, template_filled)
 
     return template_filled
 
@@ -219,7 +218,6 @@ def process_app_themes(colours: dict[str, str], mode: str) -> None:
         
         custom_css_content = custom_css_path.read_text()
         
-        # Find all @import statements
         import_pattern = r'@import\s+["\']([^"\']+)["\'];'
         imports = re.findall(import_pattern, custom_css_content)
         
@@ -229,7 +227,6 @@ def process_app_themes(colours: dict[str, str], mode: str) -> None:
             if not theme_file_path.exists():
                 continue
             
-            # Read the theme file
             content = theme_file_path.read_text()
             
             # Reorder mode-specific lines so active mode is last (takes precedence in CSS)
@@ -297,7 +294,6 @@ def process_app_themes(colours: dict[str, str], mode: str) -> None:
 
 def sync_papirus_colors(hex_color: str) -> None:
     """Sync Papirus folder icon colors using hue/saturation analysis"""
-    # Check if papirus-folders command exists
     try:
         result = subprocess.run(
             ["which", "papirus-folders"],
@@ -345,7 +341,6 @@ def sync_papirus_colors(hex_color: str) -> None:
         color = _determine_hue_color(r, g, b, brightness, False)
     
     try:
-        # Run in background to avoid blocking theme changes
         subprocess.Popen(
             ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
             stderr=subprocess.DEVNULL,
@@ -411,27 +406,16 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     
     gtk3_path = config_dir / "gtk-3.0/gtk.css"
-    gtk4_path = config_dir / "gtk-4.0/gtk.css"
-    
-    if gtk3_path.is_symlink():
-        gtk3_path.unlink()
-    if gtk4_path.is_symlink():
-        gtk4_path.unlink()
+    gtk4_path = config_dir / "gtk-4.0/gtk.css"    
     
     write_file(gtk3_path, template)
     write_file(gtk4_path, template)
 
-    # Ensure custom.css exists for user-managed app theming
-    custom_css_3 = config_dir / "gtk-3.0/custom.css"
-    custom_css_4 = config_dir / "gtk-4.0/custom.css"
-    
-    if not custom_css_3.exists():
-        custom_css_3.parent.mkdir(parents=True, exist_ok=True)
-        custom_css_3.write_text('/* Custom app theming - add @import statements here */\n')
-    
-    if not custom_css_4.exists():
-        custom_css_4.parent.mkdir(parents=True, exist_ok=True)
-        custom_css_4.write_text('/* Custom app theming - add @import statements here */\n')
+    for gtk_version in ["gtk-3.0", "gtk-4.0"]:
+        custom_css = config_dir / gtk_version / "custom.css"
+        if not custom_css.exists():
+            custom_css.parent.mkdir(parents=True, exist_ok=True)
+            custom_css.write_text('/* Custom app theming - add @import statements here */\n')
 
     process_app_themes(colours, mode)
 
@@ -503,12 +487,9 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     
     try:
         with open(lock_file, 'w') as lock_fd:
-            # Try to acquire exclusive lock with timeout
             try:
                 fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
-                # Another instance is running, exit silently
-                print("Another theme change is in progress, skipping...", file=sys.stderr)
                 return
             
             try:
@@ -545,9 +526,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_cava(colours)
             apply_user_templates(colours, mode)
             
-            # Lock is automatically released when file is closed
     finally:
-        # Clean up lock file
         try:
             lock_file.unlink()
         except FileNotFoundError:
