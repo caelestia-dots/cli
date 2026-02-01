@@ -15,3 +15,6 @@
 @define-color sidebar_fg_color @window_fg_color;
 @define-color sidebar_border_color @window_bg_color;
 @define-color sidebar_backdrop_color @window_bg_color;
+
+/* Custom app theming hook - managed by user/shell */
+@import "custom.css";
