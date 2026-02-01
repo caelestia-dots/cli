@@ -18,7 +18,7 @@ of defined @variable not being able to be used across import contexts.
    ============================================================================= */
 
 .thunar.background {
-    background: #131317; /* view-bg-color */
+    background: {{ $surface }};
 }
 
 .thunar .titlebar {
@@ -49,7 +49,7 @@ of defined @variable not being able to be used across import contexts.
     padding:10px;
     margin-right: 15px;
     border-radius: 15px;
-    background-color: #1c1b1f; /* surfaceContainerLow */
+    background-color: {{ $surfaceContainerLow }};
     animation:fading 400ms ease forwards; 
     opacity:0;
     animation-delay:250ms; 
@@ -79,12 +79,12 @@ of defined @variable not being able to be used across import contexts.
 }
 
 .thunar .sidebar .view:hover {
-    background: rgba(229, 225, 231, 0.1); /* view-fg-color with 10% opacity */
+    background: alpha({{ $onSurface }}, 0.1);
 }
 
 .thunar .sidebar .view:selected {
-    background: rgba(194, 193, 255, 0.15); /* accent-color with 15% opacity */
-    color: #c2c1ff; /* accent-color */
+    background: alpha({{ $primary }}, 0.15);
+    color: {{ $primary }};
 }
 
 /* =============================================================================
@@ -100,8 +100,8 @@ of defined @variable not being able to be used across import contexts.
 .thunar .location-button.toggle:checked,
 .thunar .path-bar-button.toggle:checked {
     padding: 8px 25px;
-    background: rgba(194, 193, 255, 0.15); /* accent-color with 15% opacity */
-    color: #c2c1ff; /* accent-color */
+    background: alpha({{ $primary }}, 0.15);
+    color: {{ $primary }};
     box-shadow: none;
 }
 
@@ -119,7 +119,7 @@ of defined @variable not being able to be used across import contexts.
    ============================================================================= */
 
 .thunar button.toggle:checked {
-    color: #c2c1ff; /* accent-color */
+    color: {{ $primary }};
 }
 
 .thunar .image-button {
@@ -133,11 +133,11 @@ of defined @variable not being able to be used across import contexts.
    ============================================================================= */
 
 .thunar statusbar {
-    background-color: #1c1b1f; /* surfaceContainerLow */
+    background-color: {{ $surfaceContainerLow }};
     border-radius:15px;
     padding:10px 10px;
     margin:15px 5px 15px -10px;
-    color:#e5e1e7; /* headerbar-fg-color */
+    color: {{ $onSurface }};
 }
 
 

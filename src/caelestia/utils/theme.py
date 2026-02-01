@@ -188,110 +188,6 @@ def apply_htop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
-def process_app_themes(colours: dict[str, str], mode: str) -> None:
-    """Process app theme files by replacing colors based on inline comment markers."""
-    import re
-    
-    color_map = {
-        "accent-color": colours["primary"],
-        "accent-fg-color": colours["onPrimary"],
-        "accent-bg-color": colours["primary"],
-        "window-bg-color": colours["background"],
-        "window-fg-color": colours["onBackground"],
-        "headerbar-bg-color": colours["surfaceDim"],
-        "headerbar-fg-color": colours["onSurface"],
-        "popover-bg-color": colours["surfaceDim"],
-        "popover-fg-color": colours["onSurface"],
-        "view-bg-color": colours["surface"],
-        "view-fg-color": colours["onSurface"],
-        "card-bg-color": colours["surface"],
-        "card-fg-color": colours["onSurface"],
-        "surfaceDim": colours["surfaceDim"],
-        "surfaceContainerLow": colours["surfaceContainerLow"],
-    }
-    
-    for gtk_version in ["gtk-3.0", "gtk-4.0"]:
-        custom_css_path = config_dir / gtk_version / "custom.css"
-        
-        if not custom_css_path.exists():
-            continue
-        
-        custom_css_content = custom_css_path.read_text()
-        
-        import_pattern = r'@import\s+["\']([^"\']+)["\'];'
-        imports = re.findall(import_pattern, custom_css_content)
-        
-        for import_file in imports:
-            theme_file_path = custom_css_path.parent / import_file
-            
-            if not theme_file_path.exists():
-                continue
-            
-            content = theme_file_path.read_text()
-            
-            # Reorder mode-specific lines so active mode is last (takes precedence in CSS)
-            def reorder_mode_lines(content):
-                lines = content.split('\n')
-                result = []
-                i = 0
-                
-                while i < len(lines):
-                    line = lines[i]
-                    has_light = '/* mode-light */' in line
-                    has_dark = '/* mode-dark */' in line
-                    
-                    # Check if next line has opposite mode marker
-                    if i + 1 < len(lines):
-                        next_line = lines[i + 1]
-                        next_has_light = '/* mode-light */' in next_line
-                        next_has_dark = '/* mode-dark */' in next_line
-                        
-                        # Found consecutive mode-light and mode-dark lines
-                        if (has_light and next_has_dark) or (has_dark and next_has_light):
-                            # Active mode goes last (CSS cascade)
-                            active_marker = '/* mode-dark */' if mode == "dark" else '/* mode-light */'
-                            inactive_line = line if active_marker in next_line else next_line
-                            active_line = next_line if active_marker in next_line else line
-                            
-                            result.append(inactive_line)
-                            result.append(active_line)
-                            i += 2
-                            continue
-                    
-                    result.append(line)
-                    i += 1
-                
-                return '\n'.join(result)
-            
-            content = reorder_mode_lines(content)
-            
-            # Replace colors based on inline comment markers
-            # Pattern: #hexvalue; /* variable-name */
-            # Also handles opacity: rgba(R, G, B, A); /* variable-name with XX% opacity */
-            for marker, color_value in color_map.items():
-                # Match solid colors: #RRGGBB; /* marker */
-                pattern = rf'#[0-9A-Fa-f]{{6}}\s*;\s*/\*\s*{re.escape(marker)}\s*\*/'
-                replacement = f'#{color_value}; /* {marker} */'
-                content = re.sub(pattern, replacement, content)
-                
-                # Match colors with opacity: rgba(R, G, B, opacity); /* marker with XX% opacity */
-                opacity_pattern = rf'rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([\d.]+)\s*\)\s*;\s*/\*\s*{re.escape(marker)}\s+with\s+(\d+)%\s+opacity\s*\*/'
-                
-                def replace_with_opacity(match):
-                    opacity_value = match.group(1)
-                    opacity_percent = match.group(2)
-
-                    r = int(color_value[0:2], 16)
-                    g = int(color_value[2:4], 16)
-                    b = int(color_value[4:6], 16)
-                    return f'rgba({r}, {g}, {b}, {opacity_value}); /* {marker} with {opacity_percent}% opacity */'
-                
-                content = re.sub(opacity_pattern, replace_with_opacity, content)
-            
-            # Write back the updated content
-            theme_file_path.write_text(content)
-
-
 def sync_papirus_colors(hex_color: str) -> None:
     """Sync Papirus folder icon colors using hue/saturation analysis"""
     try:
@@ -412,25 +308,40 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     write_file(gtk4_path, template)
 
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
-        custom_css = config_dir / gtk_version / "custom.css"
-        thunar_css = config_dir / gtk_version / "thunar.css"
+        gtk_config_dir = config_dir / gtk_version
+        custom_css = gtk_config_dir / "custom.css"
         
+        gtk_config_dir.mkdir(parents=True, exist_ok=True)
+        
+        thunar_template = gtk_config_dir / "thunar.css.template"
+        if not thunar_template.exists():
+            default_thunar = (templates_dir / "thunar.css").read_text()
+            thunar_template.write_text(default_thunar)
+        
+        template_files = list(gtk_config_dir.glob("*.template"))
+        generated_imports = []
+        
+        for template_file in template_files:
+            css_filename = template_file.stem
+            css_file = gtk_config_dir / css_filename
+            
+            template_content = gen_replace(colours, template_file, hash=True)
+            write_file(css_file, template_content)
+            generated_imports.append(css_filename)
+        
+        # Ensure custom.css exists and has imports for all generated CSS files
         if not custom_css.exists():
-            custom_css.parent.mkdir(parents=True, exist_ok=True)
-            custom_css.write_text('/* Custom app theming - add @import statements here */\n@import "thunar.css";\n')
+            imports = '\n'.join(f'@import "{name}";' for name in generated_imports)
+            custom_css.write_text(f'/* Custom app theming */\n{imports}\n')
         else:
             content = custom_css.read_text()
-            if '@import "thunar.css"' not in content and "@import 'thunar.css'" not in content:
-                if not content.strip().endswith('\n'):
-                    content += '\n'
-                content += '@import "thunar.css";\n'
-                custom_css.write_text(content)
-        
-        if not thunar_css.exists():
-            thunar_template = (templates_dir / "thunar.css").read_text()
-            write_file(thunar_css, thunar_template)
-
-    process_app_themes(colours, mode)
+            for css_name in generated_imports:
+                import_stmt = f'@import "{css_name}";'
+                if import_stmt not in content and f"@import '{css_name}';" not in content:
+                    if not content.strip().endswith('\n'):
+                        content += '\n'
+                    content += f'{import_stmt}\n'
+            custom_css.write_text(content)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
