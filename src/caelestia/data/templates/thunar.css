@@ -1,8 +1,4 @@
-/* Thunar theme - colors auto-updated by Caelestia CLI on theme change */
-/* 
-Comments as variable markers are used to work around the GTK CSS limitation 
-of defined @variable not being able to be used across import contexts.
-*/
+/* Thunar theme */
 
 /* =============================================================================
    Global Resets
@@ -60,6 +56,10 @@ of defined @variable not being able to be used across import contexts.
     background-color: transparent;
 }
 
+.thunar .frame.standard-view .view *:selected {
+	color: {{ $primary }};
+}
+
 /* =============================================================================
    Sidebar Navigation
    ============================================================================= */
@@ -106,8 +106,8 @@ of defined @variable not being able to be used across import contexts.
 }
 
 .thunar .location-button.toggle + .location-button.toggle:checked {
-    margin-left: -5px;
-    padding: 0 20px;
+    margin-left: 0px;
+    padding: 0 25px;
 }
 
 .thunar .titlebar toolbar{
