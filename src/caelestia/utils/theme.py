@@ -307,40 +307,25 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     write_file(gtk3_path, template)
     write_file(gtk4_path, template)
 
+    thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         gtk_config_dir = config_dir / gtk_version
         custom_css = gtk_config_dir / "custom.css"
+        thunar_css = gtk_config_dir / "thunar.css"
         
         gtk_config_dir.mkdir(parents=True, exist_ok=True)
         
-        thunar_template = gtk_config_dir / "thunar.css.template"
-        if not thunar_template.exists():
-            default_thunar = (templates_dir / "thunar.css").read_text()
-            thunar_template.write_text(default_thunar)
+        write_file(thunar_css, thunar_template)
         
-        template_files = list(gtk_config_dir.glob("*.template"))
-        generated_imports = []
-        
-        for template_file in template_files:
-            css_filename = template_file.stem
-            css_file = gtk_config_dir / css_filename
-            
-            template_content = gen_replace(colours, template_file, hash=True)
-            write_file(css_file, template_content)
-            generated_imports.append(css_filename)
-        
-        # Ensure custom.css exists and has imports for all generated CSS files
         if not custom_css.exists():
-            imports = '\n'.join(f'@import "{name}";' for name in generated_imports)
-            custom_css.write_text(f'/* Custom app theming */\n{imports}\n')
+            custom_css.write_text('/* Custom app theming */\n@import "thunar.css";\n')
         else:
             content = custom_css.read_text()
-            for css_name in generated_imports:
-                import_stmt = f'@import "{css_name}";'
-                if import_stmt not in content and f"@import '{css_name}';" not in content:
-                    if not content.strip().endswith('\n'):
-                        content += '\n'
-                    content += f'{import_stmt}\n'
+            import_stmt = '@import "thunar.css";'
+            if import_stmt not in content and "@import 'thunar.css';" not in content:
+                if not content.strip().endswith('\n'):
+                    content += '\n'
+                content += f'{import_stmt}\n'
             custom_css.write_text(content)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
