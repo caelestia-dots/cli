@@ -105,9 +105,22 @@
     box-shadow: none;
 }
 
+.thunar .location-button.path-bar-button:not(:checked){
+    background-color:{{ $surfaceContainerLow }};
+}
+
+.thunar .location-button.path-bar-button:not(:checked):hover{
+    background:alpha({{ $primary }},0.08);
+    color:alpha({{ $primary }},0.8);
+}
+
 .thunar .location-button.toggle + .location-button.toggle:checked {
     margin-left: 0px;
     padding: 0 25px;
+}
+
+.thunar .titlebar{
+    padding:0px;
 }
 
 .thunar .titlebar toolbar{
