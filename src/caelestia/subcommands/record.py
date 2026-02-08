@@ -1,3 +1,4 @@
+from pathlib import Path
 import json
 import re
 import shutil
@@ -107,6 +108,10 @@ class Command:
             close_notification(recording_notif_path.read_text())
         except IOError:
             pass
+
+        if self.args.clipboard:
+            file_uri = Path(new_path).resolve().as_uri() + "\n"
+            subprocess.run(["wl-copy", "--type", "text/uri-list"], input=file_uri.encode())
 
         action = notify(
             "--action=watch=Watch",
