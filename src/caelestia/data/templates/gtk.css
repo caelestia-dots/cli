@@ -18,5 +18,4 @@
 @define-color theme_selected_bg_color alpha(@accent_color, 0.15);
 @define-color theme_selected_fg_color @primary;
 
-/* Custom app theming hook - managed by user/shell */
-@import "custom.css";
+@import "thunar.css";

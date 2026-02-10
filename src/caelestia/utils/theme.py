@@ -299,34 +299,13 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
 
 @log_exception
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
-    template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
-    
-    gtk3_path = config_dir / "gtk-3.0/gtk.css"
-    gtk4_path = config_dir / "gtk-4.0/gtk.css"    
-    
-    write_file(gtk3_path, template)
-    write_file(gtk4_path, template)
-
+    gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
+    
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         gtk_config_dir = config_dir / gtk_version
-        custom_css = gtk_config_dir / "custom.css"
-        thunar_css = gtk_config_dir / "thunar.css"
-        
-        gtk_config_dir.mkdir(parents=True, exist_ok=True)
-        
-        write_file(thunar_css, thunar_template)
-        
-        if not custom_css.exists():
-            custom_css.write_text('/* Custom app theming */\n@import "thunar.css";\n')
-        else:
-            content = custom_css.read_text()
-            import_stmt = '@import "thunar.css";'
-            if import_stmt not in content and "@import 'thunar.css';" not in content:
-                if not content.strip().endswith('\n'):
-                    content += '\n'
-                content += f'{import_stmt}\n'
-            custom_css.write_text(content)
+        write_file(gtk_config_dir / "gtk.css", gtk_template)
+        write_file(gtk_config_dir / "thunar.css", thunar_template)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
