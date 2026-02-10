@@ -172,10 +172,15 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
 
     # Material colours
     primary_scheme = get_scheme(scheme.variant)(primary, not light, 0)
-    for colour in vars(MaterialDynamicColors).keys():
-        colour_name = getattr(MaterialDynamicColors, colour)
-        if hasattr(colour_name, "get_hct"):
-            colours[colour] = colour_name.get_hct(primary_scheme)
+    dyn_colours = MaterialDynamicColors()
+    for colour in dyn_colours.all_colors:
+        colours[colour.name] = colour.get_hct(primary_scheme)
+
+    # Backwards compatibility with old colour names
+    if "primaryPaletteKeyColor" in colours:  # materialyoucolor-python >= 3.0.0
+        for colour in "primary", "secondary", "tertiary", "neutral":
+            colours[f"{colour}_paletteKeyColor"] = colours[f"{colour}PaletteKeyColor"]
+        colours["neutral_variant_paletteKeyColor"] = colours["neutralVariantPaletteKeyColor"]
 
     # Harmonize terminal colours
     for i, hct in enumerate(light_gruvbox if light else dark_gruvbox):
