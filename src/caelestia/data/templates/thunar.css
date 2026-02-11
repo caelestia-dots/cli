@@ -14,7 +14,7 @@
    ============================================================================= */
 
 .thunar.background {
-    background: { $surface };
+    background: {{ $surface }};
 }
 
 .thunar .titlebar {
@@ -45,19 +45,45 @@
     padding: 10px;
     margin-right: 15px;
     border-radius: 15px;
-    background-color: { $surfaceContainerLow };
+    background-color: {{ $surfaceContainerLow }};
     animation: fading 400ms ease forwards;
     opacity: 0;
     animation-delay: 250ms;
 }
 
-.thunar .frame.standard-view .view,
-.thunar .frame.standard-view .view * {
+.thunar .frame.standard-view .view:not(.rubberband),
+.thunar .frame.standard-view .view *:not(.rubberband) {
     background-color: transparent;
 }
 
 .thunar .frame.standard-view .view *:selected {
-    color: { $primary };
+    color: {{ $primary }};
+}
+
+.thunar .rubberband{
+    background-color:alpha({{ $primary }}, 0.15);
+    border:1px solid alpha({{ $primary }}, 0.15);
+}
+
+
+/*  Tabs */
+.thunar header.top{
+    background:none;
+}
+
+.thunar header.top tabs .reorderable-page{
+    margin:0 10px 15px 0;
+    transition:all ease 300ms;
+}
+
+.thunar header.top tabs .reorderable-page:hover{
+    background-color: alpha({{ $primary }}, 0.08);
+
+}
+.thunar header.top tabs .reorderable-page:checked{
+    color: {{ $primary }};
+    background-color: alpha({{ $primary }}, 0.15);
+
 }
 
 /* =============================================================================
@@ -76,15 +102,16 @@
     padding: 8px 4px;
     border-radius: 10px;
     background: none;
+    transition: all ease 300ms;
 }
 
 .thunar .sidebar .view:hover {
-    background: alpha({ $onSurface }, 0.1);
+    background: alpha({{ $onSurface }}, 0.1);
 }
 
 .thunar .sidebar .view:selected {
-    background: alpha({ $primary }, 0.15);
-    color: { $primary };
+    background: alpha({{ $primary }}, 0.15);
+    color: {{ $primary }};
 }
 
 /* =============================================================================
@@ -100,18 +127,18 @@
 .thunar .location-button.toggle:checked,
 .thunar .path-bar-button.toggle:checked {
     padding: 8px 25px;
-    background: alpha({ $primary }, 0.15);
-    color: { $primary };
+    background: alpha({{ $primary }}, 0.15);
+    color: {{ $primary }};
     box-shadow: none;
 }
 
 .thunar .location-button.path-bar-button:not(:checked) {
-    background-color: { $surfaceContainerLow };
+    background-color: {{ $surfaceContainerLow }};
 }
 
 .thunar .location-button.path-bar-button:not(:checked):hover {
-    background: alpha({ $primary }, 0.08);
-    color: alpha({ $primary }, 0.8);
+    background: alpha({{ $primary }}, 0.08);
+    color: alpha({{ $primary }}, 0.8);
 }
 
 .thunar .location-button.toggle+.location-button.toggle:checked {
@@ -132,7 +159,7 @@
    ============================================================================= */
 
 .thunar button.toggle:checked {
-    color: { $primary };
+    color: {{ $primary }};
 }
 
 .thunar .image-button {
@@ -146,11 +173,11 @@
    ============================================================================= */
 
 .thunar statusbar {
-    background-color: { $surfaceContainerLow };
+    background-color: {{ $surfaceContainerLow }};
     border-radius:15px;
     padding:10px 10px;
     margin:15px 5px 15px -10px;
-    color: { $onSurface };
+    color: {{ $onSurface }};
 }
 
 
