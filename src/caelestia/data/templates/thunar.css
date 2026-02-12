@@ -30,7 +30,7 @@
    ============================================================================= */
 
 /* Paned separator between sidebar and main view */
-.thunar paned>separator {
+.thunar paned > separator {
     min-width: 4px;
     margin-right: -7px;
     margin-left: -7px;
@@ -70,7 +70,7 @@
 .thunar header.top {
     background: none;
     padding: 0 10px 0 0;
-    margin: 0 0 0 -2px;
+    margin: 3px 0 -3px -2px;
 }
 
 .thunar header.top tabs .reorderable-page {
