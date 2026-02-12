@@ -60,32 +60,32 @@
     color: {{ $primary }};
 }
 
-.thunar .rubberband{
-    background-color:alpha({{ $primary }}, 0.15);
-    border:1px solid alpha({{ $primary }}, 0.15);
+.thunar .rubberband {
+    background-color: alpha({{ $primary }}, 0.15);
+    border: 1px solid alpha({{ $primary }}, 0.15);
 }
 
 
 /*  Tabs */
-.thunar header.top{
-    background:none;
-    padding:0 10px 0 0;
+.thunar header.top {
+    background: none;
+    padding: 0 10px 0 0;
     margin: 0 0 0 -2px;
 }
 
-.thunar header.top tabs .reorderable-page{
+.thunar header.top tabs .reorderable-page {
     margin: 0;
-    transition:all ease 300ms;
+    transition: all ease 300ms;
 }
-.thunar header.top tabs .reorderable-page + .reorderable-page{
+.thunar header.top tabs .reorderable-page + .reorderable-page {
     margin: 0 0 0 10px;
 }
 
-.thunar header.top tabs .reorderable-page:hover{
+.thunar header.top tabs .reorderable-page:hover {
     background-color: alpha({{ $primary }}, 0.08);
 
 }
-.thunar header.top tabs .reorderable-page:checked{
+.thunar header.top tabs .reorderable-page:checked {
     color: {{ $primary }};
     background-color: alpha({{ $primary }}, 0.15);
 
@@ -175,9 +175,9 @@
 
 .thunar statusbar {
     background-color: {{ $surfaceContainerLow }};
-    border-radius:15px;
-    padding:10px 10px;
-    margin:15px 5px 15px -10px;
+    border-radius: 15px;
+    padding: 10px 10px;
+    margin: 15px 5px 15px -10px;
     color: {{ $onSurface }};
 }
 
