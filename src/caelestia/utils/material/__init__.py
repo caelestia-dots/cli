@@ -31,7 +31,7 @@ def get_colours_for_image(image: Path | str = wallpaper_thumbnail_path, scheme=N
         scheme = get_scheme()
 
     cache_base = scheme_cache_dir / compute_hash(image)
-    cache = (cache_base / scheme.variant / scheme.mode).with_suffix(".json")
+    cache = (cache_base / scheme.variant / scheme.flavour / scheme.mode).with_suffix(".json")
 
     try:
         with cache.open("r") as f:
