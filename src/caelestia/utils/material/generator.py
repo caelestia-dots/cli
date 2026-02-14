@@ -142,7 +142,7 @@ def lighten(colour: Hct, amount: float) -> Hct:
 
 def darken(colour: Hct, amount: float) -> Hct:
     diff = colour.tone * amount
-    return Hct.from_hct(colour.hue, colour.chroma + diff / 5, colour.tone - diff)
+    return Hct.from_hct(colour.hue, colour.chroma - diff / 5, colour.tone - diff)
 
 
 def get_scheme(scheme: str) -> DynamicScheme:
@@ -216,6 +216,12 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
         for name, hct in colours.items():
             colours[name].chroma -= 15
 
+    # Darken surfaces for hard flavour
+    if scheme.flavour == "hard":
+        for colour in "background", *(k for k in colours.keys() if k.startswith("surface")):
+            colours[colour] = lighten(colours[colour], 0.4) if light else darken(colours[colour], 0.8)
+        colours["term0"] = lighten(colours["term0"], 0.4) if light else darken(colours["term0"], 0.9)
+
     # FIXME: deprecated stuff
     colours["text"] = colours["onBackground"]
     colours["subtext1"] = colours["onSurfaceVariant"]
@@ -229,6 +235,18 @@ def gen_scheme(scheme, primary: Hct) -> dict[str, str]:
     colours["base"] = colours["surface"]
     colours["mantle"] = darken(colours["surface"], 0.03)
     colours["crust"] = darken(colours["surface"], 0.05)
+
+    # More darkening if hard flavour
+    if scheme.flavour == "hard":
+        for colour in "base", "mantle", "crust":
+            colours[colour] = lighten(colours[colour], 0.4) if light else darken(colours[colour], 0.9)
+        for i in range(3):
+            colours[f"overlay{i}"] = (
+                lighten(colours[f"overlay{i}"], 0.4) if light else darken(colours[f"overlay{i}"], 0.8)
+            )
+            colours[f"surface{i}"] = (
+                lighten(colours[f"surface{i}"], 0.4) if light else darken(colours[f"surface{i}"], 0.8)
+            )
 
     # For debugging
     # print("\n".join(["{}: \x1b[48;2;{};{};{}m   \x1b[0m".format(n, *c.to_rgba()[:3]) for n, c in colours.items()]))
