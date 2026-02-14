@@ -18,6 +18,32 @@ The main control script for the Caelestia dotfiles.
 
 </details>
 
+<details><summary id="optional-dependencies">Optional dependencies</summary>
+
+-   [`papirus-folders`](https://github.com/PapirusDevelopmentTeam/papirus-folders) - automatic folder icon color syncing with theme
+
+> [!NOTE]
+> For automatic Papirus folder icon color syncing, `papirus-folders` needs to be able to run with `sudo` without a password prompt.
+> 
+> **Recommended** - Create a sudoers file:
+> ```fish
+> # Fish shell
+> echo "$USER ALL=(ALL) NOPASSWD: "(which papirus-folders) | sudo tee /etc/sudoers.d/papirus-folders
+> sudo chmod 440 /etc/sudoers.d/papirus-folders
+> ```
+> ```sh
+> # Bash/other shells
+> echo "$USER ALL=(ALL) NOPASSWD: $(which papirus-folders)" | sudo tee /etc/sudoers.d/papirus-folders
+> sudo chmod 440 /etc/sudoers.d/papirus-folders
+> ```
+> 
+> **Alternatively** - Edit the main sudoers file by running `sudo visudo` and adding at the end:
+> ```
+> your_username ALL=(ALL) NOPASSWD: /usr/bin/papirus-folders
+> ```
+
+</details>
+
 ## Installation
 
 ### Arch linux
