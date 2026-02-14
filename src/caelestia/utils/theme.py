@@ -4,6 +4,8 @@ import subprocess
 from pathlib import Path
 import tempfile
 import shutil
+import fcntl
+import sys
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.logging import log_exception
@@ -58,7 +60,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     colours_dyn = get_dynamic_colours(colours)
     template_content = template.read_text()
 
-    template_filled = re.sub(dotField, fill_colour, template_content)
+    template_filled = re.sub(dotField, fill_colour, template_content) 
     template_filled = re.sub(modeField, mode, template_filled)
 
     return template_filled
@@ -125,9 +127,15 @@ def apply_terms(sequences: str) -> None:
     for pt in pts_path.iterdir():
         if pt.name.isdigit():
             try:
-                with pt.open("a") as f:
-                    f.write(sequences)
-            except PermissionError:
+                # Use non-blocking write with timeout to prevent hangs
+                import os
+                fd = os.open(str(pt), os.O_WRONLY | os.O_NONBLOCK | os.O_NOCTTY)
+                try:
+                    os.write(fd, sequences.encode())
+                finally:
+                    os.close(fd)
+            except (PermissionError, OSError, BlockingIOError):
+                # Skip terminals that are busy, closed, or inaccessible
                 pass
 
 
@@ -180,15 +188,130 @@ def apply_htop(colours: dict[str, str]) -> None:
     subprocess.run(["killall", "-USR2", "htop"], stderr=subprocess.DEVNULL)
 
 
+def sync_papirus_colors(hex_color: str) -> None:
+    """Sync Papirus folder icon colors using hue/saturation analysis"""
+    try:
+        result = subprocess.run(
+            ["which", "papirus-folders"],
+            capture_output=True,
+            check=False
+        )
+        if result.returncode != 0:
+            return
+    except Exception:
+        return
+    
+    papirus_paths = [
+        Path("/usr/share/icons/Papirus"),
+        Path("/usr/share/icons/Papirus-Dark"),
+        Path.home() / ".local/share/icons/Papirus",
+        Path.home() / ".icons/Papirus",
+    ]
+    
+    if not any(p.exists() for p in papirus_paths):
+        return
+    
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    
+    # Brightness and saturation
+    max_val = max(r, g, b)
+    min_val = min(r, g, b)
+    brightness = max_val
+    saturation = 0 if max_val == 0 else ((max_val - min_val) * 100) // max_val
+    
+    # Low saturation = grayscale
+    if saturation < 20:
+        if brightness < 85:
+            color = "black"
+        elif brightness < 170:
+            color = "grey"
+        else:
+            color = "white"
+    # Medium-low saturation with high brightness = pale variants
+    elif saturation < 60 and brightness > 180:
+        use_pale = True
+        color = _determine_hue_color(r, g, b, brightness, use_pale)
+    else:
+        color = _determine_hue_color(r, g, b, brightness, False)
+    
+    try:
+        subprocess.Popen(
+            ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            start_new_session=True
+        )
+    except Exception:
+        pass
+
+
+def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool) -> str:
+    if b > r and b > g:
+        # Blue dominant
+        r_ratio = (r * 100) // b if b > 0 else 0
+        g_ratio = (g * 100) // b if b > 0 else 0
+        rg_diff = abs(r - g)
+        
+        if r_ratio > 70 and g_ratio > 70:
+            # Both R and G high relative to B = light blue/periwinkle
+            if rg_diff < 15:
+                return "blue"
+            elif r > g:
+                return "violet"
+            else:
+                return "cyan"
+        elif r_ratio > 60 and r > g:
+            return "violet"
+        elif g_ratio > 60 and g > r:
+            return "cyan"
+        else:
+            return "blue"
+    elif r > g and r > b:
+        # Red dominant
+        if g > b + 30:
+            # Orange/yellow-ish/brown
+            rg_ratio = (g * 100) // r if r > 0 else 0
+            if use_pale:
+                if rg_ratio > 70 and brightness < 220:
+                    return "palebrown"
+                else:
+                    return "paleorange"
+            else:
+                if rg_ratio > 70 and brightness < 180:
+                    return "brown"
+                else:
+                    return "orange"
+        elif b > g + 20:
+            return "pink"
+        else:
+            return "pink" if use_pale else "red"
+    elif g > r and g > b:
+        # Green dominant
+        if r > b + 30:
+            return "yellow"
+        else:
+            return "green"
+    else:
+        return "grey"
+
+
 @log_exception
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
-    template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
-    write_file(config_dir / "gtk-3.0/gtk.css", template)
-    write_file(config_dir / "gtk-4.0/gtk.css", template)
+    gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
+    thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
+    
+    for gtk_version in ["gtk-3.0", "gtk-4.0"]:
+        gtk_config_dir = config_dir / gtk_version
+        write_file(gtk_config_dir / "gtk.css", gtk_template)
+        write_file(gtk_config_dir / "thunar.css", thunar_template)
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
+    
+    sync_papirus_colors(colours["primary"])
 
 
 @log_exception
@@ -246,36 +369,53 @@ def apply_user_templates(colours: dict[str, str], mode: str) -> None:
 
 
 def apply_colours(colours: dict[str, str], mode: str) -> None:
+    # Use file-based lock to prevent concurrent theme changes
+    lock_file = c_state_dir / "theme.lock"
+    c_state_dir.mkdir(parents=True, exist_ok=True)
+    
     try:
-        cfg = json.loads(user_config_path.read_text())["theme"]
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        cfg = {}
+        with open(lock_file, 'w') as lock_fd:
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                return
+            
+            try:
+                cfg = json.loads(user_config_path.read_text())["theme"]
+            except (FileNotFoundError, json.JSONDecodeError, KeyError):
+                cfg = {}
 
-    def check(key: str) -> bool:
-        return cfg[key] if key in cfg else True
+            def check(key: str) -> bool:
+                return cfg[key] if key in cfg else True
 
-    if check("enableTerm"):
-        apply_terms(gen_sequences(colours))
-    if check("enableHypr"):
-        apply_hypr(gen_conf(colours))
-    if check("enableDiscord"):
-        apply_discord(gen_scss(colours))
-    if check("enableSpicetify"):
-        apply_spicetify(colours, mode)
-    if check("enableFuzzel"):
-        apply_fuzzel(colours)
-    if check("enableBtop"):
-        apply_btop(colours)
-    if check("enableNvtop"):
-        apply_nvtop(colours)
-    if check("enableHtop"):
-        apply_htop(colours)
-    if check("enableGtk"):
-        apply_gtk(colours, mode)
-    if check("enableQt"):
-        apply_qt(colours, mode)
-    if check("enableWarp"):
-        apply_warp(colours, mode)
-    if check("enableCava"):
-        apply_cava(colours)
-    apply_user_templates(colours, mode)
+            if check("enableTerm"):
+                apply_terms(gen_sequences(colours))
+            if check("enableHypr"):
+                apply_hypr(gen_conf(colours))
+            if check("enableDiscord"):
+                apply_discord(gen_scss(colours))
+            if check("enableSpicetify"):
+                apply_spicetify(colours, mode)
+            if check("enableFuzzel"):
+                apply_fuzzel(colours)
+            if check("enableBtop"):
+                apply_btop(colours)
+            if check("enableNvtop"):
+                apply_nvtop(colours)
+            if check("enableHtop"):
+                apply_htop(colours)
+            if check("enableGtk"):
+                apply_gtk(colours, mode)
+            if check("enableQt"):
+                apply_qt(colours, mode)
+            if check("enableWarp"):
+                apply_warp(colours, mode)
+            if check("enableCava"):
+                apply_cava(colours)
+            apply_user_templates(colours, mode)
+            
+    finally:
+        try:
+            lock_file.unlink()
+        except FileNotFoundError:
+            pass
