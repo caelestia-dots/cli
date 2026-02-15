@@ -2,12 +2,15 @@ import json
 import os
 import random
 import subprocess
+import numpy as np
+
 from argparse import Namespace
 from pathlib import Path
 
 from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
 from PIL import Image
+
 
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
@@ -24,13 +27,57 @@ from caelestia.utils.theme import apply_colours
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]
+    return path.is_file() and path.suffix in [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".tif",
+        ".tiff",
+        ".gif",
+        ".mp4",
+    ]
+
+
+def get_video_size(video: Path) -> tuple[int, int] | None:
+    cmd = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height",
+        "-of",
+        "csv=p=0:s=x",
+        str(video),
+    ]
+    try:
+        output = (
+            subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
+        )
+        w, h = map(int, output.split("x"))
+        return w, h
+    except Exception:
+        return None
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
-    with Image.open(wall) as img:
-        width, height = img.size
-        return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+    suffix = wall.suffix.lower()
+
+    if suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]:
+
+        with Image.open(wall) as img:
+            width, height = img.size
+    elif suffix in [".mp4", ".mkv", ".webm", ".avi", ".mov"]:
+        size = get_video_size(wall)
+        if size is None:
+            return False
+        width, height = size
+    else:
+        return False
+
+    return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
 def get_wallpaper() -> str:
@@ -58,12 +105,37 @@ def get_wallpapers(args: Namespace) -> list[Path]:
 
 def get_thumb(wall: Path, cache: Path) -> Path:
     thumb = cache / "thumbnail.jpg"
+    wall = Path(wall)
+    thumb.parent.mkdir(parents=True, exist_ok=True)
 
-    if not thumb.exists():
+    if thumb.exists():
+        return thumb
+
+    if wall.suffix.lower() in (".mp4", ".webm", ".mkv", ".avi", ".mov"):
+        # Extract a single representative frame
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i",
+                str(wall),
+                "-vf",
+                "thumbnail,scale=128:-1",
+                "-frames:v",
+                "1",
+                str(thumb),
+                "-y",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+            ],
+            check=True,
+        )
+    else:
+        # Image thumbnail
         with Image.open(wall) as img:
+            img.draft("RGB", (128, 128))
             img = img.convert("RGB")
-            img.thumbnail((128, 128), Image.NEAREST)
-            thumb.parent.mkdir(parents=True, exist_ok=True)
+            img.thumbnail((128, 128), Image.LANCZOS)
             img.save(thumb, "JPEG")
 
     return thumb
@@ -122,7 +194,13 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     }
 
 
+import time
+
+
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
+    start = time.perf_counter()
+    print("hello")
+
     # Make path absolute
     wall = Path(wall).resolve()
 
@@ -168,6 +246,9 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
             )
     except (FileNotFoundError, json.JSONDecodeError):
         pass
+
+    end = time.perf_counter()
+    print(f"set_wallpaper() executed in {end - start:.2f} seconds")
 
 
 def set_random(args: Namespace) -> None:
