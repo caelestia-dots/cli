@@ -1,0 +1,18 @@
+[Unit]
+Description=Caelestia OCR Daemon
+Documentation=https://github.com/caelestia-dots/cli
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python -m caelestia.ocrd
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Environment
+Environment="OMP_NUM_THREADS=4"
+Environment="MKL_NUM_THREADS=4"
+
+[Install]
+WantedBy=default.target
