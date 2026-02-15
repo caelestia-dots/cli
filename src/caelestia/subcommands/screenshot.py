@@ -1,6 +1,9 @@
 import subprocess
+import tempfile
+import time
 from argparse import Namespace
 from datetime import datetime
+from pathlib import Path
 
 from caelestia.utils.notify import notify
 from caelestia.utils.paths import screenshots_cache_dir, screenshots_dir
@@ -19,6 +22,20 @@ class Command:
             self.fullscreen()
 
     def region(self) -> None:
+        if self.args.clipboard:
+            geometry = self.args.region
+            if geometry == "slurp":
+                try:
+                    geometry = subprocess.check_output(["slurp", "-d"], text=True).strip()
+                except subprocess.CalledProcessError:
+                    return
+
+            if not geometry:
+                return
+
+            self.capture_region_with_clipboard(geometry.strip())
+            return
+
         if self.args.region == "slurp":
             subprocess.run(
                 ["qs", "-c", "caelestia", "ipc", "call", "picker", "openFreeze" if self.args.freeze else "open"]
@@ -56,3 +73,21 @@ class Command:
             new_dest.parent.mkdir(exist_ok=True, parents=True)
             dest.rename(new_dest)
             notify("Screenshot saved", f"Saved to {new_dest}")
+
+    def capture_region_with_clipboard(self, geometry: str) -> None:
+        tmpfile = Path(tempfile.mkstemp(prefix="caelestia-screenshot-", suffix=".png")[1])
+
+        try:
+            # Give slurp a moment to dismiss its overlay to avoid tinting the capture
+            time.sleep(0.05)
+            subprocess.run(["grim", "-g", geometry, str(tmpfile)], check=True)
+
+            data = tmpfile.read_bytes()
+            subprocess.run(["wl-copy", "--type", "image/png"], input=data)
+
+            subprocess.run(["swappy", "-f", str(tmpfile), "-o", str(tmpfile)], start_new_session=True)
+
+            data = tmpfile.read_bytes()
+            subprocess.run(["wl-copy", "--type", "image/png"], input=data)
+        finally:
+            tmpfile.unlink(missing_ok=True)
