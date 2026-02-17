@@ -155,6 +155,12 @@ def apply_discord(scss: str) -> None:
     for client in "Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord":
         write_file(config_dir / client / "themes/caelestia.theme.css", conf)
 
+@log_exception
+def apply_pandora(colours: dict[str, str], mode: str) -> None:
+    template = gen_replace(colours, templates_dir / "pandora.json", hash=True)
+    template = template.replace("{{ $mode }}", mode)
+    write_file(data_dir / "PandoraLauncher/themes/caelestia.json", template)
+
 
 @log_exception
 def apply_spicetify(colours: dict[str, str], mode: str) -> None:
@@ -396,6 +402,8 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_discord(gen_scss(colours))
             if check("enableSpicetify"):
                 apply_spicetify(colours, mode)
+            if check("enablePandora"):
+                apply_pandora(colours, mode)
             if check("enableFuzzel"):
                 apply_fuzzel(colours)
             if check("enableBtop"):

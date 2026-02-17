@@ -1,0 +1,162 @@
+{
+  "$schema": "https://github.com/longbridge/gpui-component/raw/refs/heads/main/.theme-schema.json",
+  "name": "Caelestia",
+  "author": "Unrectified",
+  "url": "https://github.com/caelestia-dots/cli",
+  "themes": [
+    {
+      "name": "Caelestia",
+      "mode": "{{ $mode }}",
+      "colors": {
+        "accent.background": "{{ $surfaceContainerHigh }}",
+        "accent.foreground": "{{ $onSurface }}",
+        "background": "{{ $background }}",
+        "border": "{{ $outlineVariant }}",
+        "danger.background": "{{ $error }}",
+        "foreground": "{{ $onBackground }}",
+        "input.border": "{{ $outline }}",
+        "link.active.foreground": "{{ $primary }}",
+        "link.foreground": "{{ $primary }}",
+        "link.hover.foreground": "{{ $primaryFixed }}",
+        "list.active.background": "{{ $secondaryContainer }}",
+        "list.active.border": "{{ $secondary }}",
+        "list.even.background": "{{ $surfaceContainerLowest }}",
+        "muted.background": "{{ $surfaceVariant }}",
+        "muted.foreground": "{{ $onSurfaceVariant }}",
+        "panel.background": "{{ $surfaceContainer }}",
+        "popover.background": "{{ $surfaceContainerHigh }}",
+        "popover.foreground": "{{ $onSurface }}",
+        "primary.active.background": "{{ $primaryFixedDim }}",
+        "primary.background": "{{ $primary }}",
+        "primary.foreground": "{{ $onPrimary }}",
+        "primary.hover.background": "{{ $primaryFixed }}",
+        "scrollbar.background": "{{ $surface }}",
+        "scrollbar.thumb.background": "{{ $outline }}",
+        "secondary.background": "{{ $secondaryContainer }}",
+        "secondary.active.background": "{{ $secondaryFixedDim }}",
+        "secondary.foreground": "{{ $onSecondary }}",
+        "secondary.hover.background": "{{ $secondaryFixed }}",
+        "tab.active.background": "{{ $surface }}",
+        "tab.active.foreground": "{{ $onSurface }}",
+        "tab.background": "{{ $surfaceContainerLowest }}",
+        "tab.foreground": "{{ $onSurfaceVariant }}",
+        "tab_bar.background": "{{ $surface }}",
+        "table.background": "{{ $surfaceContainer }}",
+        "table.head.foreground": "{{ $onSurfaceVariant }}",
+        "table.row.border": "{{ $outlineVariant }}",
+        "title_bar.background": "{{ $surfaceDim }}",
+        "ring": "{{ $primary }}",
+        "base.red": "{{ $red }}",
+        "base.red.light": "{{ $peach }}",
+        "base.green": "{{ $green }}",
+        "base.green.light": "{{ $teal }}",
+        "base.blue": "{{ $blue }}",
+        "base.blue.light": "{{ $sky }}",
+        "base.cyan": "{{ $teal }}",
+        "base.cyan.light": "{{ $sky }}",
+        "base.magenta": "{{ $mauve }}",
+        "base.magenta.light": "{{ $pink }}",
+        "base.yellow": "{{ $yellow }}",
+        "base.yellow.light": "{{ $peach }}"
+      },
+      "highlight": {
+        "editor.foreground": "{{ $onSurface }}",
+        "editor.background": "{{ $surface }}",
+        "editor.active_line.background": "{{ $surfaceContainerLow }}",
+        "editor.line_number": "{{ $onSurfaceVariant }}",
+        "editor.active_line_number": "{{ $onSurface }}",
+        "editor.invisible": "{{ $outlineVariant }}",
+        "conflict": "{{ $red }}",
+        "created": "{{ $green }}",
+        "deleted": "{{ $red }}",
+        "error": "{{ $error }}",
+        "hidden": "{{ $outline }}",
+        "hint": "{{ $success }}",
+        "ignored": "{{ $outline }}",
+        "info": "{{ $blue }}",
+        "modified": "{{ $yellow }}",
+        "predictive": "{{ $overlay1 }}",
+        "renamed": "{{ $green }}",
+        "success": "{{ $success }}",
+        "unreachable": "{{ $outlineVariant }}",
+        "warning": "{{ $yellow }}",
+        "syntax": {
+          "attribute": {
+            "color": "{{ $yellow }}"
+          },
+          "boolean": {
+            "color": "{{ $green }}"
+          },
+          "comment": {
+            "color": "{{ $subtext0 }}",
+            "font_style": "italic"
+          },
+          "comment.doc": {
+            "color": "{{ $subtext0 }}",
+            "font_style": "italic"
+          },
+          "constant": {
+            "color": "{{ $red }}"
+          },
+          "constructor": {
+            "color": "{{ $yellow }}"
+          },
+          "embedded": {
+            "color": "{{ $onSurface }}"
+          },
+          "function": {
+            "color": "{{ $green }}"
+          },
+          "keyword": {
+            "color": "{{ $mauve }}"
+          },
+          "link_text": {
+            "color": "{{ $sky }}",
+            "font_style": "normal"
+          },
+          "link_uri": {
+            "color": "{{ $klink }}",
+            "font_style": "italic"
+          },
+          "number": {
+            "color": "{{ $red }}"
+          },
+          "string": {
+            "color": "{{ $green }}"
+          },
+          "string.escape": {
+            "color": "{{ $green }}"
+          },
+          "string.regex": {
+            "color": "{{ $green }}"
+          },
+          "string.special": {
+            "color": "{{ $yellow }}"
+          },
+          "string.special.symbol": {
+            "color": "{{ $yellow }}"
+          },
+          "tag": {
+            "color": "{{ $yellow }}"
+          },
+          "text.literal": {
+            "color": "{{ $red }}"
+          },
+          "title": {
+            "color": "{{ $sky }}",
+            "font_weight": 600
+          },
+          "type": {
+            "color": "{{ $yellow }}"
+          },
+          "property": {
+            "color": "{{ $onSurface }}"
+          },
+          "variable.special": {
+            "color": "{{ $red }}"
+          }
+        }
+      }
+    }
+  ]
+}
