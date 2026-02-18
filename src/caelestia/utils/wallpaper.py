@@ -140,14 +140,14 @@ def convert_gif(wall: Path) -> Path:
 
     return output_path
 
-        
+
 
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 
-    # For GIF wallpapers, cache the first frame as a static image
-    wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    # using gif's 1st frame for thumb only
+    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
@@ -162,7 +162,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     cache = wallpapers_cache_dir / compute_hash(wall)
 
     # Generate thumbnail or get from cache
-    thumb = get_thumb(wall, cache)
+    thumb = get_thumb(wall_cache, cache)
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
