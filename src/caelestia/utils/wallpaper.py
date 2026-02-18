@@ -99,8 +99,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    wall_path = Path(wall)
-    cache_wall = convert_gif(wall_path) if wall_path.suffix.lower() == ".gif" else wall_path
+    wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
     name = "dynamic"
 
@@ -121,7 +120,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         "flavour": scheme.flavour,
         "mode": scheme.mode,
         "variant": scheme.variant,
-        "colours": get_colours_for_image(get_thumb(cache_wall, cache), scheme),
+        "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
 
 def convert_gif(wall: Path) -> Path:
@@ -148,7 +147,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     wall = Path(wall).resolve()
 
     # For GIF wallpapers, cache the first frame as a static image
-    cache_wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
@@ -163,7 +162,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     cache = wallpapers_cache_dir / compute_hash(wall)
 
     # Generate thumbnail or get from cache
-    thumb = get_thumb(cache_wall, cache)
+    thumb = get_thumb(wall, cache)
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
