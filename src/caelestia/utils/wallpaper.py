@@ -24,7 +24,7 @@ from caelestia.utils.theme import apply_colours
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]
+    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
@@ -99,6 +99,9 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
+    wall_path = Path(wall)
+    cache_wall = convert_gif(wall_path) if wall_path.suffix.lower() == ".gif" else wall_path
+
     name = "dynamic"
 
     if not no_smart:
@@ -118,13 +121,34 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         "flavour": scheme.flavour,
         "mode": scheme.mode,
         "variant": scheme.variant,
-        "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
+        "colours": get_colours_for_image(get_thumb(cache_wall, cache), scheme),
     }
 
+def convert_gif(wall: Path) -> Path:
+    cache = wallpapers_cache_dir / compute_hash(wall)
+    output_path = cache / "first_frame.png"
+
+    if not output_path.exists():
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with Image.open(wall) as img:
+            try:
+                img.seek(0)
+            except EOFError:
+                pass
+
+            img = img.convert("RGB")
+            img.save(output_path, "PNG")
+
+    return output_path
+
+        
 
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
+
+    # For GIF wallpapers, cache the first frame as a static image
+    cache_wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
@@ -139,7 +163,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     cache = wallpapers_cache_dir / compute_hash(wall)
 
     # Generate thumbnail or get from cache
-    thumb = get_thumb(wall, cache)
+    thumb = get_thumb(cache_wall, cache)
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
