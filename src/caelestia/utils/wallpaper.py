@@ -7,7 +7,7 @@ from pathlib import Path
 
 from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
-from PIL import Image
+from PIL import Image, ImageOps
 
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
@@ -24,13 +24,89 @@ from caelestia.utils.theme import apply_colours
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]
+    return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+
+
+def _extract_animated_metadata(path: Path) -> dict:
+    """
+    Detects animated image and its metadata from 'path'
+    """
+    try:
+        with Image.open(path) as img:
+            is_animated = getattr(img, "is_animated", False)
+            n_frames = getattr(img, "n_frames", 1) if is_animated else 1
+            fmt = getattr(img, "format", None)
+
+            per_frame_duration = img.info.get("duration", 0) # in ms
+            loop = img.info.get("loop")
+
+            total_duration = None
+            if is_animated and per_frame_duration and n_frames:
+                try:
+                    total_duration = int(per_frame_duration) * int(n_frames) # in ms
+                except Exception:
+                    pass
+
+            return {
+                "is_animated": is_animated,
+                "format": fmt,
+                "n_frames": n_frames,
+                "frame_duration_ms": int(per_frame_duration) \
+                    if isinstance(per_frame_duration, (int, float)) else None,
+                "total_duration_ms": int(total_duration) \
+                    if isinstance(total_duration, (int, float)) else None,
+                "loop": loop if isinstance(loop, int) else None,
+            }
+
+    except Exception:
+        return {
+            "is_animated": False,
+            "format": None,
+            "n_frames": 1,
+            "frame_duration_ms": None,
+            "total_duration_ms": None,
+            "loop": None,
+        }
+
+
+def _read_animated_metadata(cache: Path) -> dict | None:
+    meta_path = cache / "animated_meta.json"
+    try:
+        return json.loads(meta_path.read_text())
+    except Exception:
+        return None
+
+
+def _write_animated_metadata(cache: Path, metadata: dict) -> None:
+    meta_path = cache / "animated_meta.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    with meta_path.open("w") as f:
+        json.dump(metadata, f)
+
+
+def _load_img_or_first_frame_in_rgb(path: Path) -> Image.Image:
+    """
+    Opens 'path' and returns a PIL Image in RGB mode, memory safe
+    """
+    with Image.open(path) as img:
+        img = ImageOps.exif_transpose(img)
+
+        if getattr(img, "is_animated", False):
+            img.seek(0)
+
+        if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+            base = Image.new("RGBA", img.size, (255, 255, 255, 255))
+            img = Image.alpha_composite(base, img.convert("RGBA")).convert("RGB")
+        else:
+            img = img.convert("RGB")
+
+    return img.copy()
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
-    with Image.open(wall) as img:
-        width, height = img.size
-        return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+    img = _load_img_or_first_frame_in_rgb(wall)
+    width, height = img.size
+    return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
 def get_wallpaper() -> str:
@@ -60,11 +136,10 @@ def get_thumb(wall: Path, cache: Path) -> Path:
     thumb = cache / "thumbnail.jpg"
 
     if not thumb.exists():
-        with Image.open(wall) as img:
-            img = img.convert("RGB")
-            img.thumbnail((128, 128), Image.NEAREST)
-            thumb.parent.mkdir(parents=True, exist_ok=True)
-            img.save(thumb, "JPEG")
+        img = _load_img_or_first_frame_in_rgb(wall)
+        img.thumbnail((128, 128), Image.NEAREST)
+        thumb.parent.mkdir(parents=True, exist_ok=True)
+        img.save(thumb, "JPEG")
 
     return thumb
 
@@ -95,7 +170,7 @@ def get_smart_opts(wall: Path, cache: Path) -> str:
     return opts
 
 
-def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
+def get_colours_for_wall(wall: Path | str, no_smart: bool) -> dict:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
@@ -137,6 +212,13 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     wallpaper_link_path.symlink_to(wall)
 
     cache = wallpapers_cache_dir / compute_hash(wall)
+
+    metadata = _read_animated_metadata(cache)
+    if not metadata:
+        metadata = _extract_animated_metadata(wall)
+        # only write metadata for animated images to preserve current behaviour
+        if metadata.get("is_animated"):
+            _write_animated_metadata(cache, metadata)
 
     # Generate thumbnail or get from cache
     thumb = get_thumb(wall, cache)
