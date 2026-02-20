@@ -99,7 +99,8 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    wall = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    if wall.suffix.lower() == ".gif"
+        wall = convert_gif(wall)
 
     name = "dynamic"
 
@@ -146,11 +147,11 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 
-    # using gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
-
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
+
+    # Use gif's 1st frame for thumb only
+    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
@@ -159,7 +160,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
     wallpaper_link_path.unlink(missing_ok=True)
     wallpaper_link_path.symlink_to(wall)
 
-    cache = wallpapers_cache_dir / compute_hash(wall)
+    cache = wallpapers_cache_dir / compute_hash(wall_cache)
 
     # Generate thumbnail or get from cache
     thumb = get_thumb(wall_cache, cache)
@@ -171,7 +172,7 @@ def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
 
     # Change mode and variant based on wallpaper colour
     if scheme.name == "dynamic" and not no_smart:
-        smart_opts = get_smart_opts(wall, cache)
+        smart_opts = get_smart_opts(wall_cache, cache)
         scheme.mode = smart_opts["mode"]
         scheme.variant = smart_opts["variant"]
 
