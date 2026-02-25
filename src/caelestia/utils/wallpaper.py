@@ -2,8 +2,10 @@ import json
 import os
 import random
 import subprocess
+
 from argparse import Namespace
 from pathlib import Path
+from typing import cast
 
 from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
@@ -11,6 +13,7 @@ from PIL import Image
 
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
+from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.paths import (
     compute_hash,
     user_config_path,
@@ -33,7 +36,7 @@ def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bo
         return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
-def get_wallpaper() -> str:
+def get_wallpaper() -> str | None:
     try:
         return wallpaper_path_path.read_text()
     except IOError:
@@ -41,16 +44,16 @@ def get_wallpaper() -> str:
 
 
 def get_wallpapers(args: Namespace) -> list[Path]:
-    dir = Path(args.random)
-    if not dir.is_dir():
+    directory = Path(args.random)
+    if not directory.is_dir():
         return []
 
-    walls = [f for f in dir.rglob("*") if is_valid_image(f)]
+    walls = [f for f in directory.rglob("*") if is_valid_image(f)]
 
     if args.no_filter:
         return walls
 
-    monitors = message("monitors")
+    monitors = cast(list[dict[str, int]], message("monitors"))
     filter_size = min(m["width"] for m in monitors), min(m["height"] for m in monitors)
 
     return [f for f in walls if check_wall(f, filter_size, args.threshold)]
@@ -62,14 +65,14 @@ def get_thumb(wall: Path, cache: Path) -> Path:
     if not thumb.exists():
         with Image.open(wall) as img:
             img = img.convert("RGB")
-            img.thumbnail((128, 128), Image.NEAREST)
+            img.thumbnail((128, 128), Image.Resampling.NEAREST)
             thumb.parent.mkdir(parents=True, exist_ok=True)
             img.save(thumb, "JPEG")
 
     return thumb
 
 
-def get_smart_opts(wall: Path, cache: Path) -> str:
+def get_smart_opts(wall: Path, cache: Path) -> dict:
     opts_cache = cache / "smart.json"
 
     try:
@@ -77,15 +80,16 @@ def get_smart_opts(wall: Path, cache: Path) -> str:
     except (IOError, json.JSONDecodeError):
         pass
 
-    from caelestia.utils.colourfulness import get_variant
-
     opts = {}
 
     with Image.open(get_thumb(wall, cache)) as img:
         opts["variant"] = get_variant(img)
+        img.thumbnail((1, 1), Image.Resampling.LANCZOS)
 
-        img.thumbnail((1, 1), Image.LANCZOS)
-        hct = Hct.from_int(argb_from_rgb(*img.getpixel((0, 0))))
+        # Cast the pixel to a tuple of 3 integers to safely unpack it
+        pixel = cast(tuple[int, int, int], img.getpixel((0, 0)))
+        hct = Hct.from_int(argb_from_rgb(*pixel))
+
         opts["mode"] = "light" if hct.tone > 60 else "dark"
 
     opts_cache.parent.mkdir(parents=True, exist_ok=True)
@@ -95,7 +99,7 @@ def get_smart_opts(wall: Path, cache: Path) -> str:
     return opts
 
 
-def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
+def get_colours_for_wall(wall: Path, no_smart: bool) -> dict[str, str | dict[str, str]]:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
@@ -124,6 +128,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
 
+
 def convert_gif(wall: Path) -> Path:
     cache = wallpapers_cache_dir / compute_hash(wall)
     output_path = cache / "first_frame.png"
@@ -142,8 +147,7 @@ def convert_gif(wall: Path) -> Path:
     return output_path
 
 
-
-def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
+def set_wallpaper(wall: Path, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 

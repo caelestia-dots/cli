@@ -33,11 +33,14 @@ class Command:
                 subprocess.run(args)
             else:
                 shell = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
-                for line in shell.stdout:
-                    if self.filter_log(line):
-                        print(line, end="")
 
-    def shell(self, *args: list[str]) -> str:
+                # Ensure stdout is not None for the type checker
+                if shell.stdout:
+                    for line in shell.stdout:
+                        if self.filter_log(line):
+                            print(line, end="")
+
+    def shell(self, *args: str) -> str:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
 
     def filter_log(self, line: str) -> bool:
