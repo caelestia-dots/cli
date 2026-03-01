@@ -4,6 +4,7 @@ import random
 import subprocess
 from argparse import Namespace
 from pathlib import Path
+from typing import cast
 
 from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
@@ -12,6 +13,8 @@ from PIL import Image
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.paths import (
+    WallpaperPaths,
+    resolve_wallpaper_paths,
     compute_hash,
     user_config_path,
     wallpaper_link_path,
@@ -124,6 +127,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
 
+
 def convert_gif(wall: Path) -> Path:
     cache = wallpapers_cache_dir / compute_hash(wall)
     output_path = cache / "first_frame.png"
@@ -142,56 +146,89 @@ def convert_gif(wall: Path) -> Path:
     return output_path
 
 
+# TODO: Perhaps place somewhere else:
+# START =============================
 
-def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
+
+def check_monitor_exists(monitorName: str) -> bool:
+    monitors = cast(list[dict[str, int]], message("monitors"))
+    for monitor in monitors:
+        if monitor.get("name") == monitorName:
+            return True
+    return False
+
+
+# ============================= END
+
+
+def set_wallpaper(wall: Path, no_smart: bool, monitor: str | None = None) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    if monitor is not None and check_monitor_exists(monitor):
+        wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+        cache = wallpapers_cache_dir / compute_hash(wall_cache)
+        thumb = get_thumb(wall_cache, cache)
 
-    # Update files
-    wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
-    wallpaper_path_path.write_text(str(wall))
-    wallpaper_link_path.parent.mkdir(parents=True, exist_ok=True)
-    wallpaper_link_path.unlink(missing_ok=True)
-    wallpaper_link_path.symlink_to(wall)
+        paths = resolve_wallpaper_paths(monitor)
+        paths.base.mkdir(parents=True, exist_ok=True)
+        paths.path.write_text(str(wall))
+        paths.current.unlink(missing_ok=True)
+        paths.current.symlink_to(wall)
+        paths.thumbnail.unlink(missing_ok=True)
+        paths.thumbnail.symlink_to(thumb)
 
-    cache = wallpapers_cache_dir / compute_hash(wall_cache)
+        # TODO: Insert code for dynamic color gen here.
+        # Base it on wallpaper on primary monitor?
+        # Base it on all wallpapers for all monitors?
 
-    # Generate thumbnail or get from cache
-    thumb = get_thumb(wall_cache, cache)
-    wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
-    wallpaper_thumbnail_path.unlink(missing_ok=True)
-    wallpaper_thumbnail_path.symlink_to(thumb)
+    # HACK: Keep for backwards compatibility:
+    else:
+        # Use gif's 1st frame for thumb only
+        wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
 
-    scheme = get_scheme()
+        # Update files
+        wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
+        wallpaper_path_path.write_text(str(wall))
+        wallpaper_link_path.parent.mkdir(parents=True, exist_ok=True)
+        wallpaper_link_path.unlink(missing_ok=True)
+        wallpaper_link_path.symlink_to(wall)
 
-    # Change mode and variant based on wallpaper colour
-    if scheme.name == "dynamic" and not no_smart:
-        smart_opts = get_smart_opts(wall_cache, cache)
-        scheme.mode = smart_opts["mode"]
-        scheme.variant = smart_opts["variant"]
+        cache = wallpapers_cache_dir / compute_hash(wall_cache)
 
-    # Update colours
-    scheme.update_colours()
-    apply_colours(scheme.colours, scheme.mode)
+        # Generate thumbnail or get from cache
+        thumb = get_thumb(wall_cache, cache)
+        wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
+        wallpaper_thumbnail_path.unlink(missing_ok=True)
+        wallpaper_thumbnail_path.symlink_to(thumb)
 
-    # Run custom post-hook if configured
-    try:
-        cfg = json.loads(user_config_path.read_text()).get("wallpaper", {})
-        if post_hook := cfg.get("postHook"):
-            subprocess.run(
-                post_hook,
-                shell=True,
-                env={**os.environ, "WALLPAPER_PATH": str(wall)},
-                stderr=subprocess.DEVNULL,
-            )
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass
+        scheme = get_scheme()
+
+        # Change mode and variant based on wallpaper colour
+        if scheme.name == "dynamic" and not no_smart:
+            smart_opts = get_smart_opts(wall_cache, cache)
+            scheme.mode = smart_opts["mode"]
+            scheme.variant = smart_opts["variant"]
+
+        # Update colours
+        scheme.update_colours()
+        apply_colours(scheme.colours, scheme.mode)
+
+        # Run custom post-hook if configured
+        try:
+            cfg = json.loads(user_config_path.read_text()).get("wallpaper", {})
+            if post_hook := cfg.get("postHook"):
+                subprocess.run(
+                    post_hook,
+                    shell=True,
+                    env={**os.environ, "WALLPAPER_PATH": str(wall)},
+                    stderr=subprocess.DEVNULL,
+                )
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
 
 
 def set_random(args: Namespace) -> None:
