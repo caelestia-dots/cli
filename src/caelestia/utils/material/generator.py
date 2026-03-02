@@ -1,5 +1,4 @@
 from materialyoucolor.blend import Blend
-from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors
 from materialyoucolor.hct import Hct
 from materialyoucolor.scheme.scheme_content import SchemeContent
@@ -12,6 +11,11 @@ from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow
 from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot
 from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant
 from materialyoucolor.utils.math_utils import difference_degrees, rotation_direction, sanitize_degrees_double
+
+try:
+    from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
+except ImportError:
+    from materialyoucolor.scheme.dynamic_scheme import DynamicScheme
 
 
 def hex_to_hct(hex: str) -> Hct:
