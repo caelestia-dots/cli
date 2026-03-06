@@ -79,6 +79,12 @@ class Command:
                     "command": ["spicetify", "watch", "-s"],
                     "move": True,
                 },
+                "youtube-music": {
+                    "enable": True,
+                    "match": [{"class": "com.github.th_ch.youtube_music"}, {"class": "youtube-music"}, {"title": "YouTube Music"}],
+                    "command": ["youtube-music"],
+                    "move": True,
+                },
                 "feishin": {
                     "enable": True,
                     "match": [{"class": "feishin"}],

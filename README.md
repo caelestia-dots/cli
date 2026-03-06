@@ -148,6 +148,13 @@ subcommands:
     resizer      window resizer daemon
 ```
 
+Examples:
+
+```
+# Region screenshot -> swappy preview -> clipboard
+caelestia screenshot --region --clipboard
+```
+
 ## Configuring
 
 All configuration options are in `~/.config/caelestia/cli.json`.
