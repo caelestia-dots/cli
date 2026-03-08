@@ -1,5 +1,4 @@
 from materialyoucolor.blend import Blend
-from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors
 from materialyoucolor.hct import Hct
 from materialyoucolor.scheme.scheme_content import SchemeContent
@@ -20,6 +19,11 @@ from typing import Protocol, Any
 # checker to expect our specific 3-argument setup instead of the base class signature.
 class SchemeConstructor(Protocol):
     def __call__(self, source_color_hct: Any, is_dark: bool, contrast_level: float) -> DynamicScheme: ...
+
+try:
+    from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
+except ImportError:
+    from materialyoucolor.scheme.dynamic_scheme import DynamicScheme
 
 
 def hex_to_hct(hex: str) -> Hct:

@@ -99,7 +99,8 @@ def get_smart_opts(wall: Path, cache: Path) -> dict:
     return opts
 
 
-def get_colours_for_wall(wall: Path, no_smart: bool) -> dict[str, str | dict[str, str]]:
+def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
+    wall = Path(wall)
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
