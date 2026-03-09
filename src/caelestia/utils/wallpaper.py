@@ -125,6 +125,7 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
 
+
 def convert_gif(wall: Path) -> Path:
     cache = wallpapers_cache_dir / compute_hash(wall)
     output_path = cache / "first_frame.png"
@@ -141,7 +142,6 @@ def convert_gif(wall: Path) -> Path:
             img.save(output_path, "PNG")
 
     return output_path
-
 
 
 def set_wallpaper(wall: Path | str, no_smart: bool) -> None:
