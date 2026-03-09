@@ -140,9 +140,12 @@ class Command:
             monitor_x = monitor.get("x")
             monitor_y = monitor.get("y")
 
-            if not all(isinstance(x, (int, float)) for x in [monitor_height, monitor_width, monitor_scale, monitor_x, monitor_y]):
+            if not all(
+                isinstance(x, (int, float))
+                for x in [monitor_height, monitor_width, monitor_scale, monitor_x, monitor_y]
+            ):
                 return
-            
+
             monitor_height = monitor_height / monitor_scale
             monitor_width = monitor_width / monitor_scale
 
@@ -232,7 +235,7 @@ class Command:
                 window_id = event.split(">>>")[1].split(",")[0]
             else:
                 window_id = event.split(">>")[1].split(",")[0]
-            
+
             # Remove any leading > characters
             window_id = window_id.lstrip(">")
 
@@ -268,9 +271,9 @@ class Command:
                 data = event[13:]  # Remove "openwindow>>>"
             else:
                 data = event[12:]  # Remove "openwindow>>"
-            
+
             window_id, workspace, window_class, title = data.split(",", 3)
-            
+
             # Remove any leading > characters
             window_id = window_id.lstrip(">")
 
@@ -348,19 +351,19 @@ class Command:
 
             # Find all windows that match the pattern
             matching_windows = self._find_matching_windows(temp_rule)
-            
+
             if not matching_windows:
                 print(f"No windows found matching pattern '{temp_rule.name}' with match type '{temp_rule.match_type}'")
                 return
 
             print(f"Found {len(matching_windows)} matching window(s)")
-            
+
             # Apply rule to all matching windows
             success_count = 0
             for window in matching_windows:
                 window_id = window["address"][2:]  # Remove "0x" prefix
                 window_title = window.get("title", "")
-                
+
                 print(f"Applying rule to window 0x{window_id}: '{window_title}'")
                 success = self._apply_window_actions(window_id, temp_rule.width, temp_rule.height, temp_rule.actions)
                 if success:
@@ -386,7 +389,7 @@ class Command:
                 return
 
             window_id = address[2:]  # Remove "0x" prefix
-            
+
             print(f"Applying rule to active window 0x{window_id}: '{window_title}'")
             success = self._apply_window_actions(window_id, temp_rule.width, temp_rule.height, temp_rule.actions)
             if success:
@@ -411,7 +414,7 @@ class Command:
 
                 window_title = window.get("title", "")
                 initial_title = window.get("initialTitle", "")
-                
+
                 # Check if window matches the pattern
                 matches = False
                 if temp_rule.match_type == "initialTitle":

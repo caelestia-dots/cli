@@ -1,11 +1,10 @@
+import fcntl
 import json
 import re
-import subprocess
-from pathlib import Path
-import tempfile
 import shutil
-import fcntl
-import sys
+import subprocess
+import tempfile
+from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.logging import log_exception
@@ -60,7 +59,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     colours_dyn = get_dynamic_colours(colours)
     template_content = template.read_text()
 
-    template_filled = re.sub(dotField, fill_colour, template_content) 
+    template_filled = re.sub(dotField, fill_colour, template_content)
     template_filled = re.sub(modeField, mode, template_filled)
 
     return template_filled
@@ -117,6 +116,7 @@ def write_file(path: Path, content: str) -> None:
         f.flush()
         shutil.move(f.name, path)
 
+
 @log_exception
 def apply_terms(sequences: str) -> None:
     state = c_state_dir / "sequences.txt"
@@ -129,6 +129,7 @@ def apply_terms(sequences: str) -> None:
             try:
                 # Use non-blocking write with timeout to prevent hangs
                 import os
+
                 fd = os.open(str(pt), os.O_WRONLY | os.O_NONBLOCK | os.O_NOCTTY)
                 try:
                     os.write(fd, sequences.encode())
@@ -154,6 +155,7 @@ def apply_discord(scss: str) -> None:
 
     for client in "Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord":
         write_file(config_dir / client / "themes/caelestia.theme.css", conf)
+
 
 @log_exception
 def apply_pandora(colours: dict[str, str], mode: str) -> None:
@@ -197,36 +199,32 @@ def apply_htop(colours: dict[str, str]) -> None:
 def sync_papirus_colors(hex_color: str) -> None:
     """Sync Papirus folder icon colors using hue/saturation analysis"""
     try:
-        result = subprocess.run(
-            ["which", "papirus-folders"],
-            capture_output=True,
-            check=False
-        )
+        result = subprocess.run(["which", "papirus-folders"], capture_output=True, check=False)
         if result.returncode != 0:
             return
     except Exception:
         return
-    
+
     papirus_paths = [
         Path("/usr/share/icons/Papirus"),
         Path("/usr/share/icons/Papirus-Dark"),
         Path.home() / ".local/share/icons/Papirus",
         Path.home() / ".icons/Papirus",
     ]
-    
+
     if not any(p.exists() for p in papirus_paths):
         return
-    
+
     r = int(hex_color[0:2], 16)
     g = int(hex_color[2:4], 16)
     b = int(hex_color[4:6], 16)
-    
+
     # Brightness and saturation
     max_val = max(r, g, b)
     min_val = min(r, g, b)
     brightness = max_val
     saturation = 0 if max_val == 0 else ((max_val - min_val) * 100) // max_val
-    
+
     # Low saturation = grayscale
     if saturation < 20:
         if brightness < 85:
@@ -241,13 +239,13 @@ def sync_papirus_colors(hex_color: str) -> None:
         color = _determine_hue_color(r, g, b, brightness, use_pale)
     else:
         color = _determine_hue_color(r, g, b, brightness, False)
-    
+
     try:
         subprocess.Popen(
             ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
             stderr=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
-            start_new_session=True
+            start_new_session=True,
         )
     except Exception:
         pass
@@ -259,7 +257,7 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
         r_ratio = (r * 100) // b if b > 0 else 0
         g_ratio = (g * 100) // b if b > 0 else 0
         rg_diff = abs(r - g)
-        
+
         if r_ratio > 70 and g_ratio > 70:
             # Both R and G high relative to B = light blue/periwinkle
             if rg_diff < 15:
@@ -307,7 +305,7 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
     gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
-    
+
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         gtk_config_dir = config_dir / gtk_version
         write_file(gtk_config_dir / "gtk.css", gtk_template)
@@ -316,7 +314,7 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
-    
+
     sync_papirus_colors(colours["primary"])
 
 
@@ -378,14 +376,14 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     # Use file-based lock to prevent concurrent theme changes
     lock_file = c_state_dir / "theme.lock"
     c_state_dir.mkdir(parents=True, exist_ok=True)
-    
+
     try:
-        with open(lock_file, 'w') as lock_fd:
+        with open(lock_file, "w") as lock_fd:
             try:
                 fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
                 return
-            
+
             try:
                 cfg = json.loads(user_config_path.read_text())["theme"]
             except (FileNotFoundError, json.JSONDecodeError, KeyError):
@@ -421,7 +419,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableCava"):
                 apply_cava(colours)
             apply_user_templates(colours, mode)
-            
+
     finally:
         try:
             lock_file.unlink()

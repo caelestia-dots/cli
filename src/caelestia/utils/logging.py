@@ -12,9 +12,11 @@ def log_exception(func):
     Used by the `apply_()` functions so that an exception, when applying
     a theme, does not prevent the other themes from being applied.
     """
+
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except Exception as e:
             log_message(f'Error during execution of "{func.__name__}()": {str(e)}')
+
     return wrapper
