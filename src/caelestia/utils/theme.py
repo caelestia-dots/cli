@@ -320,29 +320,12 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
 
 @log_exception
 def apply_qt(colours: dict[str, str], mode: str) -> None:
-    template = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
-    write_file(config_dir / "qt5ct/colors/caelestia.colors", template)
-    write_file(config_dir / "qt6ct/colors/caelestia.colors", template)
+    colours = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
+    write_file(config_dir / "qtengine/caelestia.colors", colours)
 
-    qtct = (templates_dir / "qtct.conf").read_text()
-    qtct = qtct.replace("{{ $mode }}", mode.capitalize())
-
-    for ver in 5, 6:
-        conf = qtct.replace("{{ $config }}", str(config_dir / f"qt{ver}ct"))
-
-        if ver == 5:
-            conf += """
-[Fonts]
-fixed="Monospace,12,-1,5,50,0,0,0,0,0"
-general="Sans Serif,12,-1,5,50,0,0,0,0,0"
-"""
-        else:
-            conf += """
-[Fonts]
-fixed="Monospace,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-"""
-        write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
+    config = (templates_dir / "qtengine.json").read_text()
+    config = config.replace("{{ $mode }}", mode.capitalize())
+    write_file(config_dir / "qtengine/config.json", config)
 
 
 @log_exception
