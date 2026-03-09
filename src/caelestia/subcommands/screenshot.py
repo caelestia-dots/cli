@@ -18,41 +18,110 @@ class Command:
         else:
             self.fullscreen()
 
+    def _convert_geometry_to_grim_format(self, geometry: str) -> str:
+        """Convert X11 geometry format (WIDTHxHEIGHT+X+Y) to grim format (X,Y WIDTHxHEIGHT)"""
+        import re
+        # Match X11 geometry format: WIDTHxHEIGHT+X+Y
+        match = re.match(r'(\d+)x(\d+)\+(\d+)\+(\d+)', geometry)
+        if match:
+            width, height, x, y = match.groups()
+            return f"{x},{y} {width}x{height}"
+        else:
+            # If it doesn't match X11 format, assume it's already in grim format or invalid
+            return geometry
+
     def region(self) -> None:
         if self.args.region == "slurp":
             subprocess.run(
                 ["qs", "-c", "caelestia", "ipc", "call", "picker", "openFreeze" if self.args.freeze else "open"]
             )
         else:
-            sc_data = subprocess.check_output(["grim", "-l", "0", "-g", self.args.region.strip(), "-"])
-            swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
-            swappy.stdin.write(sc_data)
-            swappy.stdin.close()
+            grim_geometry = self._convert_geometry_to_grim_format(self.args.region.strip())
+            sc_data = subprocess.check_output(["grim", "-l", "0", "-g", grim_geometry, "-"])
+            
+            # Copy to clipboard
+            subprocess.run(["wl-copy"], input=sc_data)
+
+            # Save directly to screenshots directory with proper naming
+            dest = screenshots_dir / f"screenshot_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.png"
+            screenshots_dir.mkdir(exist_ok=True, parents=True)
+            dest.write_bytes(sc_data)
+
+            # Show notification with actions
+            action = notify(
+                "-t", "0",  # No timeout, no close button
+                "-i",
+                "image-x-generic-symbolic",
+                "-h",
+                f"STRING:image-path:{dest}",
+                "--action=edit=Edit",
+                "--action=open=Open",
+                "--action=delete=Delete",
+                "Screenshot taken",
+                f"Screenshot saved to {dest.name} and copied to clipboard",
+            )
+
+            if action == "edit":
+                subprocess.Popen(["swappy", "-f", dest], start_new_session=True)
+            elif action == "open":
+                p = subprocess.run(
+                    [
+                        "dbus-send",
+                        "--session",
+                        "--dest=org.freedesktop.FileManager1",
+                        "--type=method_call",
+                        "/org/freedesktop/FileManager1",
+                        "org.freedesktop.FileManager1.ShowItems",
+                        f"array:string:file://{dest}",
+                        "string:",
+                    ]
+                )
+                if p.returncode != 0:
+                    subprocess.Popen(["app2unit", "-O", dest.parent], start_new_session=True)
+            elif action == "delete":
+                dest.unlink()
+                notify("Screenshot deleted", f"Deleted {dest.name}")
 
     def fullscreen(self) -> None:
         sc_data = subprocess.check_output(["grim", "-"])
 
         subprocess.run(["wl-copy"], input=sc_data)
 
-        dest = screenshots_cache_dir / datetime.now().strftime("%Y%m%d%H%M%S")
-        screenshots_cache_dir.mkdir(exist_ok=True, parents=True)
+        # Save directly to screenshots directory with proper naming
+        dest = screenshots_dir / f"screenshot_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.png"
+        screenshots_dir.mkdir(exist_ok=True, parents=True)
         dest.write_bytes(sc_data)
 
         action = notify(
+            "-t", "0",  # No timeout, no close button
             "-i",
             "image-x-generic-symbolic",
             "-h",
             f"STRING:image-path:{dest}",
+            "--action=edit=Edit",
             "--action=open=Open",
-            "--action=save=Save",
+            "--action=delete=Delete",
             "Screenshot taken",
-            f"Screenshot stored in {dest} and copied to clipboard",
+            f"Screenshot saved to {dest.name} and copied to clipboard",
         )
 
-        if action == "open":
+        if action == "edit":
             subprocess.Popen(["swappy", "-f", dest], start_new_session=True)
-        elif action == "save":
-            new_dest = (screenshots_dir / dest.name).with_suffix(".png")
-            new_dest.parent.mkdir(exist_ok=True, parents=True)
-            dest.rename(new_dest)
-            notify("Screenshot saved", f"Saved to {new_dest}")
+        elif action == "open":
+            p = subprocess.run(
+                [
+                    "dbus-send",
+                    "--session",
+                    "--dest=org.freedesktop.FileManager1",
+                    "--type=method_call",
+                    "/org/freedesktop/FileManager1",
+                    "org.freedesktop.FileManager1.ShowItems",
+                    f"array:string:file://{dest}",
+                    "string:",
+                ]
+            )
+            if p.returncode != 0:
+                subprocess.Popen(["app2unit", "-O", dest.parent], start_new_session=True)
+        elif action == "delete":
+            dest.unlink()
+            notify("Screenshot deleted", f"Deleted {dest.name}")
