@@ -6,7 +6,7 @@ from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
 
 
-def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
+def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     parser = argparse.ArgumentParser(prog="caelestia", description="Main control script for the Caelestia dotfiles")
     parser.add_argument("-v", "--version", action="store_true", help="print the current version")
 
