@@ -4,6 +4,8 @@ import re
 import shutil
 import subprocess
 import tempfile
+import shutil
+import fcntl
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
@@ -34,10 +36,10 @@ def gen_scss(colours: dict[str, str]) -> str:
 
 
 def gen_replace(colours: dict[str, str], template: Path, hash: bool = False) -> str:
-    template = template.read_text()
+    new_template = template.read_text()
     for name, colour in colours.items():
-        template = template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
-    return template
+        new_template = new_template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
+    return new_template
 
 
 def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> str:
@@ -65,7 +67,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     return template_filled
 
 
-def c2s(c: str, *i: list[int]) -> str:
+def hex_to_ansi(c: str, *i: int) -> str:
     """Hex to ANSI sequence (e.g. ffffff, 11 -> \x1b]11;rgb:ff/ff/ff\x1b\\)"""
     return f"\x1b]{';'.join(map(str, i))};rgb:{c[0:2]}/{c[2:4]}/{c[4:6]}\x1b\\"
 
@@ -82,29 +84,29 @@ def gen_sequences(colours: dict[str, str]) -> str:
         16+: 256 colours
     """
     return (
-        c2s(colours["onSurface"], 10)
-        + c2s(colours["surface"], 11)
-        + c2s(colours["secondary"], 12)
-        + c2s(colours["secondary"], 17)
-        + c2s(colours["term0"], 4, 0)
-        + c2s(colours["term1"], 4, 1)
-        + c2s(colours["term2"], 4, 2)
-        + c2s(colours["term3"], 4, 3)
-        + c2s(colours["term4"], 4, 4)
-        + c2s(colours["term5"], 4, 5)
-        + c2s(colours["term6"], 4, 6)
-        + c2s(colours["term7"], 4, 7)
-        + c2s(colours["term8"], 4, 8)
-        + c2s(colours["term9"], 4, 9)
-        + c2s(colours["term10"], 4, 10)
-        + c2s(colours["term11"], 4, 11)
-        + c2s(colours["term12"], 4, 12)
-        + c2s(colours["term13"], 4, 13)
-        + c2s(colours["term14"], 4, 14)
-        + c2s(colours["term15"], 4, 15)
-        + c2s(colours["primary"], 4, 16)
-        + c2s(colours["secondary"], 4, 17)
-        + c2s(colours["tertiary"], 4, 18)
+        hex_to_ansi(colours["onSurface"], 10)
+        + hex_to_ansi(colours["surface"], 11)
+        + hex_to_ansi(colours["secondary"], 12)
+        + hex_to_ansi(colours["secondary"], 17)
+        + hex_to_ansi(colours["term0"], 4, 0)
+        + hex_to_ansi(colours["term1"], 4, 1)
+        + hex_to_ansi(colours["term2"], 4, 2)
+        + hex_to_ansi(colours["term3"], 4, 3)
+        + hex_to_ansi(colours["term4"], 4, 4)
+        + hex_to_ansi(colours["term5"], 4, 5)
+        + hex_to_ansi(colours["term6"], 4, 6)
+        + hex_to_ansi(colours["term7"], 4, 7)
+        + hex_to_ansi(colours["term8"], 4, 8)
+        + hex_to_ansi(colours["term9"], 4, 9)
+        + hex_to_ansi(colours["term10"], 4, 10)
+        + hex_to_ansi(colours["term11"], 4, 11)
+        + hex_to_ansi(colours["term12"], 4, 12)
+        + hex_to_ansi(colours["term13"], 4, 13)
+        + hex_to_ansi(colours["term14"], 4, 14)
+        + hex_to_ansi(colours["term15"], 4, 15)
+        + hex_to_ansi(colours["primary"], 4, 16)
+        + hex_to_ansi(colours["secondary"], 4, 17)
+        + hex_to_ansi(colours["tertiary"], 4, 18)
     )
 
 
