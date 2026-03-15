@@ -3,8 +3,40 @@ import json
 import os
 import shutil
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+
+@dataclass(frozen=True)
+class WallpaperPaths:
+    base: Path
+    path: Path
+    current: Path
+    thumbnail: Path
+
+
+def resolve_wallpaper_paths(monitor: str | None) -> WallpaperPaths:
+    base = c_state_dir / "wallpapers" / (monitor or "default")
+    return WallpaperPaths(
+        base=base,
+        path=base / "path.txt",
+        current=base / "current",
+        thumbnail=base / "thumbnail.jpg",
+    )
+
+
+# TODO: Perhaps shift to using this for all the paths? example:
+"""
+@dataclass(frozen=True)
+class XDGDirs:
+config: Path = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
+data: Path = Path(os.getenv("XDG_DATA_HOME", Path.home() / ".local/share"))
+state: Path = Path(os.getenv("XDG_STATE_HOME", Path.home() / ".local/state"))
+cache: Path = Path(os.getenv("XDG_CACHE_HOME", Path.home() / ".cache"))
+pictures: Path = Path(os.getenv("XDG_PICTURES_DIR", Path.home() / "Pictures"))
+videos: Path = Path(os.getenv("XDG_VIDEOS_DIR", Path.home() / "Videos"))
+ """
 
 config_dir: Path = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
 data_dir: Path = Path(os.getenv("XDG_DATA_HOME", Path.home() / ".local/share"))
@@ -29,6 +61,7 @@ scheme_data_dir: Path = cli_data_dir / "schemes"
 scheme_cache_dir: Path = c_cache_dir / "schemes"
 
 wallpapers_dir: Path = Path(os.getenv("CAELESTIA_WALLPAPERS_DIR", pictures_dir / "Wallpapers"))
+
 wallpaper_path_path: Path = c_state_dir / "wallpaper/path.txt"
 wallpaper_link_path: Path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path: Path = c_state_dir / "wallpaper/thumbnail.jpg"
