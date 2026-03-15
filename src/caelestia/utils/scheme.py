@@ -1,6 +1,7 @@
 import json
 import random
 from pathlib import Path
+from typing import Any
 
 from caelestia.utils.notify import notify
 from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
@@ -14,19 +15,19 @@ class Scheme:
     _colours: dict[str, str]
     notify: bool
 
-    def __init__(self, json: dict[str, any] | None) -> None:
-        if json is None:
+    def __init__(self, scheme_json: dict[str, Any] | None) -> None:
+        if scheme_json is None:
             self._name = "catppuccin"
             self._flavour = "mocha"
             self._mode = "dark"
             self._variant = "tonalspot"
             self._colours = read_colours_from_file(self.get_colours_path())
         else:
-            self._name = json["name"]
-            self._flavour = json["flavour"]
-            self._mode = json["mode"]
-            self._variant = json["variant"]
-            self._colours = json["colours"]
+            self._name = scheme_json["name"]
+            self._flavour = scheme_json["flavour"]
+            self._mode = scheme_json["mode"]
+            self._variant = scheme_json["variant"]
+            self._colours = scheme_json["colours"]
         self.notify = False
 
     @property
@@ -196,7 +197,7 @@ scheme_variants = [
     "content",
 ]
 
-scheme: Scheme = None
+scheme: Scheme | None = None
 
 
 def read_colours_from_file(path: Path) -> dict[str, str]:
@@ -225,7 +226,7 @@ def get_scheme_names() -> list[str]:
     return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic"]
 
 
-def get_scheme_flavours(name: str = None) -> list[str]:
+def get_scheme_flavours(name: str | None = None) -> list[str]:
     if name is None:
         name = get_scheme().name
 
@@ -234,11 +235,11 @@ def get_scheme_flavours(name: str = None) -> list[str]:
     )
 
 
-def get_scheme_modes(name: str = None, flavour: str = None) -> list[str]:
-    if name is None:
+def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> list[str]:
+    if name is None or flavour is None:
         scheme = get_scheme()
-        name = scheme.name
-        flavour = scheme.flavour
+        name = name or scheme.name
+        flavour = flavour or scheme.flavour
 
     if name == "dynamic":
         return ["light", "dark"]
