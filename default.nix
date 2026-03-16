@@ -72,7 +72,7 @@ python3.pkgs.buildPythonApplication {
       --replace-fail 'app2unit' ${app2unit}/bin/app2unit
 
     # Use config style instead of darkly
-    substituteInPlace src/caelestia/data/templates/qtct.conf \
+    substituteInPlace src/caelestia/data/templates/qtengine.json \
     	--replace-fail 'Darkly' '${qtctStyle}'
   '';
 
