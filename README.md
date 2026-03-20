@@ -219,3 +219,21 @@ All configuration options are in `~/.config/caelestia/cli.json`.
 ```
 
 </details>
+
+## User Templates
+
+Custom user templates can be defined in `~/.config/caelestia/templates/`.
+
+#### Template syntax
+
+`{{ <color>.<format> }}`
+
+- `<color>` is a theme color role derived from the Material You color system (e.g. `primary`, `secondary`, `background`)
+- `<format>` is the output format: `hex` or `rgb`
+
+#### Examples
+
+- `{{ primary.hex }}` outputs `3f4ba2`
+- `{{ primary.rgb }}` outputs `rgb(193, 132, 207)`
+
+Output files are written to `~/.local/state/caelestia/theme/`. You can symlink them to your desired locations.
