@@ -33,6 +33,12 @@ class Command:
     def intersects(self, a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
         return a[0] < b[0] + b[2] and a[0] + a[2] > b[0] and a[1] < b[1] + b[3] and a[1] + a[3] > b[1]
 
+    def toggle_notifs(self, enable: bool) -> None:
+        if not self.args.allow_notifs:
+            subprocess.run(
+                ["qs", "-c", "caelestia", "ipc", "call", "notifs", "enableDnd" if enable else "disableDnd"]
+            )
+
     def start(self) -> None:
         args = ["-w"]
 
@@ -74,6 +80,7 @@ class Command:
             raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
+        self.toggle_notifs(True)
         proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], start_new_session=True)
 
         notif = notify("-p", "Recording started", "Recording...")
@@ -81,6 +88,7 @@ class Command:
 
         try:
             if proc.wait(1) != 0:
+                self.toggle_notifs(False)
                 close_notification(notif)
                 notify(
                     "Recording failed",
@@ -90,9 +98,12 @@ class Command:
         except subprocess.TimeoutExpired:
             pass
 
+
+
     def stop(self) -> None:
         # Start killing recording process
         subprocess.run(["pkill", "-f", RECORDER], stdout=subprocess.DEVNULL)
+        self.toggle_notifs(False)
 
         # Wait for recording to finish to avoid corrupted video file
         while self.proc_running():

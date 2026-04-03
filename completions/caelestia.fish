@@ -106,6 +106,7 @@ complete -c caelestia -n "$seen screenshot" -s 'f' -l 'freeze' -d 'Freeze while 
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
 complete -c caelestia -n "$seen record" -s 's' -l 'sound' -d 'Capture sound'
 complete -c caelestia -n "$seen record" -s 'c' -l 'clipboard' -d 'Copy recording path to clipboard'
+complete -c caelestia -n "$seen record" -s 'n' -l 'allow-notifs' -d 'Allow notifications to show during recording'
 
 # Clipboard
 complete -c caelestia -n "$seen clipboard" -s 'd' -l 'delete' -d 'Delete from cliboard history'
