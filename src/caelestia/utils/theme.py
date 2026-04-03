@@ -1,11 +1,12 @@
+import fcntl
 import json
 import re
+import shutil
 import subprocess
-from pathlib import Path
 import tempfile
 import shutil
 import fcntl
-import sys
+from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.logging import log_exception
@@ -35,10 +36,10 @@ def gen_scss(colours: dict[str, str]) -> str:
 
 
 def gen_replace(colours: dict[str, str], template: Path, hash: bool = False) -> str:
-    template = template.read_text()
+    new_template = template.read_text()
     for name, colour in colours.items():
-        template = template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
-    return template
+        new_template = new_template.replace(f"{{{{ ${name} }}}}", f"#{colour}" if hash else colour)
+    return new_template
 
 
 def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> str:
@@ -60,13 +61,13 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
     colours_dyn = get_dynamic_colours(colours)
     template_content = template.read_text()
 
-    template_filled = re.sub(dotField, fill_colour, template_content) 
+    template_filled = re.sub(dotField, fill_colour, template_content)
     template_filled = re.sub(modeField, mode, template_filled)
 
     return template_filled
 
 
-def c2s(c: str, *i: list[int]) -> str:
+def hex_to_ansi(c: str, *i: int) -> str:
     """Hex to ANSI sequence (e.g. ffffff, 11 -> \x1b]11;rgb:ff/ff/ff\x1b\\)"""
     return f"\x1b]{';'.join(map(str, i))};rgb:{c[0:2]}/{c[2:4]}/{c[4:6]}\x1b\\"
 
@@ -83,29 +84,29 @@ def gen_sequences(colours: dict[str, str]) -> str:
         16+: 256 colours
     """
     return (
-        c2s(colours["onSurface"], 10)
-        + c2s(colours["surface"], 11)
-        + c2s(colours["secondary"], 12)
-        + c2s(colours["secondary"], 17)
-        + c2s(colours["term0"], 4, 0)
-        + c2s(colours["term1"], 4, 1)
-        + c2s(colours["term2"], 4, 2)
-        + c2s(colours["term3"], 4, 3)
-        + c2s(colours["term4"], 4, 4)
-        + c2s(colours["term5"], 4, 5)
-        + c2s(colours["term6"], 4, 6)
-        + c2s(colours["term7"], 4, 7)
-        + c2s(colours["term8"], 4, 8)
-        + c2s(colours["term9"], 4, 9)
-        + c2s(colours["term10"], 4, 10)
-        + c2s(colours["term11"], 4, 11)
-        + c2s(colours["term12"], 4, 12)
-        + c2s(colours["term13"], 4, 13)
-        + c2s(colours["term14"], 4, 14)
-        + c2s(colours["term15"], 4, 15)
-        + c2s(colours["primary"], 4, 16)
-        + c2s(colours["secondary"], 4, 17)
-        + c2s(colours["tertiary"], 4, 18)
+        hex_to_ansi(colours["onSurface"], 10)
+        + hex_to_ansi(colours["surface"], 11)
+        + hex_to_ansi(colours["secondary"], 12)
+        + hex_to_ansi(colours["secondary"], 17)
+        + hex_to_ansi(colours["term0"], 4, 0)
+        + hex_to_ansi(colours["term1"], 4, 1)
+        + hex_to_ansi(colours["term2"], 4, 2)
+        + hex_to_ansi(colours["term3"], 4, 3)
+        + hex_to_ansi(colours["term4"], 4, 4)
+        + hex_to_ansi(colours["term5"], 4, 5)
+        + hex_to_ansi(colours["term6"], 4, 6)
+        + hex_to_ansi(colours["term7"], 4, 7)
+        + hex_to_ansi(colours["term8"], 4, 8)
+        + hex_to_ansi(colours["term9"], 4, 9)
+        + hex_to_ansi(colours["term10"], 4, 10)
+        + hex_to_ansi(colours["term11"], 4, 11)
+        + hex_to_ansi(colours["term12"], 4, 12)
+        + hex_to_ansi(colours["term13"], 4, 13)
+        + hex_to_ansi(colours["term14"], 4, 14)
+        + hex_to_ansi(colours["term15"], 4, 15)
+        + hex_to_ansi(colours["primary"], 4, 16)
+        + hex_to_ansi(colours["secondary"], 4, 17)
+        + hex_to_ansi(colours["tertiary"], 4, 18)
     )
 
 
@@ -116,6 +117,7 @@ def write_file(path: Path, content: str) -> None:
         f.write(content)
         f.flush()
         shutil.move(f.name, path)
+
 
 @log_exception
 def apply_terms(sequences: str) -> None:
@@ -129,6 +131,7 @@ def apply_terms(sequences: str) -> None:
             try:
                 # Use non-blocking write with timeout to prevent hangs
                 import os
+
                 fd = os.open(str(pt), os.O_WRONLY | os.O_NONBLOCK | os.O_NOCTTY)
                 try:
                     os.write(fd, sequences.encode())
@@ -154,6 +157,7 @@ def apply_discord(scss: str) -> None:
 
     for client in "Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord":
         write_file(config_dir / client / "themes/caelestia.theme.css", conf)
+
 
 @log_exception
 def apply_pandora(colours: dict[str, str], mode: str) -> None:
@@ -197,36 +201,32 @@ def apply_htop(colours: dict[str, str]) -> None:
 def sync_papirus_colors(hex_color: str) -> None:
     """Sync Papirus folder icon colors using hue/saturation analysis"""
     try:
-        result = subprocess.run(
-            ["which", "papirus-folders"],
-            capture_output=True,
-            check=False
-        )
+        result = subprocess.run(["which", "papirus-folders"], capture_output=True, check=False)
         if result.returncode != 0:
             return
     except Exception:
         return
-    
+
     papirus_paths = [
         Path("/usr/share/icons/Papirus"),
         Path("/usr/share/icons/Papirus-Dark"),
         Path.home() / ".local/share/icons/Papirus",
         Path.home() / ".icons/Papirus",
     ]
-    
+
     if not any(p.exists() for p in papirus_paths):
         return
-    
+
     r = int(hex_color[0:2], 16)
     g = int(hex_color[2:4], 16)
     b = int(hex_color[4:6], 16)
-    
+
     # Brightness and saturation
     max_val = max(r, g, b)
     min_val = min(r, g, b)
     brightness = max_val
     saturation = 0 if max_val == 0 else ((max_val - min_val) * 100) // max_val
-    
+
     # Low saturation = grayscale
     if saturation < 20:
         if brightness < 85:
@@ -241,13 +241,13 @@ def sync_papirus_colors(hex_color: str) -> None:
         color = _determine_hue_color(r, g, b, brightness, use_pale)
     else:
         color = _determine_hue_color(r, g, b, brightness, False)
-    
+
     try:
         subprocess.Popen(
             ["sudo", "-n", "papirus-folders", "-C", color, "-u"],
             stderr=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
-            start_new_session=True
+            start_new_session=True,
         )
     except Exception:
         pass
@@ -259,7 +259,7 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
         r_ratio = (r * 100) // b if b > 0 else 0
         g_ratio = (g * 100) // b if b > 0 else 0
         rg_diff = abs(r - g)
-        
+
         if r_ratio > 70 and g_ratio > 70:
             # Both R and G high relative to B = light blue/periwinkle
             if rg_diff < 15:
@@ -307,7 +307,7 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
 def apply_gtk(colours: dict[str, str], mode: str) -> None:
     gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
-    
+
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         gtk_config_dir = config_dir / gtk_version
         write_file(gtk_config_dir / "gtk.css", gtk_template)
@@ -316,35 +316,18 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
-    
+
     sync_papirus_colors(colours["primary"])
 
 
 @log_exception
 def apply_qt(colours: dict[str, str], mode: str) -> None:
-    template = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
-    write_file(config_dir / "qt5ct/colors/caelestia.colors", template)
-    write_file(config_dir / "qt6ct/colors/caelestia.colors", template)
+    colours = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
+    write_file(config_dir / "qtengine/caelestia.colors", colours)
 
-    qtct = (templates_dir / "qtct.conf").read_text()
-    qtct = qtct.replace("{{ $mode }}", mode.capitalize())
-
-    for ver in 5, 6:
-        conf = qtct.replace("{{ $config }}", str(config_dir / f"qt{ver}ct"))
-
-        if ver == 5:
-            conf += """
-[Fonts]
-fixed="Monospace,12,-1,5,50,0,0,0,0,0"
-general="Sans Serif,12,-1,5,50,0,0,0,0,0"
-"""
-        else:
-            conf += """
-[Fonts]
-fixed="Monospace,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-general="Sans Serif,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-"""
-        write_file(config_dir / f"qt{ver}ct/qt{ver}ct.conf", conf)
+    config = (templates_dir / "qtengine.json").read_text()
+    config = config.replace("{{ $mode }}", mode.capitalize())
+    write_file(config_dir / "qtengine/config.json", config)
 
 
 @log_exception
@@ -378,14 +361,14 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
     # Use file-based lock to prevent concurrent theme changes
     lock_file = c_state_dir / "theme.lock"
     c_state_dir.mkdir(parents=True, exist_ok=True)
-    
+
     try:
-        with open(lock_file, 'w') as lock_fd:
+        with open(lock_file, "w") as lock_fd:
             try:
                 fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
                 return
-            
+
             try:
                 cfg = json.loads(user_config_path.read_text())["theme"]
             except (FileNotFoundError, json.JSONDecodeError, KeyError):
@@ -421,7 +404,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableCava"):
                 apply_cava(colours)
             apply_user_templates(colours, mode)
-            
+
     finally:
         try:
             lock_file.unlink()

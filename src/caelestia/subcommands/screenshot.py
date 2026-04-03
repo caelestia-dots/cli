@@ -26,8 +26,11 @@ class Command:
         else:
             sc_data = subprocess.check_output(["grim", "-l", "0", "-g", self.args.region.strip(), "-"])
             swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
-            swappy.stdin.write(sc_data)
-            swappy.stdin.close()
+
+            # Ensure stdin is not None for the type checker
+            if swappy.stdin:
+                swappy.stdin.write(sc_data)
+                swappy.stdin.close()
 
     def fullscreen(self) -> None:
         sc_data = subprocess.check_output(["grim", "-"])
