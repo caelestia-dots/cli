@@ -39,6 +39,7 @@ screenshots_cache_dir = c_cache_dir / "screenshots"
 recordings_dir = os.getenv("CAELESTIA_RECORDINGS_DIR", videos_dir / "Recordings")
 recording_path = c_state_dir / "record/recording.mp4"
 recording_notif_path = c_state_dir / "record/notifid.txt"
+recording_dnd_state_path = c_state_dir / "record/dnd_state.txt"
 
 
 def compute_hash(path: Path | str) -> str:
