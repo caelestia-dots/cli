@@ -73,7 +73,7 @@ def parse_args() -> (argparse.ArgumentParser, argparse.Namespace):
     record_parser.add_argument("-p", "--pause", action="store_true", help="pause/resume the recording")
     record_parser.add_argument("-c", "--clipboard", action="store_true", help="copy recording path to clipboard")
     record_parser.add_argument(
-        "-n", "--allow-notifs", action="store_false", help="allow notifications to show during recording"
+        "-n", "--allow-notifs", action="store_true", help="allow notifications to show during recording"
     )
 
     # Create parser for clipboard opts
