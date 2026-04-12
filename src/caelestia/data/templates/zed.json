@@ -1,0 +1,457 @@
+{
+  "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
+  "name": "Caelestia",
+  "author": "Caelestia",
+  "themes": [
+    {
+      "name": "Caelestia",
+      "appearance": "{{ mode }}",
+      "style": {
+        "background": "#{{ surface.hex }}",
+        "border": "#{{ outlineVariant.hex }}40",
+        "border.variant": "#{{ outlineVariant.hex }}60",
+        "border.focused": "#{{ primary.hex }}",
+        "border.selected": "#{{ primary.hex }}80",
+        "border.transparent": "#00000000",
+        "border.disabled": "#{{ outlineVariant.hex }}30",
+
+        "elevated_surface.background": "#{{ surfaceContainerHigh.hex }}",
+        "surface.background": "#{{ surface.hex }}",
+
+        "element.background": "#{{ outlineVariant.hex }}40",
+        "element.hover": "#{{ outlineVariant.hex }}60",
+        "element.active": "#{{ primary.hex }}30",
+        "element.selected": "#{{ primary.hex }}20",
+        "element.disabled": "#{{ outlineVariant.hex }}20",
+
+        "drop_target.background": "#{{ primary.hex }}20",
+
+        "ghost_element.background": "#00000000",
+        "ghost_element.hover": "#{{ outlineVariant.hex }}40",
+        "ghost_element.active": "#{{ primary.hex }}30",
+        "ghost_element.selected": "#{{ primary.hex }}20",
+        "ghost_element.disabled": "#{{ outlineVariant.hex }}20",
+
+        "text": "#{{ onSurface.hex }}",
+        "text.muted": "#{{ onSurfaceVariant.hex }}",
+        "text.placeholder": "#{{ outline.hex }}",
+        "text.disabled": "#{{ outline.hex }}80",
+        "text.accent": "#{{ primary.hex }}",
+
+        "icon": "#{{ onSurface.hex }}",
+        "icon.muted": "#{{ onSurfaceVariant.hex }}",
+        "icon.disabled": "#{{ outlineVariant.hex }}60",
+        "icon.placeholder": "#{{ onSurfaceVariant.hex }}",
+        "icon.accent": "#{{ primary.hex }}",
+
+        "status_bar.background": "#{{ surface.hex }}",
+        "title_bar.background": "#{{ surface.hex }}",
+        "title_bar.inactive_background": "#{{ surface.hex }}",
+        "toolbar.background": "#{{ surface.hex }}",
+        "tab_bar.background": "#{{ surface.hex }}",
+        "tab.inactive_background": "#{{ surface.hex }}",
+        "tab.active_background": "#{{ surfaceContainerHigh.hex }}",
+
+        "search.match_background": "#{{ yellow.hex }}40",
+
+        "panel.background": "#{{ surface.hex }}",
+        "panel.focused_border": "#{{ primary.hex }}",
+
+        "pane.focused_border": "#{{ primary.hex }}",
+
+        "scrollbar.thumb.background": "#{{ outlineVariant.hex }}30",
+        "scrollbar.thumb.hover_background": "#{{ outlineVariant.hex }}60",
+        "scrollbar.thumb.border": "#{{ outlineVariant.hex }}20",
+        "scrollbar.track.background": "#00000000",
+        "scrollbar.track.border": "#00000000",
+
+        "editor.foreground": "#{{ onSurface.hex }}",
+        "editor.background": "#{{ surface.hex }}",
+        "editor.gutter.background": "#{{ surface.hex }}",
+        "editor.subheader.background": "#{{ surfaceContainer.hex }}",
+        "editor.active_line.background": "#{{ surfaceContainerHigh.hex }}60",
+        "editor.highlighted_line.background": "#{{ primary.hex }}15",
+        "editor.line_number": "#{{ onSurfaceVariant.hex }}",
+        "editor.active_line_number": "#{{ onSurface.hex }}",
+        "editor.invisible": "#{{ outlineVariant.hex }}40",
+        "editor.wrap_guide": "#{{ outlineVariant.hex }}30",
+        "editor.active_wrap_guide": "#{{ outlineVariant.hex }}60",
+        "editor.document_highlight.read_background": "#{{ primary.hex }}20",
+        "editor.document_highlight.write_background": "#{{ primary.hex }}30",
+
+        "terminal.background": "#{{ surface.hex }}",
+        "terminal.foreground": "#{{ onSurface.hex }}",
+        "terminal.bright_foreground": "#{{ onSurface.hex }}",
+        "terminal.dim_foreground": "#{{ onSurfaceVariant.hex }}",
+        "terminal.ansi.black": "#{{ surface.hex }}",
+        "terminal.ansi.bright_black": "#{{ onSurfaceVariant.hex }}",
+        "terminal.ansi.dim_black": "#{{ surface.hex }}80",
+        "terminal.ansi.red": "#{{ red.hex }}",
+        "terminal.ansi.bright_red": "#{{ maroon.hex }}",
+        "terminal.ansi.dim_red": "#{{ red.hex }}80",
+        "terminal.ansi.green": "#{{ green.hex }}",
+        "terminal.ansi.bright_green": "#{{ teal.hex }}",
+        "terminal.ansi.dim_green": "#{{ green.hex }}80",
+        "terminal.ansi.yellow": "#{{ yellow.hex }}",
+        "terminal.ansi.bright_yellow": "#{{ peach.hex }}",
+        "terminal.ansi.dim_yellow": "#{{ yellow.hex }}80",
+        "terminal.ansi.blue": "#{{ blue.hex }}",
+        "terminal.ansi.bright_blue": "#{{ sapphire.hex }}",
+        "terminal.ansi.dim_blue": "#{{ blue.hex }}80",
+        "terminal.ansi.magenta": "#{{ mauve.hex }}",
+        "terminal.ansi.bright_magenta": "#{{ pink.hex }}",
+        "terminal.ansi.dim_magenta": "#{{ mauve.hex }}80",
+        "terminal.ansi.cyan": "#{{ teal.hex }}",
+        "terminal.ansi.bright_cyan": "#{{ sky.hex }}",
+        "terminal.ansi.dim_cyan": "#{{ teal.hex }}80",
+        "terminal.ansi.white": "#{{ onSurface.hex }}",
+        "terminal.ansi.bright_white": "#{{ onSurface.hex }}",
+        "terminal.ansi.dim_white": "#{{ onSurface.hex }}80",
+
+        "link_text.hover": "#{{ primary.hex }}",
+
+        "conflict": "#{{ yellow.hex }}",
+        "conflict.background": "#{{ yellow.hex }}15",
+        "conflict.border": "#{{ yellow.hex }}",
+
+        "created": "#{{ green.hex }}",
+        "created.background": "#{{ green.hex }}15",
+        "created.border": "#{{ green.hex }}",
+
+        "deleted": "#{{ red.hex }}",
+        "deleted.background": "#{{ red.hex }}15",
+        "deleted.border": "#{{ red.hex }}",
+
+        "error": "#{{ error.hex }}",
+        "error.background": "#{{ error.hex }}15",
+        "error.border": "#{{ error.hex }}",
+
+        "hidden": "#{{ outline.hex }}",
+        "hidden.background": "#{{ outline.hex }}15",
+        "hidden.border": "#{{ outline.hex }}",
+
+        "hint": "#{{ success.hex }}",
+        "hint.background": "#{{ success.hex }}15",
+        "hint.border": "#{{ success.hex }}",
+
+        "ignored": "#{{ outline.hex }}",
+        "ignored.background": "#{{ outline.hex }}15",
+        "ignored.border": "#{{ outline.hex }}",
+
+        "info": "#{{ blue.hex }}",
+        "info.background": "#{{ blue.hex }}15",
+        "info.border": "#{{ blue.hex }}",
+
+        "modified": "#{{ peach.hex }}",
+        "modified.background": "#{{ peach.hex }}15",
+        "modified.border": "#{{ peach.hex }}",
+
+        "predictive": "#{{ onSurfaceVariant.hex }}",
+        "predictive.background": "#{{ onSurfaceVariant.hex }}15",
+        "predictive.border": "#{{ outlineVariant.hex }}40",
+
+        "renamed": "#{{ teal.hex }}",
+        "renamed.background": "#{{ teal.hex }}15",
+        "renamed.border": "#{{ teal.hex }}",
+
+        "success": "#{{ success.hex }}",
+        "success.background": "#{{ success.hex }}15",
+        "success.border": "#{{ success.hex }}",
+
+        "unreachable": "#{{ outline.hex }}",
+        "unreachable.background": "#{{ outline.hex }}15",
+        "unreachable.border": "#{{ outline.hex }}",
+
+        "warning": "#{{ yellow.hex }}",
+        "warning.background": "#{{ yellow.hex }}15",
+        "warning.border": "#{{ yellow.hex }}",
+
+        "players": [
+          {
+            "cursor": "#{{ onSurface.hex }}",
+            "selection": "#{{ onSurface.hex }}60",
+            "background": "#{{ primary.hex }}"
+          },
+          {
+            "cursor": "#{{ teal.hex }}",
+            "selection": "#{{ teal.hex }}40",
+            "background": "#{{ teal.hex }}"
+          },
+          {
+            "cursor": "#{{ pink.hex }}",
+            "selection": "#{{ pink.hex }}40",
+            "background": "#{{ pink.hex }}"
+          },
+          {
+            "cursor": "#{{ yellow.hex }}",
+            "selection": "#{{ yellow.hex }}40",
+            "background": "#{{ yellow.hex }}"
+          },
+          {
+            "cursor": "#{{ green.hex }}",
+            "selection": "#{{ green.hex }}40",
+            "background": "#{{ green.hex }}"
+          },
+          {
+            "cursor": "#{{ red.hex }}",
+            "selection": "#{{ red.hex }}40",
+            "background": "#{{ red.hex }}"
+          },
+          {
+            "cursor": "#{{ blue.hex }}",
+            "selection": "#{{ blue.hex }}40",
+            "background": "#{{ blue.hex }}"
+          },
+          {
+            "cursor": "#{{ maroon.hex }}",
+            "selection": "#{{ maroon.hex }}40",
+            "background": "#{{ maroon.hex }}"
+          }
+        ],
+
+        "syntax": {
+          "attribute": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "boolean": {
+            "color": "#{{ peach.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "comment": {
+            "color": "#{{ subtext0.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "comment.doc": {
+            "color": "#{{ subtext0.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "constant": {
+            "color": "#{{ peach.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "constructor": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "embedded": {
+            "color": "#{{ onSurface.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "emphasis": {
+            "color": "#{{ red.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "emphasis.strong": {
+            "color": "#{{ red.hex }}",
+            "font_style": null,
+            "font_weight": 700
+          },
+          "enum": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "function": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "function.builtin": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "function.definition": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "function.method": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "function.special.definition": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "hint": {
+            "color": "#{{ onSurfaceVariant.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "keyword": {
+            "color": "#{{ pink.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "label": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "link_text": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "link_uri": {
+            "color": "#{{ teal.hex }}",
+            "font_style": "underline",
+            "font_weight": null
+          },
+          "number": {
+            "color": "#{{ peach.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "operator": {
+            "color": "#{{ sapphire.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "predictive": {
+            "color": "#{{ onSurfaceVariant.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "preproc": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "primary": {
+            "color": "#{{ onSurface.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "property": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "punctuation": {
+            "color": "#{{ subtext1.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "punctuation.bracket": {
+            "color": "#{{ subtext1.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "punctuation.delimiter": {
+            "color": "#{{ subtext1.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "punctuation.list_marker": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "punctuation.special": {
+            "color": "#{{ sapphire.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "string": {
+            "color": "#{{ green.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "string.escape": {
+            "color": "#{{ pink.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "string.regex": {
+            "color": "#{{ sky.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "string.special": {
+            "color": "#{{ green.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "string.special.symbol": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "tag": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "text.literal": {
+            "color": "#{{ green.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "title": {
+            "color": "#{{ blue.hex }}",
+            "font_style": null,
+            "font_weight": 700
+          },
+          "type": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "type.builtin": {
+            "color": "#{{ onSurface.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "type.interface": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "type.super": {
+            "color": "#{{ yellow.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "variable": {
+            "color": "#{{ onSurface.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "variable.member": {
+            "color": "#{{ teal.hex }}",
+            "font_style": null,
+            "font_weight": null
+          },
+          "variable.parameter": {
+            "color": "#{{ teal.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "variable.special": {
+            "color": "#{{ onSurface.hex }}",
+            "font_style": "italic",
+            "font_weight": null
+          },
+          "variant": {
+            "color": "#{{ peach.hex }}",
+            "font_style": null,
+            "font_weight": null
+          }
+        }
+      }
+    }
+  ]
+}

@@ -360,6 +360,15 @@ def apply_chromium(colours: dict[str, str]) -> None:
             [cmd, "--refresh-platform-policy", "--no-startup-window"],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
+def apply_zed(colours: dict[str, str], mode: str) -> None:
+    theme_path = config_dir / "zed/themes/caelestia.json"
+    # Zed's file watcher does not detect changes through symlinks,
+    # so resolve to a regular file before writing
+    if theme_path.is_symlink():
+        theme_path.unlink()
+
+    content = gen_replace_dynamic(colours, templates_dir / "zed.json", mode)
+    write_file(theme_path, content)
 
 
 @log_exception
@@ -426,6 +435,8 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_warp(colours, mode)
             if check("enableChromium"):
                 apply_chromium(colours)
+            if check("enableZed"):
+                apply_zed(colours, mode)
             if check("enableCava"):
                 apply_cava(colours)
             apply_user_templates(colours, mode)
