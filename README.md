@@ -21,6 +21,7 @@ The main control script for the Caelestia dotfiles.
 <details><summary id="optional-dependencies">Optional dependencies</summary>
 
 - [`papirus-folders`](https://github.com/PapirusDevelopmentTeam/papirus-folders) - automatic folder icon color syncing with theme
+- Chromium-based browser (`chromium`, `brave`, or `google-chrome-stable`) - live browser theming
 
 > [!NOTE]
 > For automatic Papirus folder icon color syncing, `papirus-folders` needs to be able to run with `sudo` without a password prompt.
@@ -43,6 +44,22 @@ The main control script for the Caelestia dotfiles.
 >
 > ```
 > your_username ALL=(ALL) NOPASSWD: /usr/bin/papirus-folders
+> ```
+
+> [!NOTE]
+> For live Chromium-based browser theming, `mkdir` and `chmod` for browser policy directories need to be able to run with `sudo` without a password prompt.
+>
+> **Recommended** - Create a sudoers file:
+>
+> ```sh
+> echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/mkdir, /usr/bin/chmod" | sudo tee /etc/sudoers.d/caelestia-chromium
+> sudo chmod 440 /etc/sudoers.d/caelestia-chromium
+> ```
+>
+> **Alternatively** - Edit the main sudoers file by running `sudo visudo` and adding at the end:
+>
+> ```
+> your_username ALL=(ALL) NOPASSWD: /usr/bin/mkdir, /usr/bin/chmod
 > ```
 
 </details>

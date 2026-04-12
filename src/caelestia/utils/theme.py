@@ -1,11 +1,10 @@
 import fcntl
 import json
+import os
 import re
 import shutil
 import subprocess
 import tempfile
-import shutil
-import fcntl
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
@@ -340,6 +339,30 @@ def apply_warp(colours: dict[str, str], mode: str) -> None:
 
 
 @log_exception
+def apply_chromium(colours: dict[str, str]) -> None:
+    surface_hex = colours["surface"]
+    theme_color = f"#{surface_hex}"
+    browsers = [
+        ("chromium", Path("/etc/chromium/policies/managed")),
+        ("brave", Path("/etc/brave/policies/managed")),
+        ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed")),
+    ]
+    for cmd, policy_dir in browsers:
+        if shutil.which(cmd) is None:
+            continue
+        if not policy_dir.is_dir():
+            subprocess.run(["sudo", "-n", "mkdir", "-p", str(policy_dir)], stderr=subprocess.DEVNULL)
+            subprocess.run(["sudo", "-n", "chmod", "a+rw", str(policy_dir)], stderr=subprocess.DEVNULL)
+        if not policy_dir.is_dir() or not os.access(policy_dir, os.W_OK):
+            continue
+        write_file(policy_dir / "caelestia.json", json.dumps({"BrowserThemeColor": theme_color, "BrowserColorScheme": "device"}))
+        subprocess.run(
+            [cmd, "--refresh-platform-policy", "--no-startup-window"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+
+@log_exception
 def apply_cava(colours: dict[str, str]) -> None:
     template = gen_replace(colours, templates_dir / "cava.conf", hash=True)
     write_file(config_dir / "cava/config", template)
@@ -401,6 +424,8 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_qt(colours, mode)
             if check("enableWarp"):
                 apply_warp(colours, mode)
+            if check("enableChromium"):
+                apply_chromium(colours)
             if check("enableCava"):
                 apply_cava(colours)
             apply_user_templates(colours, mode)
