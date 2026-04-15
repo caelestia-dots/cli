@@ -18,35 +18,6 @@ The main control script for the Caelestia dotfiles.
 
 </details>
 
-<details><summary id="optional-dependencies">Optional dependencies</summary>
-
-- [`papirus-folders`](https://github.com/PapirusDevelopmentTeam/papirus-folders) - automatic folder icon color syncing with theme
-
-> [!NOTE]
-> For automatic Papirus folder icon color syncing, `papirus-folders` needs to be able to run with `sudo` without a password prompt.
->
-> **Recommended** - Create a sudoers file:
->
-> ```fish
-> # Fish shell
-> echo "$USER ALL=(ALL) NOPASSWD: "(which papirus-folders) | sudo tee /etc/sudoers.d/papirus-folders
-> sudo chmod 440 /etc/sudoers.d/papirus-folders
-> ```
->
-> ```sh
-> # Bash/other shells
-> echo "$USER ALL=(ALL) NOPASSWD: $(which papirus-folders)" | sudo tee /etc/sudoers.d/papirus-folders
-> sudo chmod 440 /etc/sudoers.d/papirus-folders
-> ```
->
-> **Alternatively** - Edit the main sudoers file by running `sudo visudo` and adding at the end:
->
-> ```
-> your_username ALL=(ALL) NOPASSWD: /usr/bin/papirus-folders
-> ```
-
-</details>
-
 ## Installation
 
 ### Arch linux
@@ -122,6 +93,45 @@ sudo python -m installer dist/*.whl
 sudo cp completions/caelestia.fish /usr/share/fish/vendor_completions.d/caelestia.fish
 ```
 
+### Additional steps
+
+#### Auto folder colour theming
+
+For automatic Papirus folder icon colour syncing, you must have [`papirus-folders`](https://github.com/PapirusDevelopmentTeam/papirus-folders)
+installed, and `papirus-folders` must to be able to run with `sudo` without a password prompt.
+
+You can allow this by creating a sudoers file:
+
+```sh
+echo "$USER ALL=(ALL) NOPASSWD: $(which papirus-folders)" | sudo tee /etc/sudoers.d/papirus-folders
+sudo chmod 440 /etc/sudoers.d/papirus-folders
+```
+
+#### Chromium-based browser theming
+
+For live Chromium-based browser theming, the CLI must be allowed to create certain directories in `/etc`
+and write to them via `sudo` without a password prompt.
+
+You can allow this by creating a sudoers file:
+
+```fish
+# Fish shell
+for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed
+    echo "$USER ALL=(ALL) NOPASSWD: $(which mkdir) -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+    echo "$USER ALL=(ALL) NOPASSWD: $(which tee) $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+end
+sudo chmod 440 /etc/sudoers.d/caelestia-chromium
+```
+
+```sh
+# Bash/other shells
+for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed; do
+    echo "$USER ALL=(ALL) NOPASSWD: $(which mkdir) -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+    echo "$USER ALL=(ALL) NOPASSWD: $(which tee) $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+done
+sudo chmod 440 /etc/sudoers.d/caelestia-chromium
+```
+
 ## Usage
 
 All subcommands/options can be explored via the help flag.
@@ -151,7 +161,7 @@ subcommands:
     resizer      window resizer daemon
 ```
 
-### User Templates
+### User templates
 
 Custom user templates can be defined in `~/.config/caelestia/templates/`.
 
