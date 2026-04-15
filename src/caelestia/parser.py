@@ -1,6 +1,6 @@
 import argparse
 
-from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
+from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper, icons
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
@@ -63,6 +63,25 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     screenshot_parser.add_argument("-r", "--region", nargs="?", const="slurp", help="take a screenshot of a region")
     screenshot_parser.add_argument(
         "-f", "--freeze", action="store_true", help="freeze the screen while selecting a region"
+    )
+
+    # Create parser for icons opts
+
+    icons_parser = command_parser.add_parser("icons", help="manage icon themes")
+    icons_parser.set_defaults(cls=icons.Command)
+
+    icons_parser.add_argument(
+        "-l",
+        "--list",
+        action="store_true",
+        help="list available icon themes"
+    )
+
+    icons_parser.add_argument(
+        "-s",
+        "--set",
+        metavar="THEME",
+        help="set icon theme"
     )
 
     # Create parser for record opts
