@@ -28,14 +28,7 @@ The main control script for the Caelestia dotfiles.
 >
 > **Recommended** - Create a sudoers file:
 >
-> ```fish
-> # Fish shell
-> echo "$USER ALL=(ALL) NOPASSWD: "(which papirus-folders) | sudo tee /etc/sudoers.d/papirus-folders
-> sudo chmod 440 /etc/sudoers.d/papirus-folders
-> ```
->
 > ```sh
-> # Bash/other shells
 > echo "$USER ALL=(ALL) NOPASSWD: $(which papirus-folders)" | sudo tee /etc/sudoers.d/papirus-folders
 > sudo chmod 440 /etc/sudoers.d/papirus-folders
 > ```
@@ -51,15 +44,22 @@ The main control script for the Caelestia dotfiles.
 >
 > **Recommended** - Create a sudoers file:
 >
-> ```sh
-> echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/mkdir, /usr/bin/chmod" | sudo tee /etc/sudoers.d/caelestia-chromium
+> ```fish
+> # Fish shell
+> for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed
+>   echo "$USER ALL=(ALL) NOPASSWD: $(which mkdir) -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+>   echo "$USER ALL=(ALL) NOPASSWD: $(which tee) $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+> end
 > sudo chmod 440 /etc/sudoers.d/caelestia-chromium
 > ```
 >
-> **Alternatively** - Edit the main sudoers file by running `sudo visudo` and adding at the end:
->
-> ```
-> your_username ALL=(ALL) NOPASSWD: /usr/bin/mkdir, /usr/bin/chmod
+> ```sh
+> # Bash/other shells
+> for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed; do
+>   echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+>   echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/tee $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
+> done
+> sudo chmod 440 /etc/sudoers.d/caelestia-chromium
 > ```
 
 </details>
