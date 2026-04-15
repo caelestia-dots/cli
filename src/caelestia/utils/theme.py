@@ -1,6 +1,5 @@
 import fcntl
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -347,19 +346,31 @@ def apply_chromium(colours: dict[str, str]) -> None:
         ("brave", Path("/etc/brave/policies/managed")),
         ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed")),
     ]
+
     for cmd, policy_dir in browsers:
         if shutil.which(cmd) is None:
             continue
         if not policy_dir.is_dir():
             subprocess.run(["sudo", "-n", "mkdir", "-p", str(policy_dir)], stderr=subprocess.DEVNULL)
-            subprocess.run(["sudo", "-n", "chmod", "a+rw", str(policy_dir)], stderr=subprocess.DEVNULL)
-        if not policy_dir.is_dir() or not os.access(policy_dir, os.W_OK):
+        if not policy_dir.is_dir():
+            print(f"Unable to create {policy_dir} directory")
             continue
-        write_file(policy_dir / "caelestia.json", json.dumps({"BrowserThemeColor": theme_color, "BrowserColorScheme": "device"}))
+
+        # Use tee instead of write_file cause we need sudo
+        subprocess.run(
+            ["sudo", "-n", "tee", str(policy_dir / "caelestia.json")],
+            input=json.dumps({"BrowserThemeColor": theme_color, "BrowserColorScheme": "device"}),
+            text=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         subprocess.run(
             [cmd, "--refresh-platform-policy", "--no-startup-window"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
+
+
 def apply_zed(colours: dict[str, str], mode: str) -> None:
     theme_path = config_dir / "zed/themes/caelestia.json"
     # Zed's file watcher does not detect changes through symlinks,
