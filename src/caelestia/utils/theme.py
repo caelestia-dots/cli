@@ -4,8 +4,6 @@ import re
 import shutil
 import subprocess
 import tempfile
-import shutil
-import fcntl
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
@@ -340,6 +338,39 @@ def apply_warp(colours: dict[str, str], mode: str) -> None:
 
 
 @log_exception
+def apply_chromium(colours: dict[str, str]) -> None:
+    surface_hex = colours["surface"]
+    theme_color = f"#{surface_hex}"
+    browsers = [
+        ("chromium", Path("/etc/chromium/policies/managed")),
+        ("brave", Path("/etc/brave/policies/managed")),
+        ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed")),
+    ]
+
+    for cmd, policy_dir in browsers:
+        if shutil.which(cmd) is None:
+            continue
+        if not policy_dir.is_dir():
+            subprocess.run(["sudo", "-n", "mkdir", "-p", str(policy_dir)], stderr=subprocess.DEVNULL)
+        if not policy_dir.is_dir():
+            print(f"Unable to create {policy_dir} directory")
+            continue
+
+        # Use tee instead of write_file cause we need sudo
+        subprocess.run(
+            ["sudo", "-n", "tee", str(policy_dir / "caelestia.json")],
+            input=json.dumps({"BrowserThemeColor": theme_color, "BrowserColorScheme": "device"}),
+            text=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        subprocess.run(
+            [cmd, "--refresh-platform-policy", "--no-startup-window"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+
 def apply_zed(colours: dict[str, str], mode: str) -> None:
     theme_path = config_dir / "zed/themes/caelestia.json"
     # Zed's file watcher does not detect changes through symlinks,
@@ -413,6 +444,8 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_qt(colours, mode)
             if check("enableWarp"):
                 apply_warp(colours, mode)
+            if check("enableChromium"):
+                apply_chromium(colours)
             if check("enableZed"):
                 apply_zed(colours, mode)
             if check("enableCava"):
