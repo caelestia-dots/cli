@@ -159,6 +159,7 @@ subcommands:
     emoji        emoji/glyph utilities
     wallpaper    manage the wallpaper
     resizer      window resizer daemon
+    icons        manage icon themes
 ```
 
 ### User templates
