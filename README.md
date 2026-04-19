@@ -198,10 +198,17 @@ All configuration options are in `~/.config/caelestia/cli.json`.
         "enableHypr": true,
         "enableDiscord": true,
         "enableSpicetify": true,
+        "enablePandora": true,
         "enableFuzzel": true,
         "enableBtop": true,
+        "enableNvtop": true,
+        "enableHtop": true,
         "enableGtk": true,
-        "enableQt": true
+        "enableQt": true,
+        "enableWarp": true,
+        "enableChromium": true,
+        "enableZed": true,
+        "enableCava": true
     },
     "toggles": {
         "communication": {
