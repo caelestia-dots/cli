@@ -23,6 +23,10 @@ AUDIO_MODES = {
     "combined": "default_output|default_input",
 }
 
+# Maximum time (in seconds) to wait for the recorder process to exit cleanly
+STOP_TIMEOUT = 5.0
+STOP_POLL_INTERVAL = 0.1
+
 
 class Command:
     args: Namespace
@@ -31,9 +35,9 @@ class Command:
         self.args = args
 
     def run(self) -> None:
-        if hasattr(self.args, "status") and self.args.status:
+        if getattr(self.args, "status", False):
             self.status()
-        elif hasattr(self.args, "stop") and self.args.stop:
+        elif getattr(self.args, "stop", False):
             self.stop()
         elif self.args.pause:
             subprocess.run(
@@ -45,7 +49,7 @@ class Command:
             self.start()
 
     def status(self) -> None:
-        """Check and display recording status"""
+        """Print the current recording status."""
         if self.proc_running():
             print("Recording: RUNNING")
         else:
@@ -67,195 +71,167 @@ class Command:
             and a[1] + a[3] > b[1]
         )
 
-    def get_audio_device(self, audio_mode: str) -> str:
-        """Get the appropriate audio device for the given mode with fallback handling."""
-        if not audio_mode:
-            return "none"
+    def get_audio_device(self, audio_mode: str | None) -> str:
+        """Return the audio device string for the given mode, with fallback handling.
+
+        Returns an empty string when no audio should be recorded.
+        """
+        if not audio_mode or audio_mode == "none":
+            return ""
 
         device = AUDIO_MODES.get(audio_mode, "")
 
-        # Check if the device is available
-        if audio_mode in ["mic", "system", "combined"]:
-            try:
-                result = subprocess.run(
-                    ["pactl", "list", "sources", "short"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                available_devices = [
-                    line.split("\t")[1]
-                    for line in result.stdout.strip().split("\n")
-                    if line
-                ]
+        try:
+            result = subprocess.run(
+                ["pactl", "list", "sources", "short"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            available_devices = [
+                line.split("\t")[1]
+                for line in result.stdout.strip().split("\n")
+                if line
+            ]
 
-                if device and device not in available_devices:
-                    print(
-                        f"Warning: Audio device '{device}' not available, falling back to default"
-                    )
-                    if audio_mode == "mic":
-                        input_devices = [
-                            d
-                            for d in available_devices
-                            if "input" in d.lower() or "mic" in d.lower()
-                        ]
-                        device = input_devices[0] if input_devices else ""
-                    elif audio_mode == "system":
-                        output_devices = [
-                            d
-                            for d in available_devices
-                            if "output" in d.lower() or "monitor" in d.lower()
-                        ]
-                        device = output_devices[0] if output_devices else ""
-            except (subprocess.CalledProcessError, FileNotFoundError):
+            if device and device not in available_devices:
                 print(
-                    "Warning: Could not check audio devices, audio recording may fail"
+                    f"Warning: audio device '{device}' not available, falling back to default"
                 )
-                device = ""
+                if audio_mode == "mic":
+                    candidates = [
+                        d
+                        for d in available_devices
+                        if "input" in d.lower() or "mic" in d.lower()
+                    ]
+                    device = candidates[0] if candidates else ""
+                elif audio_mode == "system":
+                    candidates = [
+                        d
+                        for d in available_devices
+                        if "output" in d.lower() or "monitor" in d.lower()
+                    ]
+                    device = candidates[0] if candidates else ""
+
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("Warning: could not check audio devices, audio recording may fail")
 
         return device
 
     def get_window_region(self) -> str | None:
-        """Get window region using Hyprland's client list and slurp for selection."""
+        """Select a window via slurp and return its region string."""
         try:
-            # Get all windows from Hyprland
             clients = json.loads(subprocess.check_output(["hyprctl", "clients", "-j"]))
 
             if not clients:
                 print("No windows found")
                 return None
 
-            # Create slurp format strings for each window
-            slurp_regions = []
-            for client in clients:
-                x = client["at"][0]
-                y = client["at"][1]
-                w = client["size"][0]
-                h = client["size"][1]
-                slurp_regions.append(f"{x},{y} {w}x{h}")
+            slurp_regions = [
+                f"{c['at'][0]},{c['at'][1]} {c['size'][0]}x{c['size'][1]}"
+                for c in clients
+            ]
 
-            # Use slurp with predefined regions to pick a window
-            slurp_input = "\n".join(slurp_regions)
             result = subprocess.run(
                 ["slurp", "-f", "%wx%h+%x+%y"],
-                input=slurp_input,
+                input="\n".join(slurp_regions),
                 capture_output=True,
                 text=True,
             )
 
-            if result.returncode != 0:
-                return None
-
-            return result.stdout.strip()
+            return result.stdout.strip() if result.returncode == 0 else None
 
         except (subprocess.CalledProcessError, json.JSONDecodeError, KeyError) as e:
             print(f"Error getting window region: {e}")
             return None
 
+    def _max_refresh_rate_for_region(
+        self,
+        monitors: list[dict],
+        region: tuple[int, int, int, int],
+    ) -> int:
+        """Return the highest refresh rate among monitors that overlap *region*."""
+        max_rr = 0
+        for monitor in monitors:
+            if self.intersects(
+                (monitor["x"], monitor["y"], monitor["width"], monitor["height"]),
+                region,
+            ):
+                max_rr = max(max_rr, round(monitor["refreshRate"]))
+        return max_rr
+
+    def _parse_region(self, region_str: str) -> tuple[int, int, int, int]:
+        """Parse a ``WxH+X+Y`` region string into ``(x, y, w, h)``."""
+        m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region_str)
+        if not m:
+            raise ValueError(f"Invalid region format: {region_str!r}")
+        w, h, x, y = map(int, m.groups())
+        return x, y, w, h
+
     def start(self) -> None:
         args = ["-w"]
 
-        # Get video mode and audio mode from args
         video_mode = getattr(self.args, "mode", "fullscreen")
-        audio_mode = getattr(self.args, "audio", "none")
+        audio_mode = getattr(self.args, "audio", None)
 
         monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
 
-        # Handle video modes
+        # --- Video mode ---
         if video_mode == "region" or self.args.region:
             if self.args.region == "slurp" or not self.args.region:
-                region = subprocess.check_output(
+                region_str = subprocess.check_output(
                     ["slurp", "-f", "%wx%h+%x+%y"], text=True
                 ).strip()
             else:
-                region = self.args.region.strip()
-            args += ["region", "-region", region]
+                region_str = self.args.region.strip()
 
-            m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region)
-            if not m:
-                raise ValueError(f"Invalid region: {region}")
-
-            w, h, x, y = map(int, m.groups())
-            r = x, y, w, h
-            max_rr = 0
-            for monitor in monitors:
-                if self.intersects(
-                    (monitor["x"], monitor["y"], monitor["width"], monitor["height"]), r
-                ):
-                    rr = round(monitor["refreshRate"])
-                    max_rr = max(max_rr, rr)
-            args += ["-f", str(max_rr)]
+            x, y, w, h = self._parse_region(region_str)
+            max_rr = self._max_refresh_rate_for_region(monitors, (x, y, w, h))
+            args += ["region", "-region", region_str, "-f", str(max_rr)]
 
         elif video_mode == "window":
             window_info = self.get_window_region()
             if not window_info:
-                print("Window selection canceled")
+                print("Window selection cancelled")
                 return
 
-            args += ["region", "-region", window_info]
-            m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", window_info)
-            if not m:
-                raise ValueError(f"Invalid window region: {window_info}")
-
-            w, h, x, y = map(int, m.groups())
-            r = x, y, w, h
-
-            # Calculate max refresh rate for the window region
-            max_rr = 0
-            for monitor in monitors:
-                if self.intersects(
-                    (
-                        monitor["x"],
-                        monitor["y"],
-                        monitor["width"],
-                        monitor["height"],
-                    ),
-                    r,
-                ):
-                    rr = round(monitor["refreshRate"])
-                    max_rr = max(max_rr, rr)
-            args += ["-f", str(max_rr)]
+            x, y, w, h = self._parse_region(window_info)
+            max_rr = self._max_refresh_rate_for_region(monitors, (x, y, w, h))
+            args += ["region", "-region", window_info, "-f", str(max_rr)]
 
         else:  # fullscreen
-            focused_monitor = next(
-                (monitor for monitor in monitors if monitor["focused"]), None
-            )
-            if focused_monitor:
-                args += [
-                    focused_monitor["name"],
-                    "-f",
-                    str(round(focused_monitor["refreshRate"])),
-                ]
+            focused = next((m for m in monitors if m["focused"]), None)
+            if focused:
+                args += [focused["name"], "-f", str(round(focused["refreshRate"]))]
 
-        # Handle audio modes
+        # --- Audio mode ---
         audio_device = self.get_audio_device(audio_mode)
         if audio_device:
             args += ["-a", audio_device, "-ac", "opus", "-ab", "192k"]
             print(f"Recording with audio: {audio_device} ({audio_mode})")
-        elif hasattr(self.args, "sound") and self.args.sound:
+        elif getattr(self.args, "sound", False):
             args += ["-a", "default_output"]
         else:
             print("Recording without audio")
 
-        # Load extra args from config
+        # --- Extra args from user config ---
         try:
             config = json.loads(user_config_path.read_text())
-            if "record" in config and "extraArgs" in config["record"]:
-                args += config["record"]["extraArgs"]
+            extra = config.get("record", {}).get("extraArgs", [])
+            if not isinstance(extra, list):
+                raise ValueError("Config option 'record.extraArgs' must be an array")
+            args += extra
         except (json.JSONDecodeError, FileNotFoundError):
             pass
-        except TypeError as e:
-            raise ValueError(
-                f"Config option 'record.extraArgs' should be an array: {e}"
-            )
 
+        # --- Launch recorder ---
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         proc = subprocess.Popen(
             [RECORDER, *args, "-o", str(recording_path)], start_new_session=True
         )
 
-        # Show notification with mode info
-        mode_text = f"{video_mode} with {audio_mode if audio_device else 'no'} audio"
+        audio_label = audio_mode if audio_device else "no audio"
+        mode_text = f"{video_mode} with {audio_label}"
         notif = notify("-p", "Recording started", f"Recording {mode_text}...")
         recording_notif_path.write_text(notif)
 
@@ -268,37 +244,33 @@ class Command:
                     f"Command `{' '.join(proc.args)}` failed with exit code {proc.returncode}",
                 )
         except subprocess.TimeoutExpired:
-            pass
+            pass  # Still running — good
 
     def stop(self) -> None:
-        # Start killing recording process
         subprocess.run(["pkill", "-f", RECORDER], stdout=subprocess.DEVNULL)
 
-        # Wait for recording to finish to avoid corrupted video file
-        max_wait = 50  # Max 5 seconds
-        wait_count = 0
-        while self.proc_running() and wait_count < max_wait:
-            time.sleep(0.1)
-            wait_count += 1
+        # Wait up to STOP_TIMEOUT seconds for a clean exit
+        max_polls = int(STOP_TIMEOUT / STOP_POLL_INTERVAL)
+        for _ in range(max_polls):
+            if not self.proc_running():
+                break
+            time.sleep(STOP_POLL_INTERVAL)
 
-        # Check if file exists before trying to move it
         if not recording_path.exists():
-            print("Warning: No recording file found")
+            print("Warning: no recording file found")
             try:
                 close_notification(recording_notif_path.read_text())
             except IOError:
                 pass
             return
 
-        # Move to recordings folder
-        new_path = (
-            recordings_dir
-            / f"recording_{datetime.now().strftime('%Y%m%d_%H-%M-%S')}.mp4"
-        )
+        # Move to recordings folder with a timestamped name
+        timestamp = datetime.now().strftime("%Y%m%d_%H-%M-%S")
+        new_path = recordings_dir / f"recording_{timestamp}.mp4"
         recordings_dir.mkdir(exist_ok=True, parents=True)
         shutil.move(recording_path, new_path)
 
-        # Close start notification
+        # Dismiss the "recording started" notification
         try:
             close_notification(recording_notif_path.read_text())
         except IOError:
