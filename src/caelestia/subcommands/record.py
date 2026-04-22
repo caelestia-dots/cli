@@ -23,7 +23,11 @@ AUDIO_MODES = {
     "combined": "default_output|default_input",
 }
 
-# Maximum time (in seconds) to wait for the recorder process to exit cleanly
+# PipeWire/PulseAudio symbolic aliases — never appear literally in `pactl list
+# sources short` but are always valid; skip availability checks for these.
+SYMBOLIC_DEFAULTS = {"default_input", "default_output", "default_output|default_input"}
+
+# Maximum time (in seconds) to wait for the recorder process to exit cleanly.
 STOP_TIMEOUT = 5.0
 STOP_POLL_INTERVAL = 0.1
 
@@ -94,21 +98,21 @@ class Command:
                 if line
             ]
 
-            if device and device not in available_devices:
+            # Symbolic defaults are PipeWire aliases — skip the availability
+            # check for them since they'll never appear in the source list.
+            if device and device not in SYMBOLIC_DEFAULTS and device not in available_devices:
                 print(
                     f"Warning: audio device '{device}' not available, falling back to default"
                 )
                 if audio_mode == "mic":
                     candidates = [
-                        d
-                        for d in available_devices
+                        d for d in available_devices
                         if "input" in d.lower() or "mic" in d.lower()
                     ]
                     device = candidates[0] if candidates else ""
                 elif audio_mode == "system":
                     candidates = [
-                        d
-                        for d in available_devices
+                        d for d in available_devices
                         if "output" in d.lower() or "monitor" in d.lower()
                     ]
                     device = candidates[0] if candidates else ""
@@ -145,6 +149,14 @@ class Command:
             print(f"Error getting window region: {e}")
             return None
 
+    def _parse_region(self, region_str: str) -> tuple[int, int, int, int]:
+        """Parse a ``WxH+X+Y`` region string into ``(x, y, w, h)``."""
+        m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region_str)
+        if not m:
+            raise ValueError(f"Invalid region format: {region_str!r}")
+        w, h, x, y = map(int, m.groups())
+        return x, y, w, h
+
     def _max_refresh_rate_for_region(
         self,
         monitors: list[dict],
@@ -159,14 +171,6 @@ class Command:
             ):
                 max_rr = max(max_rr, round(monitor["refreshRate"]))
         return max_rr
-
-    def _parse_region(self, region_str: str) -> tuple[int, int, int, int]:
-        """Parse a ``WxH+X+Y`` region string into ``(x, y, w, h)``."""
-        m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region_str)
-        if not m:
-            raise ValueError(f"Invalid region format: {region_str!r}")
-        w, h, x, y = map(int, m.groups())
-        return x, y, w, h
 
     def start(self) -> None:
         args = ["-w"]
@@ -270,28 +274,73 @@ class Command:
         recordings_dir.mkdir(exist_ok=True, parents=True)
         shutil.move(recording_path, new_path)
 
+        # Re-encode audio to AAC for compatibility with Premiere, WhatsApp, etc.
+        # gpu-screen-recorder outputs Opus audio, which many apps don't support.
+        # -c:v copy means video is never re-encoded, so this only takes ~10-30s
+        # even for multi-hour recordings.
+        if shutil.which("ffmpeg") is None:
+            print("Warning: ffmpeg not found — skipping audio re-encode. "
+                  "Install ffmpeg for Premiere/WhatsApp compatibility.")
+        else:
+            fixed_path = recordings_dir / f"recording_{timestamp}_aac.mp4"
+            result = subprocess.run(
+                [
+                    "ffmpeg", "-i", str(new_path),
+                    "-c:v", "copy",            # copy video stream — no quality loss
+                    "-c:a", "aac",             # re-encode audio to AAC
+                    "-b:a", "192k",
+                    "-movflags", "+faststart", # better compatibility for apps/web
+                    str(fixed_path),
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            if result.returncode == 0:
+                new_path.unlink()  # delete the original Opus file
+                new_path = fixed_path.rename(recordings_dir / f"recording_{timestamp}.mp4")
+            else:
+                print("Warning: ffmpeg audio re-encode failed, keeping original file")
+
         # Dismiss the "recording started" notification
         try:
             close_notification(recording_notif_path.read_text())
         except IOError:
             pass
 
-        # Show completion notification in background (non-blocking)
-        try:
-            subprocess.Popen(
-                [
-                    "notify-send",
-                    "-a",
-                    "caelestia-cli",
-                    "--action=watch=Watch",
-                    "--action=open=Open",
-                    "--action=delete=Delete",
-                    "Recording stopped",
-                    f"Recording saved in {new_path}",
-                ],
-                start_new_session=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+        # Copy to clipboard if requested
+        if self.args.clipboard:
+            file_uri = Path(new_path).resolve().as_uri() + "\n"
+            subprocess.run(
+                ["wl-copy", "--type", "text/uri-list"], input=file_uri.encode()
             )
-        except Exception as e:
-            print(f"Could not show notification: {e}")
+
+        # Show completion notification and handle user action
+        action = notify(
+            "--action=watch=Watch",
+            "--action=open=Open",
+            "--action=delete=Delete",
+            "Recording stopped",
+            f"Recording saved in {new_path}",
+        )
+
+        if action == "watch":
+            subprocess.Popen(["app2unit", "-O", new_path], start_new_session=True)
+        elif action == "open":
+            p = subprocess.run(
+                [
+                    "dbus-send",
+                    "--session",
+                    "--dest=org.freedesktop.FileManager1",
+                    "--type=method_call",
+                    "/org/freedesktop/FileManager1",
+                    "org.freedesktop.FileManager1.ShowItems",
+                    f"array:string:file://{new_path}",
+                    "string:",
+                ]
+            )
+            if p.returncode != 0:
+                subprocess.Popen(
+                    ["app2unit", "-O", new_path.parent], start_new_session=True
+                )
+        elif action == "delete":
+            new_path.unlink()
