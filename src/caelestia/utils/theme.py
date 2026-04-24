@@ -302,7 +302,7 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
 
 
 @log_exception
-def apply_gtk(colours: dict[str, str], mode: str) -> None:
+def apply_gtk(colours: dict[str, str], mode: str, icon_theme: str | None = None) -> None:
     gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
 
@@ -313,18 +313,21 @@ def apply_gtk(colours: dict[str, str], mode: str) -> None:
 
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", "'adw-gtk3-dark'"])
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'prefer-{mode}'"])
-    subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'Papirus-{mode.capitalize()}'"])
+    gtk_icon_theme = icon_theme if icon_theme is not None else f"Papirus-{mode.capitalize()}"
+    subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/icon-theme", f"'{gtk_icon_theme}'"])
 
     sync_papirus_colors(colours["primary"])
 
 
 @log_exception
-def apply_qt(colours: dict[str, str], mode: str) -> None:
+def apply_qt(colours: dict[str, str], mode: str, icon_theme: str | None = None) -> None:
     colours = gen_replace(colours, templates_dir / f"qt{mode}.colors", hash=True)
     write_file(config_dir / "qtengine/caelestia.colors", colours)
 
     config = (templates_dir / "qtengine.json").read_text()
     config = config.replace("{{ $mode }}", mode.capitalize())
+    if icon_theme is not None:
+        config = config.replace(f'"iconTheme": "Papirus-{mode.capitalize()}"', f'"iconTheme": "{icon_theme}"')
     write_file(config_dir / "qtengine/config.json", config)
 
 
@@ -438,10 +441,11 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_nvtop(colours)
             if check("enableHtop"):
                 apply_htop(colours)
+            icon_theme = cfg.get(f"iconTheme{mode.capitalize()}") or cfg.get("iconTheme")
             if check("enableGtk"):
-                apply_gtk(colours, mode)
+                apply_gtk(colours, mode, icon_theme)
             if check("enableQt"):
-                apply_qt(colours, mode)
+                apply_qt(colours, mode, icon_theme)
             if check("enableWarp"):
                 apply_warp(colours, mode)
             if check("enableChromium"):
