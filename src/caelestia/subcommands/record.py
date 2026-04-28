@@ -7,6 +7,7 @@ from argparse import Namespace
 from datetime import datetime
 from pathlib import Path
 
+from caelestia.utils import hypr
 from caelestia.utils.notify import close_notification, notify
 from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir, user_config_path
 
@@ -36,7 +37,7 @@ class Command:
     def start(self) -> None:
         args = ["-w"]
 
-        monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
+        monitors = hypr.message("monitors")
         if self.args.region:
             if self.args.region == "slurp":
                 region = subprocess.check_output(["slurp", "-f", "%wx%h+%x+%y"], text=True)
