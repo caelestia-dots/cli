@@ -192,7 +192,16 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
             subprocess.run(
                 post_hook,
                 shell=True,
-                env={**os.environ, "WALLPAPER_PATH": str(wall)},
+                env={
+                    **os.environ,
+                    "WALLPAPER_PATH": str(wall),
+                    "SCHEME_NAME": scheme.name,
+                    "SCHEME_FLAVOUR": scheme.flavour,
+                    "SCHEME_MODE": scheme.mode,
+                    "SCHEME_VARIANT": scheme.variant,
+                    "SCHEME_COLOURS": json.dumps(scheme.colours),
+                    "THUMBNAIL_PATH": str(thumb),
+                },
                 stderr=subprocess.DEVNULL,
             )
     except (FileNotFoundError, json.JSONDecodeError):

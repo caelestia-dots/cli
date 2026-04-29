@@ -191,7 +191,7 @@ All configuration options are in `~/.config/caelestia/cli.json`.
         "extraArgs": []
     },
     "wallpaper": {
-        "postHook": "echo $WALLPAPER_PATH"
+        "postHook": "echo $WALLPAPER_PATH $SCHEME_NAME $SCHEME_FLAVOUR $SCHEME_MODE $SCHEME_VARIANT $SCHEME_COLOURS"
     },
     "theme": {
         "enableTerm": true,
