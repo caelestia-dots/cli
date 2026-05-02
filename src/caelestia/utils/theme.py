@@ -1,5 +1,6 @@
 import fcntl
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -17,6 +18,7 @@ from caelestia.utils.paths import (
     user_config_path,
     user_templates_dir,
 )
+from caelestia.utils.scheme import get_scheme
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -455,6 +457,22 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableCava"):
                 apply_cava(colours)
             apply_user_templates(colours, mode)
+
+            if post_hook := cfg.get("postHook"):
+                scheme = get_scheme()
+                subprocess.run(
+                    post_hook,
+                    shell=True,
+                    env={
+                        **os.environ,
+                        "SCHEME_NAME": scheme.name,
+                        "SCHEME_FLAVOUR": scheme.flavour,
+                        "SCHEME_MODE": scheme.mode,
+                        "SCHEME_VARIANT": scheme.variant,
+                        "SCHEME_COLOURS": json.dumps(scheme.colours),
+                    },
+                    stderr=subprocess.DEVNULL,
+                )
 
     finally:
         try:
