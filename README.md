@@ -209,6 +209,9 @@ All configuration options are in `~/.config/caelestia/cli.json`.
         "enableChromium": true,
         "enableZed": true,
         "enableCava": true,
+        "iconTheme": "Papirus-Dark",
+        "iconThemeLight": "Papirus-Light",
+        "iconThemeDark": "Papirus-Dark",
         "postHook": "echo $SCHEME_NAME $SCHEME_FLAVOUR $SCHEME_MODE $SCHEME_VARIANT $SCHEME_COLOURS"
     },
     "toggles": {
