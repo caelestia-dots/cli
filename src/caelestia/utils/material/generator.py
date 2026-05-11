@@ -18,7 +18,7 @@ from typing import Protocol, Any
 # subclasses in get_scheme() handle that internally. This Protocol tells the type
 # checker to expect our specific 3-argument setup instead of the base class signature.
 class SchemeConstructor(Protocol):
-    def __call__(self, source_color_hct: Any, is_dark: bool, contrast_level: float) -> DynamicScheme: ...
+    def __call__(self, source_color_hct: Any, is_dark: bool, contrast_level: float) -> "DynamicScheme": ...
 
 try:
     from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
