@@ -119,7 +119,7 @@ class Command:
                     spawned = True
 
         if not spawned:
-            hypr.dispatch("togglespecialworkspace", self.args.workspace)
+            hypr.dispatch(f'hl.dsp.workspace.toggle_special( "{self.args.workspace}" )')
 
     def get_clients(self) -> list[dict[str, Any]]:
         if self.clients is None:
@@ -129,13 +129,13 @@ class Command:
     def move_client(self, selector: Callable, workspace: str) -> None:
         for client in self.get_clients():
             if selector(client) and client["workspace"]["name"] != f"special:{workspace}":
-                hypr.dispatch("movetoworkspacesilent", f"special:{workspace},address:{client['address']}")
+                hypr.dispatch(f'hl.dsp.window.move({{ workspace = "special:{workspace}" , follow = "address:{client['address']}"}}')
 
     def spawn_client(self, selector: Callable, spawn: list[str]) -> bool:
         if (spawn[0].endswith(".desktop") or shutil.which(spawn[0])) and not any(
             selector(client) for client in self.get_clients()
         ):
-            hypr.dispatch("exec", f"[workspace special:{self.args.workspace}] app2unit -- {shlex.join(spawn)}")
+            hypr.dispatch(f'hl.dsp.exec_cmd(" app2unit -- {shlex.join(spawn)} " ,{{ workspace = "special:{self.args.workspace}" }})')
             return True
         else:
             return False
@@ -161,4 +161,4 @@ class Command:
         target = next((m for m in monitors if m.get("focused")), None)
         if target:
             special = target.get("specialWorkspace", {}).get("name", "")[8:] or "special"
-            hypr.dispatch("togglespecialworkspace", special)
+            hypr.dispatch(f'hl.dsp.workspace.toggle_special( "{special}" )')
