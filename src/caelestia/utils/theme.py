@@ -21,11 +21,17 @@ from caelestia.utils.paths import (
 from caelestia.utils.scheme import get_scheme
 
 
-def gen_conf(colours: dict[str, str]) -> str:
-    conf = ""
+def gen_lua(colours: dict[str, str]) -> str:
+    # Start the Lua return statement
+    lua = "return {\n"
+
     for name, colour in colours.items():
-        conf += f"${name} = {colour}\n"
-    return conf
+        # Indent, add the key, and wrap the hex code in quotes
+        lua += f'  {name} = "{colour}",\n'
+
+    # Close the table
+    lua += "}"
+    return lua
 
 
 def gen_scss(colours: dict[str, str]) -> str:
@@ -143,8 +149,8 @@ def apply_terms(sequences: str) -> None:
 
 
 @log_exception
-def apply_hypr(conf: str) -> None:
-    write_file(config_dir / "hypr/scheme/current.conf", conf)
+def apply_hypr(lua: str) -> None:
+    write_file(config_dir / "hypr/scheme/current.lua", lua)
 
 
 @log_exception
@@ -428,7 +434,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableTerm"):
                 apply_terms(gen_sequences(colours))
             if check("enableHypr"):
-                apply_hypr(gen_conf(colours))
+                apply_hypr(gen_lua(colours))
             if check("enableDiscord"):
                 apply_discord(gen_scss(colours))
             if check("enableSpicetify"):
