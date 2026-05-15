@@ -33,6 +33,11 @@ def gen_lua(colours: dict[str, str]) -> str:
     lua += "}"
     return lua
 
+def gen_conf(colours: dict[str, str]) -> str:
+    conf = ""
+    for name, colour in colours.items():
+        conf += f"${name} = {colour}\n"
+    return conf
 
 def gen_scss(colours: dict[str, str]) -> str:
     scss = ""
@@ -152,6 +157,8 @@ def apply_terms(sequences: str) -> None:
 def apply_hypr(lua: str) -> None:
     write_file(config_dir / "hypr/scheme/current.lua", lua)
 
+def apply_hyprlang(conf: str) -> None:
+    write_file(config_dir / "hypr/scheme/current.conf", conf)
 
 @log_exception
 def apply_discord(scss: str) -> None:
@@ -435,6 +442,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
                 apply_terms(gen_sequences(colours))
             if check("enableHypr"):
                 apply_hypr(gen_lua(colours))
+                apply_hyprlang(gen_conf(colours))
             if check("enableDiscord"):
                 apply_discord(gen_scss(colours))
             if check("enableSpicetify"):
