@@ -26,7 +26,30 @@ def message(msg: str, is_json: bool = True) -> str | dict[str, Any]:
         return json.loads(resp) if is_json else resp
 
 
+def _is_lua_config() -> bool:
+    try:
+        result = message("systeminfo", is_json=False)
+        for line in result.splitlines():
+            if "configProvider:" in line:
+                return "lua" in line.lower()
+        return False
+    except Exception:
+        return False
+
+
+DISPATCHER_MAP_LUA = {
+    "togglespecialworkspace": lambda *a: f'hl.dsp.workspace.toggle_special("{a[0]}")' if a else 'hl.dsp.workspace.toggle_special()',
+    "movetoworkspacesilent": lambda *a: (
+    f'hl.dsp.window.move({{window = "address:{a[0].split(",")[1].replace("address:", "")}", workspace = "{a[0].split(",")[0]}", follow = false}})'
+),
+    "exec": lambda *a: 'hl.dsp.exec_cmd("' + ' '.join(a).replace('\\', '\\\\').replace('"', '\\"') + '")',
+}
+
+
 def dispatch(dispatcher: str, *args: str) -> bool:
+    if _is_lua_config() and dispatcher in DISPATCHER_MAP_LUA:
+        lua_dispatch = DISPATCHER_MAP_LUA[dispatcher](*args)
+        return message(f"dispatch {lua_dispatch}", is_json=False) == "ok"
     return message(f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), is_json=False) == "ok"
 
 

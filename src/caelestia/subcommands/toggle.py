@@ -160,5 +160,7 @@ class Command:
         monitors = cast(list[dict[str, Any]], hypr.message("monitors"))
         target = next((m for m in monitors if m.get("focused")), None)
         if target:
-            special = target.get("specialWorkspace", {}).get("name", "")[8:] or "special"
-            hypr.dispatch("togglespecialworkspace", special)
+            special = target.get("specialWorkspace", {}).get("name", "")[8:]
+            if special and special != "special":
+                hypr.dispatch("togglespecialworkspace", special)
+            hypr.dispatch("togglespecialworkspace", "special")
