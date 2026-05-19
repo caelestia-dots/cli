@@ -36,6 +36,9 @@ def _is_lua_config() -> bool:
     except Exception:
         return False
 
+def is_lua_config() -> bool:
+    return _is_lua_config()
+
 
 DISPATCHER_MAP_LUA = {
     "togglespecialworkspace": lambda *a: f'hl.dsp.workspace.toggle_special("{a[0]}")' if a else 'hl.dsp.workspace.toggle_special()',
