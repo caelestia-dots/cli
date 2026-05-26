@@ -28,9 +28,10 @@ def gen_conf(colours: dict[str, str]) -> str:
     return conf
 
 def gen_lua(colours: dict[str, str]) -> str:
-    lua = ""
+    lua = "return {\n"
     for name, colour in colours.items():
-        lua += f'{name} = "{colour}"\n'
+        lua += f'  {name} = "{colour}",\n'
+    lua += "}"
     return lua
 
 def gen_scss(colours: dict[str, str]) -> str:
