@@ -19,6 +19,7 @@ from caelestia.utils.paths import (
     user_templates_dir,
 )
 from caelestia.utils.scheme import get_scheme
+from caelestia.utils.hypr import is_lua_config
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -150,11 +151,8 @@ def apply_terms(sequences: str) -> None:
 
 @log_exception
 def apply_hypr(conf: str) -> None:
-    from caelestia.utils.hypr import is_lua_config
-    if is_lua_config():
-        write_file(config_dir / "hypr/scheme/current.lua", conf)
-    else:
-        write_file(config_dir / "hypr/scheme/current.conf", conf)
+    ext = "lua" if is_lua_config() else "conf"
+    write_file(config_dir / f"hypr/scheme/current.{ext}", conf)
 
 
 @log_exception
@@ -438,11 +436,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableTerm"):
                 apply_terms(gen_sequences(colours))
             if check("enableHypr"):
-                from caelestia.utils.hypr import is_lua_config
-                if is_lua_config():
-                    apply_hypr(gen_lua(colours))
-                else:
-                    apply_hypr(gen_conf(colours))
+                apply_hypr(gen_lua(colours) if is_lua_config() else gen_conf(colours))
             if check("enableDiscord"):
                 apply_discord(gen_scss(colours))
             if check("enableSpicetify"):

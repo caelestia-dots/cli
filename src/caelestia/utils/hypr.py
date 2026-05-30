@@ -7,6 +7,7 @@ socket_base = f"{os.getenv('XDG_RUNTIME_DIR')}/hypr/{os.getenv('HYPRLAND_INSTANC
 socket_path = f"{socket_base}/.socket.sock"
 socket2_path = f"{socket_base}/.socket2.sock"
 
+_lua_config_cache: bool | None = None
 
 def message(msg: str, is_json: bool = True) -> str | dict[str, Any]:
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -26,18 +27,21 @@ def message(msg: str, is_json: bool = True) -> str | dict[str, Any]:
         return json.loads(resp) if is_json else resp
 
 
-def _is_lua_config() -> bool:
+def is_lua_config() -> bool:
+    global _lua_config_cache
+    if _lua_config_cache is not None:
+        return _lua_config_cache
     try:
         result = message("systeminfo", is_json=False)
         for line in result.splitlines():
             if "configProvider:" in line:
-                return "lua" in line.lower()
+                _lua_config_cache = "lua" in line.lower()
+                return _lua_config_cache
+        _lua_config_cache = False
         return False
     except Exception:
+        _lua_config_cache = False
         return False
-
-def is_lua_config() -> bool:
-    return _is_lua_config()
 
 
 DISPATCHER_MAP_LUA = {
@@ -50,7 +54,7 @@ DISPATCHER_MAP_LUA = {
 
 
 def dispatch(dispatcher: str, *args: str) -> bool:
-    if _is_lua_config() and dispatcher in DISPATCHER_MAP_LUA:
+    if is_lua_config() and dispatcher in DISPATCHER_MAP_LUA:
         lua_dispatch = DISPATCHER_MAP_LUA[dispatcher](*args)
         return message(f"dispatch {lua_dispatch}", is_json=False) == "ok"
     return message(f"dispatch {dispatcher} {' '.join(map(str, args))}".rstrip(), is_json=False) == "ok"
