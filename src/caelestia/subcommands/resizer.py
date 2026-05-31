@@ -46,7 +46,6 @@ class Command:
             return "dispatch hl.dsp.window.center()"
         return "dispatch centerwindow"
 
-
     def _load_window_rules(self) -> list[WindowRule]:
         default_rules = [
             WindowRule("(Bitwarden", "titleContains", "20%", "54%", ["float", "center"]),
@@ -188,7 +187,6 @@ class Command:
             command1 = self._make_resize_cmd(scaled_width, scaled_height, address)
             command2 = self._make_move_cmd(int(move_x), int(move_y), address)
             hypr.batch(command1, command2)
-
 
             log_message(
                 f"Applied PiP action to window {address}: {scaled_width}x{scaled_height} at ({move_x}, {move_y})"
