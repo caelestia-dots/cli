@@ -178,6 +178,10 @@ def apply_pandora(colours: dict[str, str], mode: str) -> None:
 def apply_spicetify(colours: dict[str, str], mode: str) -> None:
     template = gen_replace(colours, templates_dir / f"spicetify-{mode}.ini")
     write_file(config_dir / "spicetify/Themes/caelestia/color.ini", template)
+    # Push the new colours into a running Spotify. Only attempt this if Spicetify
+    # is actually installed, so users without it are unaffected.
+    if shutil.which("spicetify"):
+        subprocess.run(["spicetify", "apply"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 @log_exception
