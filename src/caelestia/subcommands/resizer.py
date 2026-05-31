@@ -26,6 +26,26 @@ class Command:
         self.timeout_tracker: dict[str, float] = {}
         self.window_rules = self._load_window_rules()
 
+    def _make_resize_cmd(self, width: int | str, height: int | str, address: str) -> str:
+        if hypr.is_lua_config():
+            return f'dispatch hl.dsp.window.resize({{x = {width}, y = {height}, exact = true, window = "address:{address}"}})'
+        return f"dispatch resizewindowpixel exact {width} {height},address:{address}"
+
+    def _make_move_cmd(self, x: int, y: int, address: str) -> str:
+        if hypr.is_lua_config():
+            return f'dispatch hl.dsp.window.move({{x = {x}, y = {y}, window = "address:{address}"}})'
+        return f"dispatch movewindowpixel exact {x} {y},address:{address}"
+
+    def _make_float_cmd(self, address: str) -> str:
+        if hypr.is_lua_config():
+            return f'dispatch hl.dsp.window.float({{action = "toggle", window = "address:{address}"}})'
+        return f"dispatch togglefloating address:{address}"
+
+    def _make_center_cmd(self) -> str:
+        if hypr.is_lua_config():
+            return "dispatch hl.dsp.window.center()"
+        return "dispatch centerwindow"
+
     def _load_window_rules(self) -> list[WindowRule]:
         default_rules = [
             WindowRule("(Bitwarden", "titleContains", "20%", "54%", ["float", "center"]),
@@ -164,8 +184,8 @@ class Command:
             move_x = monitor_x + monitor_width - scaled_width - offset
             move_y = monitor_y + monitor_height - scaled_height - offset
 
-            command1 = f"dispatch resizewindowpixel exact {scaled_width} {scaled_height},address:{address}"
-            command2 = f"dispatch movewindowpixel exact {int(move_x)} {int(move_y)},address:{address}"
+            command1 = self._make_resize_cmd(scaled_width, scaled_height, address)
+            command2 = self._make_move_cmd(int(move_x), int(move_y), address)
             hypr.batch(command1, command2)
 
             log_message(
@@ -181,16 +201,16 @@ class Command:
         if "float" in actions:
             window_info = self._get_window_info(window_id)
             if window_info and not window_info.get("floating", False):
-                dispatch_commands.append(f"dispatch togglefloating address:0x{window_id}")
+                dispatch_commands.append(self._make_float_cmd(f"0x{window_id}"))
 
         if "pip" in actions:
             self._apply_pip_action(window_id)
             return True
 
-        dispatch_commands.append(f"dispatch resizewindowpixel exact {width} {height},address:0x{window_id}")
+        dispatch_commands.append(self._make_resize_cmd(width, height, f"0x{window_id}"))
 
         if "center" in actions:
-            dispatch_commands.append("dispatch centerwindow")
+            dispatch_commands.append(self._make_center_cmd())
 
         try:
             hypr.batch(*dispatch_commands)
