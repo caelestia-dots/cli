@@ -32,7 +32,7 @@
         "primary.hover.background": "{{ $primaryFixed }}",
         "scrollbar.background": "{{ $surface }}",
         "scrollbar.thumb.background": "{{ $outline }}",
-        "secondary.background": "{{ $secondaryContainer }}",
+        "secondary.background": "{{ $peach }}",
         "secondary.active.background": "{{ $secondaryFixedDim }}",
         "secondary.foreground": "{{ $onSecondary }}",
         "secondary.hover.background": "{{ $secondaryFixed }}",
