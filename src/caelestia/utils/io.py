@@ -1,10 +1,4 @@
 import sys
-from time import strftime
-
-
-def log_message(message: str) -> None:
-    timestamp = strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}] {message}")
 
 
 def log_exception(func):
@@ -18,7 +12,7 @@ def log_exception(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            log_message(f'Error during execution of "{func.__name__}()": {str(e)}')
+            error(f'exception during "{func.__name__}()": {str(e)}')
 
     return wrapper
 
