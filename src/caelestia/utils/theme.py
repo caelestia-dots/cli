@@ -15,9 +15,9 @@ from caelestia.utils.paths import (
     c_state_dir,
     config_dir,
     data_dir,
+    get_config,
     templates_dir,
     theme_dir,
-    user_config_path,
     user_templates_dir,
 )
 from caelestia.utils.scheme import get_scheme
@@ -417,10 +417,7 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             except BlockingIOError:
                 return
 
-            try:
-                cfg = json.loads(user_config_path.read_text())["theme"]
-            except (FileNotFoundError, json.JSONDecodeError, KeyError):
-                cfg = {}
+            cfg = get_config().get("theme", {})
 
             def check(key: str) -> bool:
                 return cfg[key] if key in cfg else True

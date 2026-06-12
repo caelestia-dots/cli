@@ -5,6 +5,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from caelestia.utils.io import warn
+
 config_dir: Path = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
 data_dir: Path = Path(os.getenv("XDG_DATA_HOME", Path.home() / ".local/share"))
 state_dir: Path = Path(os.getenv("XDG_STATE_HOME", Path.home() / ".local/state"))
@@ -67,3 +69,13 @@ def atomic_write(path: Path, content: str) -> None:
 
 def atomic_dump(path: Path, content: dict[str, Any]) -> None:
     atomic_write(path, json.dumps(content))
+
+
+def get_config() -> dict[str, Any]:
+    try:
+        return json.loads(user_config_path.read_text())
+    except json.JSONDecodeError:
+        warn("failed to parse config, invalid JSON")
+    except FileNotFoundError:
+        pass
+    return {}

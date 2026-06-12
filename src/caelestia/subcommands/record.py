@@ -1,4 +1,3 @@
-import json
 import re
 import shutil
 import subprocess
@@ -9,7 +8,7 @@ from pathlib import Path
 
 from caelestia.utils import hypr
 from caelestia.utils.notify import close_notification, notify
-from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir, user_config_path
+from caelestia.utils.paths import get_config, recording_notif_path, recording_path, recordings_dir
 
 RECORDER = "gpu-screen-recorder"
 
@@ -65,12 +64,10 @@ class Command:
         if self.args.sound:
             args += ["-a", "default_output"]
 
+        config = get_config()
         try:
-            config = json.loads(user_config_path.read_text())
             if "record" in config and "extraArgs" in config["record"]:
                 args += config["record"]["extraArgs"]
-        except (json.JSONDecodeError, FileNotFoundError):
-            pass
         except TypeError as e:
             raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 

@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 from caelestia.utils import hypr
 from caelestia.utils.io import log_message
-from caelestia.utils.paths import user_config_path
+from caelestia.utils.paths import get_config
 
 
 class WindowRule:
@@ -52,8 +52,8 @@ class Command:
             WindowRule("^[Pp]icture(-| )in(-| )[Pp]icture$", "titleRegex", "", "", ["pip"]),
         ]
 
+        config = get_config()
         try:
-            config = json.loads(user_config_path.read_text())
             if "resizer" in config and "rules" in config["resizer"]:
                 rules = []
                 for rule_config in config["resizer"]["rules"]:
@@ -67,7 +67,7 @@ class Command:
                         )
                     )
                 return rules
-        except (json.JSONDecodeError, KeyError):
+        except KeyError:
             log_message("ERROR: invalid config")
         except FileNotFoundError:
             pass
