@@ -2,7 +2,6 @@ import json
 import os
 import random
 import subprocess
-
 from argparse import Namespace
 from pathlib import Path
 from typing import cast
@@ -11,9 +10,9 @@ from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
 from PIL import Image
 
+from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
-from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.paths import (
     compute_hash,
     get_config,
