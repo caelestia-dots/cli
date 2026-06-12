@@ -1,7 +1,6 @@
 import hashlib
 import json
 import os
-import shutil
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -52,8 +51,19 @@ def compute_hash(path: Path | str) -> str:
     return sha.hexdigest()
 
 
+def atomic_write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    f = tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False)
+    try:
+        with f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(f.name, path)
+    except BaseException:
+        os.unlink(f.name)
+        raise
+
+
 def atomic_dump(path: Path, content: dict[str, Any]) -> None:
-    with tempfile.NamedTemporaryFile("w") as f:
-        json.dump(content, f)
-        f.flush()
-        shutil.move(f.name, path)
+    atomic_write(path, json.dumps(content))
