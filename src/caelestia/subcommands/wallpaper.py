@@ -12,7 +12,13 @@ class Command:
 
     def run(self) -> None:
         if self.args.print:
-            print(json.dumps(get_colours_for_wall(self.args.print, self.args.no_smart)))
+            # -p with no path means the current wallpaper (resolved here instead of
+            # at argument parsing time to avoid the cost on unrelated commands)
+            wall = get_wallpaper() if self.args.print is True else self.args.print
+            if wall is None:
+                print("No wallpaper set")
+                return
+            print(json.dumps(get_colours_for_wall(wall, self.args.no_smart)))
         elif self.args.file:
             set_wallpaper(self.args.file, self.args.no_smart)
         elif self.args.random:
