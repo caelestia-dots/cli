@@ -8,7 +8,8 @@ import tempfile
 from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
-from caelestia.utils.logging import log_exception
+from caelestia.utils.hypr import is_lua_config
+from caelestia.utils.io import log_exception
 from caelestia.utils.paths import (
     c_state_dir,
     config_dir,
@@ -19,7 +20,6 @@ from caelestia.utils.paths import (
     user_templates_dir,
 )
 from caelestia.utils.scheme import get_scheme
-from caelestia.utils.hypr import is_lua_config
 
 
 def gen_conf(colours: dict[str, str]) -> str:
@@ -28,12 +28,14 @@ def gen_conf(colours: dict[str, str]) -> str:
         conf += f"${name} = {colour}\n"
     return conf
 
+
 def gen_lua(colours: dict[str, str]) -> str:
     lua = "return {\n"
     for name, colour in colours.items():
         lua += f'  {name} = "{colour}",\n'
     lua += "}"
     return lua
+
 
 def gen_scss(colours: dict[str, str]) -> str:
     scss = ""
