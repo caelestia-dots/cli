@@ -120,7 +120,7 @@ class Command:
                     spawned = True
                     # Windows spawned via IPC ignore the [workspace special:X] exec rule,
                     # so the workspace has to be toggled open explicitly after spawning
-                    if client.get("spawnThenToggle") or client.get("spawn_then_toggle"):
+                    if client.get("spawnThenToggle"):
                         toggle_after_spawn = True
 
         if not spawned or toggle_after_spawn:
