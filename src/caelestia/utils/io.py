@@ -42,10 +42,18 @@ def fatal(msg: str) -> None:
     sys.exit(1)
 
 
+def _input(prompt: str) -> str:
+    try:
+        return input(prompt)
+    except (KeyboardInterrupt, EOFError):
+        print()
+        raise KeyboardInterrupt()
+
+
 def prompt(msg: str) -> str:
-    return input(_format_msg(36, msg) + " ")
+    return _input(_format_msg(36, msg) + " ")
 
 
 def pause() -> None:
-    input("\033[2m\033[3m(Ctrl+C to exit, enter to continue)\033[0m")
-    print("\033[1A\r\033[2K", end="")  # Clear pause prompt
+    _input("\n\033[2m\033[3m(Ctrl+C to exit, enter to continue)\033[0m")
+    print("\033[1A\r\033[2K\033[1A\r\033[2K", end="")  # Clear pause prompt
