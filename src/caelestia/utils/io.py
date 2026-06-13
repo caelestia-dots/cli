@@ -1,6 +1,13 @@
 import sys
 from typing import Never
 
+_disable_input: bool = False
+
+
+def disable_input() -> None:
+    global _disable_input
+    _disable_input = True
+
 
 def log_exception(func):
     """Log exceptions to stdout instead of raising
@@ -44,6 +51,10 @@ def fatal(err: str | Exception) -> Never:
 
 
 def _input(prompt: str) -> str:
+    if _disable_input:
+        print(prompt, end="")
+        return ""
+
     try:
         return input(prompt)
     except (KeyboardInterrupt, EOFError):
@@ -55,6 +66,17 @@ def prompt(msg: str) -> str:
     return _input(_format_msg(36, msg) + " ")
 
 
+def confirm(msg: str, default: bool = True) -> bool:
+    suffix = " [Y/n]" if default else " [y/N]"
+    answer = prompt(msg + suffix).strip().lower()
+    if not answer:
+        return default
+    return answer in ("y", "yes")
+
+
 def pause() -> None:
+    if _disable_input:
+        return
+
     _input("\n\033[2m\033[3m(Ctrl+C to exit, enter to continue)\033[0m")
     print("\033[1A\r\033[2K\033[1A\r\033[2K", end="")  # Clear pause prompt
