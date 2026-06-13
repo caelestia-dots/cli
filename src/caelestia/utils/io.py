@@ -1,4 +1,5 @@
 import sys
+from typing import Never
 
 
 def log_exception(func):
@@ -33,12 +34,12 @@ def warn(msg: str) -> None:
     print(_format_msg(33, f"Warning: {msg}"))
 
 
-def error(msg: str) -> None:
-    print(_format_msg(31, f"Error: {msg}"), file=sys.stderr)
+def error(err: str | Exception) -> None:
+    print(_format_msg(31, f"Error: {err}"), file=sys.stderr)
 
 
-def fatal(msg: str) -> None:
-    print(_format_msg(31, f"Fatal: {msg}"), file=sys.stderr)
+def fatal(err: str | Exception) -> Never:
+    print(_format_msg(31, f"Fatal: {err}"), file=sys.stderr)
     sys.exit(1)
 
 
