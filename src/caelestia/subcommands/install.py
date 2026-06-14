@@ -1,0 +1,171 @@
+import os
+import shutil
+import subprocess
+import textwrap
+from argparse import Namespace
+from pathlib import Path
+
+from caelestia.utils.dots.deployer import Deployer
+from caelestia.utils.dots.manifest import Manifest, ManifestError, expand, expand_dests
+from caelestia.utils.dots.packages import PackageInstaller
+from caelestia.utils.dots.source import DotsSource, SourceError
+from caelestia.utils.dots.state import DotsState
+from caelestia.utils.io import confirm, disable_input, fatal, info, log, pause, warn
+from caelestia.utils.paths import (
+    config_backup_dir,
+    config_dir,
+    dots_dir,
+)
+
+
+def _parse_list_arg(value: str | None) -> list[str] | None:
+    if value is None:
+        return None
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+class Command:
+    args: Namespace
+
+    def __init__(self, args: Namespace) -> None:
+        self.args = args
+
+    def run(self) -> None:
+        if self.args.noconfirm:
+            disable_input()
+
+        self.print_greeting()
+        self.create_backup()
+
+        source, tip, manifest = self.fetch_manifest()
+        self.deploy_configs(source, manifest)
+        helper, packages, local_packages = self.install_packages(source, manifest)
+        self.run_hooks(manifest)
+
+        DotsState(
+            aur_helper=helper,
+            applied_rev=tip,
+            enabled_components=manifest.enabled_components,
+            packages=packages,
+            local_packages=local_packages,
+        ).save()
+
+        info("Done!")
+
+    def print_greeting(self) -> None:
+        print(
+            "\033[38;2;150;241;241m"  # Caelestia colour
+            + textwrap.dedent(
+                r"""
+                ╭─────────────────────────────────────────────────╮
+                │      ______           __          __  _         │
+                │     / ____/___ ____  / /__  _____/ /_(_)___ _   │
+                │    / /   / __ `/ _ \/ / _ \/ ___/ __/ / __ `/   │
+                │   / /___/ /_/ /  __/ /  __(__  ) /_/ / /_/ /    │
+                │   \____/\__,_/\___/_/\___/____/\__/_/\__,_/     │
+                │                                                 │
+                ╰─────────────────────────────────────────────────╯
+                """
+            )
+            + "\033[0m"
+        )
+        info("Welcome to the Caelestia dotfiles installer!")
+        info("Here's a quick overview on what this command is going to do:")
+        info("  - Install dependencies")
+        info("  - Install config files")
+        info("The installer does NOT set up hardware/system level configs (e.g. drivers). Please do this yourself.")
+        pause()
+
+    def create_backup(self) -> None:
+        if config_dir.exists():
+            if not confirm("Back up the config directory?", default=True):
+                return
+
+            log(f"Creating a backup of {config_dir}...")
+            if config_backup_dir.exists():
+                if not confirm("A backup already exists, overwrite?", default=False):
+                    info("Not creating backup.")
+                    return
+
+                log("Deleting old backup...")
+                shutil.rmtree(config_backup_dir)
+
+            shutil.copytree(config_dir, config_backup_dir, symlinks=True)
+            info(f"Created backup at {config_backup_dir}")
+
+    def fetch_manifest(self) -> tuple[DotsSource, str, Manifest]:
+        log("Fetching dots repo...")
+        source = DotsSource()
+        try:
+            source.ensure()
+            tip = source.checkout_tip()
+        except SourceError as e:
+            fatal(e)
+
+        try:
+            manifest = source.manifest_at(tip)
+            manifest.resolve_components(
+                enable=_parse_list_arg(self.args.enable_components),
+                disable=_parse_list_arg(self.args.disable_components),
+            )
+        except ManifestError as e:
+            fatal(e)
+
+        names = ", ".join(manifest.enabled_components) or "none"
+        info(f"Enabled components: {names}")
+
+        return source, tip, manifest
+
+    def deploy_configs(self, source: DotsSource, manifest: Manifest) -> None:
+        log("Installing configs...")
+        deployer = Deployer()
+        for entry in manifest.enabled_entries():
+            src = source.working_path(expand(entry.src))
+            if not src.exists():
+                warn(f"missing in source, skipping: {entry.src}")
+                continue
+
+            dests = expand_dests(entry.dest)
+            if not dests:
+                warn(f"dest glob matched nothing, skipping: {entry.dest}")
+                continue
+
+            for dest in dests:
+                deployer.place(src, Path(dest))
+                info(f"{entry.src} -> {dest}")
+
+    def install_packages(self, source: DotsSource, manifest: Manifest) -> tuple[str, list[str], dict[str, list[str]]]:
+        installer = PackageInstaller.get(self.args.aur_helper, self.args.noconfirm)
+
+        packages = manifest.enabled_packages()
+        if packages:
+            log("Installing packages...")
+            installer.install(packages)
+
+        local_packages = {}
+        local_dirs = manifest.enabled_local_packages()
+        if local_dirs:
+            log("Building local packages...")
+            for path in local_dirs:
+                directory = source.working_path(path)
+                if not directory.is_dir():
+                    warn(f"missing in repo, skipping: {path}")
+                    continue
+
+                log(f"Building {path}...")
+                local_packages[path] = installer.build_install(directory)
+
+        return getattr(installer, "helper", ""), packages, local_packages
+
+    def run_hooks(self, manifest: Manifest) -> None:
+        hooks = manifest.enabled_hooks("post_install")
+        if not hooks:
+            return
+
+        log("Running post-install hooks...")
+        env = {**os.environ, "CAELESTIA_DOTS": str(dots_dir)}
+        for hook in hooks:
+            log(f"Running hook: {hook}")
+            result = subprocess.run(hook, shell=True, env=env)
+            if result.returncode != 0:
+                warn(f"hook exited with {result.returncode}")

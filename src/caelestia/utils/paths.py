@@ -25,6 +25,10 @@ templates_dir: Path = cli_data_dir / "templates"
 user_templates_dir: Path = c_config_dir / "templates"
 theme_dir: Path = c_state_dir / "theme"
 
+config_backup_dir: Path = config_dir.parent / f"{config_dir.name}.bak"
+dots_dir: Path = c_state_dir / "dots"
+dots_state_path: Path = c_state_dir / "dots-state.json"
+
 scheme_path: Path = c_state_dir / "scheme.json"
 scheme_data_dir: Path = cli_data_dir / "schemes"
 scheme_cache_dir: Path = c_cache_dir / "schemes"

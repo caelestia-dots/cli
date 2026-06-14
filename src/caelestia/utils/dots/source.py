@@ -1,0 +1,89 @@
+import subprocess
+from pathlib import Path
+
+from caelestia.utils.dots.manifest import Manifest
+from caelestia.utils.paths import dots_dir, get_config
+
+
+class SourceError(Exception):
+    """Raised when a git operation against the dots clone fails."""
+
+
+class DotsSource:
+    def __init__(self) -> None:
+        cfg = get_config().get("dots", {})
+        self.url = cfg.get("url", "https://github.com/caelestia-dots/caelestia.git")
+        self.branch = cfg.get("branch", "main")
+
+    @property
+    def remote_ref(self) -> str:
+        return f"origin/{self.branch}"
+
+    def exists(self) -> bool:
+        return (dots_dir / ".git").is_dir()
+
+    def working_path(self, relpath: str | Path) -> Path:
+        """Get a Path relative to the dots dir."""
+        return dots_dir / relpath
+
+    def ensure(self) -> None:
+        """Clone the repo if absent, otherwise fetch the latest refs."""
+
+        if self.exists():
+            self._git("fetch", "--prune", "origin", self.branch)
+        else:
+            dots_dir.parent.mkdir(parents=True, exist_ok=True)
+            self._run("git", "clone", "--branch", self.branch, self.url, str(dots_dir))
+
+    def checkout_tip(self) -> str:
+        """Reset the working tree to the fetched tip and return its commit hash."""
+
+        self._git("reset", "--hard", self.remote_ref)
+        return self.tip_rev()
+
+    def tip_rev(self) -> str:
+        return self._git("rev-parse", self.remote_ref).strip()
+
+    def changed_files(self, base: str, head: str) -> list[str]:
+        """Repo-relative paths that differ between two revisions."""
+
+        out = self._git("diff", "--name-only", base, head)
+        return [line for line in out.splitlines() if line]
+
+    def clean(self) -> None:
+        """Remove all untracked files in the git repo."""
+        self._git("clean", "-fdx")
+
+    # --- Accessors ---
+
+    def manifest_at(self, ref: str) -> Manifest:
+        return Manifest.parse(self.text_at(ref, "manifest.toml"))
+
+    def text_at(self, ref: str, relpath: str) -> str:
+        return self._git("show", f"{ref}:{relpath}")
+
+    def blob_at(self, ref: str, relpath: str) -> bytes:
+        return self._git_bytes("show", f"{ref}:{relpath}")
+
+    def files_at(self, ref: str, relpath: str) -> list[str]:
+        """Repo-relative paths of all files under relpath at ref (the path itself if it is a file)."""
+
+        out = self._git("ls-tree", "-r", "--name-only", ref, "--", relpath)
+        return [line for line in out.splitlines() if line]
+
+    # --- Helpers ---
+
+    def _git(self, *args: str) -> str:
+        return self._run("git", "-C", str(dots_dir), *args)
+
+    def _git_bytes(self, *args: str) -> bytes:
+        result = subprocess.run(["git", "-C", str(dots_dir), *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            raise SourceError(result.stderr.decode().strip() or f"git {' '.join(args)} failed")
+        return result.stdout
+
+    def _run(self, *cmd: str) -> str:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            raise SourceError(result.stderr.strip() or f"{' '.join(cmd)} failed")
+        return result.stdout
