@@ -17,18 +17,13 @@ def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
     subprocess.run(pacman_cmd, check=True)
 
     repo_url = f"https://aur.archlinux.org/{helper}.git"
-    repo_dir = f"/tmp/{helper}"
-    subprocess.run(["git", "clone", repo_url, repo_dir], check=True)
+    with tempfile.TemporaryDirectory() as repo_dir:
+        subprocess.run(["git", "clone", repo_url, repo_dir], check=True)
 
-    makepkg_cmd = ["makepkg", "-si"]
-    if noconfirm:
-        makepkg_cmd.append("--noconfirm")
-    subprocess.run(makepkg_cmd, cwd=repo_dir, check=True)
-
-    try:
-        shutil.rmtree(repo_dir)
-    except FileNotFoundError:
-        pass
+        makepkg_cmd = ["makepkg", "-si"]
+        if noconfirm:
+            makepkg_cmd.append("--noconfirm")
+        subprocess.run(makepkg_cmd, cwd=repo_dir, check=True)
 
     if helper == "yay":
         subprocess.run(["yay", "-Y", "--gendb"], check=True)
