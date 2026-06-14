@@ -50,7 +50,7 @@ class Command:
             local_packages=local_packages,
         ).save()
 
-        info("Done!")
+        self.print_done()
 
     def print_greeting(self) -> None:
         print(
@@ -75,6 +75,7 @@ class Command:
         info("  - Install config files")
         info("The installer does NOT set up hardware/system level configs (e.g. drivers). Please do this yourself.")
         pause()
+        print()
 
     def create_backup(self) -> None:
         if config_dir.exists():
@@ -94,6 +95,7 @@ class Command:
             info(f"Created backup at {config_backup_dir}")
 
     def fetch_manifest(self) -> tuple[DotsSource, str, Manifest]:
+        print()
         log("Fetching dots repo...")
         source = DotsSource()
         try:
@@ -161,6 +163,7 @@ class Command:
             manifest.resolve_components(enable=list(set(enabled)))
 
     def deploy_configs(self, source: DotsSource, manifest: Manifest) -> None:
+        print()
         log("Installing configs...")
         deployer = Deployer()
         for entry in manifest.enabled_entries():
@@ -183,12 +186,14 @@ class Command:
 
         packages = manifest.enabled_packages()
         if packages:
+            print()
             log("Installing packages...")
             installer.install(packages)
 
         local_packages = {}
         local_dirs = manifest.enabled_local_packages()
         if local_dirs:
+            print()
             log("Building local packages...")
             for path in local_dirs:
                 directory = source.working_path(path)
@@ -206,6 +211,7 @@ class Command:
         if not hooks:
             return
 
+        print()
         log("Running post-install hooks...")
         env = {**os.environ, "CAELESTIA_DOTS": str(dots_dir)}
         for hook in hooks:
@@ -213,3 +219,13 @@ class Command:
             result = subprocess.run(hook, shell=True, env=env)
             if result.returncode != 0:
                 warn(f"hook exited with {result.returncode}")
+
+    def print_done(self) -> None:
+        print()
+        info("All done! Caelestia has been installed.")
+        info("A few things to finish up:")
+        info("  - A reboot is recommended for all changes take effect")
+        info("  - Edit `~/.config/caelestia/hypr-vars.conf` to set default apps, keybinds and much more")
+        info("  - Edit `~/.config/caelestia/hypr-user.conf` to set your monitor layout and other Hyprland configs")
+        info("  - Run `caelestia update` later to pull in the latest changes")
+        info("Enjoy! For support (or to just hang out), join our Discord server: https://discord.gg/BGDCFCmMBk")
