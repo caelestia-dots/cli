@@ -130,29 +130,30 @@ class Command:
         for i, comp in enumerate(comp_arr):
             print(format_msg(PROMPT_COLOUR, f"  {i + 1:<{max_idx_w}}\t{comp}"))
         print(format_msg(PROMPT_COLOUR, "[A]ll or (1 2 3, 1-3, ^4)"))
-        ans = prompt("", end="").lower().strip()
 
         def _valid_v(v: str) -> int:
             try:
                 i_v = int(v, base=10) - 1  # -1 to translate to 0 index
             except ValueError:
-                fatal(f'Invalid input. Given value "{v}" must be an integer.')
+                raise ValueError(f'Given value "{v}" must be an integer.')
             if i_v < 0 or i_v >= len(comp_arr):
-                fatal(f'Invalid input. Given value "{v}" must be between 1 and {len(comp_arr)} inclusive.')
+                raise ValueError(f'Given value "{v}" must be between 1 and {len(comp_arr)} inclusive.')
             return i_v
 
-        if ans in ("a", "all"):
-            manifest.resolve_components(enable=list(manifest.components))
-        elif ans:
+        def _parse(ans: str) -> list[str] | None:
+            if ans in ("a", "all"):
+                return list(manifest.components)
+            if not ans:
+                return None
+
             enabled: list[str] = []
-            toks = ans.split()
-            for tok in toks:
+            for tok in ans.split():
                 fr, sep, to = tok.partition("-")
                 if sep:
                     fr = _valid_v(fr)
                     to = _valid_v(to)
                     if fr > to:
-                        fatal(f'Invalid input. Given range "{tok}" must be lo-hi.')
+                        raise ValueError(f'Given range "{tok}" must be lo-hi.')
                     enabled += comp_arr[fr : to + 1]
                 elif tok.startswith("^"):
                     t = _valid_v(tok[1:])
@@ -160,7 +161,19 @@ class Command:
                 else:
                     t = _valid_v(tok)
                     enabled.append(comp_arr[t])
-            manifest.resolve_components(enable=list(set(enabled)))
+            return list(set(enabled))
+
+        while True:
+            ans = prompt("", end="").lower().strip()
+            try:
+                enabled = _parse(ans)
+            except ValueError as e:
+                warn(f"invalid input. {e} Please try again.")
+                continue
+
+            if enabled is not None:
+                manifest.resolve_components(enable=enabled)
+            return
 
     def deploy_configs(self, source: DotsSource, manifest: Manifest) -> None:
         print()
