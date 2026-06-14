@@ -68,7 +68,6 @@ class ManifestComponent:
 
 @dataclass
 class _ManifestData:
-    resolved_comps: bool = False
     enabled_comps: list[str] = field(default_factory=list)
     disabled_comps: list[str] = field(default_factory=list)
 
@@ -121,9 +120,6 @@ class Manifest:
     ) -> None:
         """Resolves enabled/disabled components. This MUST be called before calling any other method."""
 
-        if self._data.resolved_comps:
-            return
-
         enable_set = set(enable or [])
         disable_set = set(disable or [])
         known = set(self.components)
@@ -140,12 +136,13 @@ class Manifest:
         enabled |= enable_set
         enabled -= disable_set
 
+        self._data.enabled_comps.clear()
+        self._data.disabled_comps.clear()
         for name in self.components:
             if name in enabled:
                 self._data.enabled_comps.append(name)
             else:
                 self._data.disabled_comps.append(name)
-        self._data.resolved_comps = True
 
     def enabled_entries(self) -> list[ManifestEntry]:
         """The entries of every enabled component."""

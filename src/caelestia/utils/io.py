@@ -1,6 +1,12 @@
 import sys
 from typing import Never
 
+LOG_COLOUR: int = 2
+INFO_COLOUR: int = 0
+PROMPT_COLOUR: int = 36
+WARNING_COLOUR: int = 33
+ERROR_COLOUR: int = 31
+
 _disable_input: bool = False
 
 
@@ -25,28 +31,28 @@ def log_exception(func):
     return wrapper
 
 
-def _format_msg(colour: int, msg: str) -> str:
+def format_msg(colour: int, msg: str) -> str:
     return f"\033[{colour}m:: {msg}\033[0m"
 
 
 def log(msg: str) -> None:
-    print(_format_msg(2, msg))
+    print(format_msg(LOG_COLOUR, msg))
 
 
 def info(msg: str) -> None:
-    print(_format_msg(0, msg))
+    print(format_msg(INFO_COLOUR, msg))
 
 
 def warn(msg: str) -> None:
-    print(_format_msg(33, f"Warning: {msg}"))
+    print(format_msg(WARNING_COLOUR, f"Warning: {msg}"))
 
 
 def error(err: str | Exception) -> None:
-    print(_format_msg(31, f"Error: {err}"), file=sys.stderr)
+    print(format_msg(ERROR_COLOUR, f"Error: {err}"), file=sys.stderr)
 
 
 def fatal(err: str | Exception) -> Never:
-    print(_format_msg(31, f"Fatal: {err}"), file=sys.stderr)
+    print(format_msg(ERROR_COLOUR, f"Fatal: {err}"), file=sys.stderr)
     sys.exit(1)
 
 
@@ -62,8 +68,8 @@ def _input(prompt: str) -> str:
         raise KeyboardInterrupt()
 
 
-def prompt(msg: str) -> str:
-    return _input(_format_msg(36, msg) + " ")
+def prompt(msg: str, end: str = " ") -> str:
+    return _input(format_msg(PROMPT_COLOUR, msg) + end)
 
 
 def confirm(msg: str, default: bool = True) -> bool:

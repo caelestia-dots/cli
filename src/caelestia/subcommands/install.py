@@ -10,7 +10,7 @@ from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestErro
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
-from caelestia.utils.io import confirm, disable_input, fatal, info, log, pause, warn
+from caelestia.utils.io import PROMPT_COLOUR, confirm, disable_input, fatal, format_msg, info, log, pause, prompt, warn
 from caelestia.utils.paths import (
     config_backup_dir,
     config_dir,
@@ -102,12 +102,14 @@ class Command:
         except SourceError as e:
             fatal(e)
 
+        enable = _parse_list_arg(self.args.enable_components)
+        disable = _parse_list_arg(self.args.disable_components)
         try:
             manifest = source.manifest_at(tip)
-            manifest.resolve_components(
-                enable=_parse_list_arg(self.args.enable_components),
-                disable=_parse_list_arg(self.args.disable_components),
-            )
+            manifest.resolve_components(enable=enable, disable=disable)
+
+            if enable is None and disable is None:
+                self.prompt_optional_components(manifest)
         except (SourceError, ManifestError, ComponentError) as e:
             fatal(e)
 
@@ -115,6 +117,47 @@ class Command:
         info(f"Enabled components: {names}")
 
         return source, tip, manifest
+
+    def prompt_optional_components(self, manifest: Manifest) -> None:
+        comp_arr = manifest.disabled_components
+        if not comp_arr:
+            return
+
+        print(format_msg(PROMPT_COLOUR, "Components to enable?"))
+        for i, comp in enumerate(comp_arr):
+            print(format_msg(PROMPT_COLOUR, f"  [{i + 1}] {comp}"))
+        print(format_msg(PROMPT_COLOUR, "[A]ll or (1 2 3, 1-3, ^4)"))
+        ans = prompt("", end="").lower().strip()
+
+        def _valid_v(v: str) -> int:
+            try:
+                i_v = int(v, base=10) - 1  # -1 to translate to 0 index
+            except ValueError:
+                fatal(f'Invalid input. Given value "{v}" must be an integer.')
+            if i_v < 0 or i_v >= len(comp_arr):
+                fatal(f'Invalid input. Given value "{v}" must be between 1 and {len(comp_arr)} inclusive.')
+            return i_v
+
+        if ans in ("a", "all"):
+            manifest.resolve_components(enable=list(manifest.components))
+        elif ans:
+            enabled: list[str] = []
+            toks = ans.split()
+            for tok in toks:
+                fr, sep, to = tok.partition("-")
+                if sep:
+                    fr = _valid_v(fr)
+                    to = _valid_v(to)
+                    if fr > to:
+                        fatal(f'Invalid input. Given range "{tok}" must be lo-hi.')
+                    enabled += comp_arr[fr : to + 1]
+                elif tok.startswith("^"):
+                    t = _valid_v(tok[1:])
+                    enabled += comp_arr[:t] + comp_arr[t + 1 :]
+                else:
+                    t = _valid_v(tok)
+                    enabled.append(comp_arr[t])
+            manifest.resolve_components(enable=list(set(enabled)))
 
     def deploy_configs(self, source: DotsSource, manifest: Manifest) -> None:
         log("Installing configs...")
