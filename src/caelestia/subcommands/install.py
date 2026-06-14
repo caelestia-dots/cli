@@ -209,7 +209,7 @@ class Command:
         log("Running post-install hooks...")
         env = {**os.environ, "CAELESTIA_DOTS": str(dots_dir)}
         for hook in hooks:
-            log(f"Running hook: {hook}")
+            info(f"Running hook: {hook}")
             result = subprocess.run(hook, shell=True, env=env)
             if result.returncode != 0:
                 warn(f"hook exited with {result.returncode}")
