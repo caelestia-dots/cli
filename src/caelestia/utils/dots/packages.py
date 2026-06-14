@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 import tempfile
@@ -120,7 +121,10 @@ class ArchInstaller(PackageInstaller):
                 depends.append(value.strip())
 
         self.install(depends, extra_flags=["--asdeps"])
+
+        # Stop makepkg from resetting sudo
+        env = {**os.environ, "PACMAN_AUTH": "sudo"}
         # -f = force, -s = sync deps, -i = install
-        subprocess.run(["makepkg", "-fsi", *self.flags], cwd=directory, check=True)
+        subprocess.run(["makepkg", "-fsi", *self.flags], cwd=directory, env=env, check=True)
 
         return names
