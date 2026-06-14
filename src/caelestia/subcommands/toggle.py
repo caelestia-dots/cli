@@ -113,12 +113,15 @@ class Command:
             return
 
         spawned = False
+        needs_toggle = False
         if self.args.workspace in self.cfg:
             for client in self.cfg[self.args.workspace].values():
                 if "enable" in client and client["enable"] and self.handle_client_config(client):
                     spawned = True
+                    if client.get("spawn_then_toggle"):
+                        needs_toggle = True
 
-        if not spawned:
+        if not spawned or needs_toggle:
             hypr.dispatch("togglespecialworkspace", self.args.workspace)
 
     def get_clients(self) -> list[dict[str, Any]]:
