@@ -64,6 +64,9 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     screenshot_parser.add_argument(
         "-f", "--freeze", action="store_true", help="freeze the screen while selecting a region"
     )
+    screenshot_parser.add_argument(
+        "-c", "--copy", action="store_true", help="copy the screenshot to the clipboard instead of opening it"
+    )
 
     # Create parser for record opts
     record_parser = command_parser.add_parser("record", help="start a screen recording")
@@ -77,6 +80,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
     clipboard_parser.set_defaults(cls=clipboard.Command)
     clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
+    clipboard_parser.add_argument("-c", "--clear", action="store_true", help="clear the clipboard history")
 
     # Create parser for emoji-picker opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
