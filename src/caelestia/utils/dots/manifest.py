@@ -173,8 +173,19 @@ class Manifest:
         return [p[len(_LOCAL_PREFIX) :] for p in self._all_packages() if p.startswith(_LOCAL_PREFIX)]
 
     def _all_packages(self) -> list[str]:
-        """The manifest's top-level packages plus enabled components'."""
-        return list(set(self.packages) | set(p for c in self._data.enabled_comps for p in self.components[c].packages))
+        """The manifest's top-level packages plus enabled components', in manifest order.
+
+        Top-level packages come first, then each enabled component's packages in
+        component order. Only the first occurrence of each package is kept.
+        """
+
+        seen: set[str] = set()
+        ordered: list[str] = []
+        for pkg in (*self.packages, *(p for c in self._data.enabled_comps for p in self.components[c].packages)):
+            if pkg not in seen:
+                seen.add(pkg)
+                ordered.append(pkg)
+        return ordered
 
 
 def _require_key(d: dict[str, Any], key: str, ctx: str) -> Any:
