@@ -7,7 +7,7 @@ from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
 from caelestia.utils.dots.manifest import Manifest, ManifestError, expand, expand_dests
-from caelestia.utils.dots.packages import PackageInstaller
+from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
 from caelestia.utils.io import confirm, disable_input, fatal, info, log, pause, warn
@@ -155,7 +155,7 @@ class Command:
                 log(f"Building {path}...")
                 local_packages[path] = installer.build_install(directory)
 
-        return getattr(installer, "helper", ""), packages, local_packages
+        return getattr(installer, "helper", DEFAULT_AUR_HELPER), packages, local_packages
 
     def run_hooks(self, manifest: Manifest) -> None:
         hooks = manifest.enabled_hooks("post_install")

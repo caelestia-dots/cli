@@ -1,11 +1,13 @@
 import shutil
 import subprocess
+import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 from caelestia.utils.io import fatal, info
 
-AUR_HELPERS = "paru", "yay"
+DEFAULT_AUR_HELPER = "paru"
+AUR_HELPERS = DEFAULT_AUR_HELPER, "yay"
 
 
 def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
@@ -31,7 +33,7 @@ def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
     if helper == "yay":
         subprocess.run(["yay", "-Y", "--gendb"], check=True)
         subprocess.run(["yay", "-Y", "--devel", "--save"], check=True)
-    else:
+    elif helper == "paru":
         subprocess.run(["paru", "--gendb"], check=True)
 
 
@@ -59,9 +61,9 @@ class PackageInstaller(ABC):
             if shutil.which(candidate):
                 return ArchInstaller(candidate, noconfirm)
 
-        info("No AUR helper found. Installing paru...")
-        _install_aur_helper("paru", noconfirm)
-        return ArchInstaller("paru", noconfirm)
+        info(f"No AUR helper found. Installing {DEFAULT_AUR_HELPER}...")
+        _install_aur_helper(DEFAULT_AUR_HELPER, noconfirm)
+        return ArchInstaller(DEFAULT_AUR_HELPER, noconfirm)
 
     # --- Abstract methods ---
 
