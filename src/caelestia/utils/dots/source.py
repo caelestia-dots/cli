@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -27,13 +28,23 @@ class DotsSource:
         return dots_dir / relpath
 
     def ensure(self) -> None:
-        """Clone the repo if absent, otherwise fetch the latest refs."""
+        """Clone the repo if absent, otherwise fetch the latest refs.
+
+        If the configured url changed, the stale clone is removed and re-cloned
+        from the new source.
+        """
 
         if self.exists():
-            self._git("fetch", "--prune", "origin", self.branch)
-        else:
-            dots_dir.parent.mkdir(parents=True, exist_ok=True)
-            self._run("git", "clone", "--branch", self.branch, self.url, str(dots_dir))
+            if self.current_url() == self.url:
+                self._git("fetch", "--prune", "origin", self.branch)
+                return
+            shutil.rmtree(dots_dir)
+
+        dots_dir.parent.mkdir(parents=True, exist_ok=True)
+        self._run("git", "clone", "--branch", self.branch, self.url, str(dots_dir))
+
+    def current_url(self) -> str:
+        return self._git("remote", "get-url", "origin").strip()
 
     def checkout_tip(self) -> str:
         """Reset the working tree to the fetched tip and return its commit hash."""
