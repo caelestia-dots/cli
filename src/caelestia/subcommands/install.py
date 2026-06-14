@@ -108,7 +108,7 @@ class Command:
                 enable=_parse_list_arg(self.args.enable_components),
                 disable=_parse_list_arg(self.args.disable_components),
             )
-        except (ManifestError, ComponentError) as e:
+        except (SourceError, ManifestError, ComponentError) as e:
             fatal(e)
 
         names = ", ".join(manifest.enabled_components) or "none"
