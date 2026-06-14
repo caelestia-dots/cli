@@ -130,11 +130,11 @@ class Manifest:
 
         for name in enable_set | disable_set:
             if name not in known:
-                raise ManifestError(f"unknown component: {name}")
+                raise ComponentError(f"unknown component: {name}")
 
         conflict = enable_set & disable_set
         if conflict:
-            raise ManifestError(f"component(s) both enabled and disabled: {', '.join(sorted(conflict))}")
+            raise ComponentError(f"component(s) both enabled and disabled: {', '.join(sorted(conflict))}")
 
         enabled = {name for name, comp in self.components.items() if comp.default}
         enabled |= enable_set

@@ -6,7 +6,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
-from caelestia.utils.dots.manifest import Manifest, ManifestError, expand, expand_dests
+from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError, expand, expand_dests
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
@@ -108,7 +108,7 @@ class Command:
                 enable=_parse_list_arg(self.args.enable_components),
                 disable=_parse_list_arg(self.args.disable_components),
             )
-        except ManifestError as e:
+        except (ManifestError, ComponentError) as e:
             fatal(e)
 
         names = ", ".join(manifest.enabled_components) or "none"
