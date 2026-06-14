@@ -15,7 +15,7 @@ class Deployer:
             self.place_file(src, dest)
 
     def place_dir(self, src: Path, dest: Path) -> None:
-        """Place a directory tree recursively, replacing any existing dest."""
+        """Place a directory tree recursively, overwriting any existing dest files."""
 
         if dest.is_symlink() or dest.is_file():
             self.remove(dest)
