@@ -94,10 +94,10 @@ body {
     --text-5: #{c.$outline}; /* muted channels/chats and timestamps */
 
     /* background and dark colors */
-    --bg-1: #{c.$surfaceContainerHighest}; /* dark buttons when clicked */
-    --bg-2: #{c.$surfaceContainerHigh}; /* dark buttons */
-    --bg-3: #{c.$surface}; /* spacing, secondary elements */
-    --bg-4: #{c.$surfaceContainer}; /* main background color */
+    --bg-1: #{c.$surfaceContainerHighest}66; /* dark buttons when clicked */
+    --bg-2: #{c.$surfaceContainerHigh}66; /* dark buttons */
+    --bg-3: #{c.$surface}d9; /* spacing, secondary elements */
+    --bg-4: #{c.$surfaceContainer}66; /* main background color */
     --hover: #{color.change(c.$onSurface, $alpha: 0.08)}; /* channels and buttons when hovered */
     --active: #{color.change(c.$onSurface, $alpha: 0.1)}; /* channels and buttons when clicked or selected */
     --active-2: #{color.change(c.$onSurface, $alpha: 0.2)}; /* extra state for transparent buttons */
