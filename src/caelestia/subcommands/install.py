@@ -125,11 +125,11 @@ class Command:
         if not comp_arr:
             return
 
-        print(format_msg(PROMPT_COLOUR, "Components to enable?"))
+        print(format_msg(PROMPT_COLOUR, True, "Components to enable?"))
         max_idx_w = len(str(len(comp_arr)))
         for i, comp in enumerate(comp_arr):
-            print(format_msg(PROMPT_COLOUR, f"  {i + 1:<{max_idx_w}}\t{comp}"))
-        print(format_msg(PROMPT_COLOUR, "[A]ll or (1 2 3, 1-3, ^4)"))
+            print(format_msg(PROMPT_COLOUR, True, f"  {i + 1:<{max_idx_w}}\t{comp}"))
+        print(format_msg(PROMPT_COLOUR, True, "[A]ll or (1 2 3, 1-3, ^4)"))
 
         def _valid_v(v: str) -> int:
             try:

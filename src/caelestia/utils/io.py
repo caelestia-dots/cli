@@ -31,28 +31,28 @@ def log_exception(func):
     return wrapper
 
 
-def format_msg(colour: int, msg: str) -> str:
-    return f"\033[{colour}m:: {msg}\033[0m"
+def format_msg(colour: int, prefix: bool, msg: str) -> str:
+    return f"\033[{colour}m{':: ' if prefix else ''}{msg}\033[0m"
 
 
-def log(msg: str) -> None:
-    print(format_msg(LOG_COLOUR, msg))
+def log(msg: str, prefix: bool = True) -> None:
+    print(format_msg(LOG_COLOUR, prefix, msg))
 
 
-def info(msg: str) -> None:
-    print(format_msg(INFO_COLOUR, msg))
+def info(msg: str, prefix: bool = True) -> None:
+    print(format_msg(INFO_COLOUR, prefix, msg))
 
 
-def warn(msg: str) -> None:
-    print(format_msg(WARNING_COLOUR, f"Warning: {msg}"))
+def warn(msg: str, prefix: bool = True) -> None:
+    print(format_msg(WARNING_COLOUR, prefix, f"Warning: {msg}"))
 
 
-def error(err: str | Exception) -> None:
-    print(format_msg(ERROR_COLOUR, f"Error: {err}"), file=sys.stderr)
+def error(err: str | Exception, prefix: bool = True) -> None:
+    print(format_msg(ERROR_COLOUR, prefix, f"Error: {err}"), file=sys.stderr)
 
 
-def fatal(err: str | Exception) -> Never:
-    print(format_msg(ERROR_COLOUR, f"Fatal: {err}"), file=sys.stderr)
+def fatal(err: str | Exception, prefix: bool = True) -> Never:
+    print(format_msg(ERROR_COLOUR, prefix, f"Fatal: {err}"), file=sys.stderr)
     sys.exit(1)
 
 
@@ -68,13 +68,13 @@ def _input(prompt: str) -> str:
         raise KeyboardInterrupt()
 
 
-def prompt(msg: str, end: str = " ") -> str:
-    return _input(format_msg(PROMPT_COLOUR, msg) + end)
+def prompt(msg: str, prefix: bool = True, end: str = " ") -> str:
+    return _input(format_msg(PROMPT_COLOUR, prefix, msg) + end)
 
 
-def confirm(msg: str, default: bool = True) -> bool:
+def confirm(msg: str, prefix: bool = True, default: bool = True) -> bool:
     suffix = " [Y/n]" if default else " [y/N]"
-    answer = prompt(msg + suffix).strip().lower()
+    answer = prompt(msg + suffix, prefix=prefix).strip().lower()
     if not answer:
         return default
     return answer in ("y", "yes")
