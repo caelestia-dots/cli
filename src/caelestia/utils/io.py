@@ -16,7 +16,7 @@ def disable_input() -> None:
 
 
 def log_exception(func):
-    """Log exceptions to stdout instead of raising
+    """Log exceptions to stderr instead of raising.
 
     Used by the `apply_()` functions so that an exception, when applying
     a theme, does not prevent the other themes from being applied.
