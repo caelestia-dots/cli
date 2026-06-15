@@ -9,7 +9,13 @@ from pathlib import Path
 
 from caelestia.utils import hypr
 from caelestia.utils.notify import close_notification, notify
-from caelestia.utils.paths import recording_notif_path, recording_path, recordings_dir, user_config_path
+from caelestia.utils.paths import (
+    recording_dnd_state_path,
+    recording_notif_path,
+    recording_path,
+    recordings_dir,
+    user_config_path,
+)
 
 RECORDER = "gpu-screen-recorder"
 
@@ -33,6 +39,25 @@ class Command:
 
     def intersects(self, a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
         return a[0] < b[0] + b[2] and a[0] + a[2] > b[0] and a[1] < b[1] + b[3] and a[1] + a[3] > b[1]
+
+    def set_dnd(self, enable: bool) -> None:
+        subprocess.run(["qs", "-c", "caelestia", "ipc", "call", "notifs", "enableDnd" if enable else "disableDnd"])
+
+    def save_dnd_state(self) -> None:
+        state = subprocess.check_output(
+            ["qs", "-c", "caelestia", "ipc", "call", "notifs", "isDndEnabled"], text=True
+        ).strip() == "true"
+        recording_dnd_state_path.write_text("true" if state else "false")
+
+    def restore_dnd_state(self) -> None:
+        try:
+            state = recording_dnd_state_path.read_text().strip() == "true"
+            self.set_dnd(state)
+        except FileNotFoundError:
+            return
+        finally:
+            recording_dnd_state_path.unlink(missing_ok=True)
+
 
     def start(self) -> None:
         args = ["-w"]
@@ -75,6 +100,10 @@ class Command:
             raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if not self.args.allow_notifs:
+            self.save_dnd_state()
+            self.set_dnd(True)
         proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], start_new_session=True)
 
         notif = notify("-p", "Recording started", "Recording...")
@@ -82,6 +111,7 @@ class Command:
 
         try:
             if proc.wait(1) != 0:
+                self.restore_dnd_state()
                 close_notification(notif)
                 notify(
                     "Recording failed",
@@ -94,6 +124,7 @@ class Command:
     def stop(self) -> None:
         # Start killing recording process
         subprocess.run(["pkill", "-f", RECORDER], stdout=subprocess.DEVNULL)
+        self.restore_dnd_state()
 
         # Wait for recording to finish to avoid corrupted video file
         while self.proc_running():
