@@ -95,10 +95,10 @@ class ArchInstaller(PackageInstaller):
         self.helper = helper
         self.flags = ["--noconfirm"] if noconfirm else []
 
-    def install(self, packages: list[str], extra_flags: list[str] = []) -> None:
+    def install(self, packages: list[str], extra_flags: list[str] | None = None) -> None:
         if not packages:
             return
-        subprocess.run([self.helper, "-S", "--needed", *self.flags, *extra_flags, *packages], check=True)
+        subprocess.run([self.helper, "-S", "--needed", *self.flags, *(extra_flags or []), *packages], check=True)
 
     def remove(self, packages: list[str]) -> None:
         if not packages:
