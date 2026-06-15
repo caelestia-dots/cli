@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from caelestia.utils.notify import notify
-from caelestia.utils.paths import atomic_dump, custom_scheme_data_dir, scheme_data_dir, scheme_path, wallpaper_path_path
+from caelestia.utils.paths import atomic_dump, manual_scheme_json, scheme_data_dir, scheme_path, wallpaper_path_path
 
 
 class Scheme:
@@ -182,26 +182,44 @@ class Scheme:
     def _update_colours_manual(self) -> None:
         # Look if there is a manual scheme for the current wallpaper.
         # If so, use it; otherwise use dynamic coloring.
-        wallpaper_name = ""
-        try:
-            with wallpaper_path_path.open("r") as file_read:
-                wallpaper_name = os.path.basename(file_read.read())
-        except (IOError, json.JSONDecodeError):
-            pass
 
-        custom_scheme_path = custom_scheme_data_dir.joinpath(f"{wallpaper_name}.txt")
-        try:
-            self._colours = read_colours_from_file(custom_scheme_path)
-        except Exception:
-            # Fallback to dynamic scheme if their is no user scheme for the current wallpaper.
+        def fallback_to_dynamic(message: str) -> None:
+            # Fallback to dynamic scheme if there is no user scheme for the current wallpaper.
             if self.notify:
                 notify(
                     "-u",
                     "normal",
-                    "Unable to set custom scheme",
-                    f"{custom_scheme_path} wasn't found, using dynamic scheme instead.",
+                    "Cannot set manual scheme",
+                    message,
                 )
             self._update_colours_dynamic()
+
+        wallpaper_name: str = ""
+        scheme_path: Path = Path()
+
+        try:
+            with wallpaper_path_path.open("r") as file_read:
+                wallpaper_name = os.path.basename(file_read.read())
+        except (IOError, json.JSONDecodeError):
+            fallback_to_dynamic("Cannot get wallpaper name.")
+            return
+
+        try:
+            with manual_scheme_json.open("r") as file_read:
+                schemes = json.load(file_read)
+                scheme_path = Path(schemes[wallpaper_name]).expanduser()
+        except (IOError, json.JSONDecodeError):
+            fallback_to_dynamic("Cannot open manual-scheme.json file.")
+            return
+        except KeyError:
+            fallback_to_dynamic(f"No manual scheme matching {wallpaper_name} found.")
+            return
+
+        try:
+            self._colours = read_colours_from_file(scheme_path)
+        except Exception:
+            fallback_to_dynamic(f"Failed to read colors from {scheme_path}.")
+            return
 
     def __str__(self) -> str:
         return (
