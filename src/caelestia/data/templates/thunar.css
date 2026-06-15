@@ -46,9 +46,6 @@
     margin: 10px 15px 0 0;
     border-radius: 15px;
     background-color: {{ $surfaceContainerLow }};
-    animation: fading 400ms ease forwards;
-    opacity: 0;
-    animation-delay: 250ms;
 }
 
 .thunar .frame.standard-view .view:not(.rubberband),
@@ -98,9 +95,6 @@
 .thunar .sidebar {
     padding: 0 20px;
     background: none;
-    animation: fading 600ms ease forwards;
-    animation-delay: 100ms;
-    opacity: 0;
 }
 
 .thunar .sidebar .view {
@@ -188,15 +182,4 @@
 
 .thunar box.vertical .image {
     margin: 15px;
-}
-
-
-/* =============================================================================
-   Animation
-   ============================================================================= */
-
-@keyframes fading {
-    to {
-        opacity: 1;
-    }
 }
