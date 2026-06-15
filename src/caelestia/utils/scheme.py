@@ -1,6 +1,6 @@
 import json
-import os
 import random
+import re
 from pathlib import Path
 from typing import Any
 
@@ -180,11 +180,17 @@ class Scheme:
             )
 
     def _update_colours_manual(self) -> None:
-        # Look if there is a manual scheme for the current wallpaper.
-        # If so, use it; otherwise use dynamic coloring.
+        """Look if there is a manual scheme for the current wallpaper.
+
+        Logic:
+            - Open `manual_scheme_json`
+            - Look for exact wallpaper name match
+            - If none, look for regex wallpaper path match
+            - If none, use dynamic coloring.
+        """
 
         def fallback_to_dynamic(message: str) -> None:
-            # Fallback to dynamic scheme if there is no user scheme for the current wallpaper.
+            """Fallback to dynamic scheme if there is no user scheme for the current wallpaper."""
             if self.notify:
                 notify(
                     "-u",
@@ -194,25 +200,37 @@ class Scheme:
                 )
             self._update_colours_dynamic()
 
-        wallpaper_name: str = ""
+        wallpaper_path: Path = Path()
         scheme_path: Path = Path()
 
         try:
             with wallpaper_path_path.open("r") as file_read:
-                wallpaper_name = os.path.basename(file_read.read())
+                wallpaper_path = Path(file_read.read())
         except (IOError, json.JSONDecodeError):
             fallback_to_dynamic("Cannot get wallpaper name.")
             return
 
         try:
             with manual_scheme_json.open("r") as file_read:
-                schemes = json.load(file_read)
-                scheme_path = Path(schemes[wallpaper_name]).expanduser()
+                schemes: dict = json.load(file_read)
+
+                wallpaper_name: str = wallpaper_path.name
+
+                # Look for wallpaper name exact match
+                if wallpaper_name in schemes.keys():
+                    scheme_path = Path(schemes[wallpaper_name]).expanduser()
+
+                # If none, look for regex match against path
+                elif match := next((k for k in schemes if re.search(k, str(wallpaper_path))), None):
+                    scheme_path = Path(schemes[match]).expanduser()
+                else:
+                    raise KeyError
+
         except (IOError, json.JSONDecodeError):
-            fallback_to_dynamic("Cannot open manual-scheme.json file.")
+            fallback_to_dynamic("Cannot open manual-scheme.json.")
             return
         except KeyError:
-            fallback_to_dynamic(f"No manual scheme matching {wallpaper_name} found.")
+            fallback_to_dynamic(f"No manual scheme matching {wallpaper_path} found.")
             return
 
         try:
