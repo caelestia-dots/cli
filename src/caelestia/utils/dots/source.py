@@ -11,6 +11,8 @@ class SourceError(Exception):
 
 
 class DotsSource:
+    _fetched_source: bool = False
+
     def __init__(self) -> None:
         cfg = get_config().get("dots", {})
         self.url = cfg.get("url", "https://github.com/caelestia-dots/caelestia.git")
@@ -36,12 +38,17 @@ class DotsSource:
 
         if self.exists():
             if self.current_url() == self.url:
+                if DotsSource._fetched_source:
+                    return
+
                 self._git("fetch", "--prune", "origin", self.branch)
+                DotsSource._fetched_source = True
                 return
             shutil.rmtree(dots_dir)
 
         dots_dir.parent.mkdir(parents=True, exist_ok=True)
         self._run("git", "clone", "--branch", self.branch, self.url, str(dots_dir))
+        DotsSource._fetched_source = True
 
     def current_url(self) -> str:
         return self._git("remote", "get-url", "origin").strip()
