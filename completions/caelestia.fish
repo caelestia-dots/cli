@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer
+set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer install
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -20,6 +20,7 @@ complete -c caelestia -n $not_seen -a 'clipboard' -d 'Open clipboard history'
 complete -c caelestia -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
 complete -c caelestia -n $not_seen -a 'resizer' -d 'Window resizer'
+complete -c caelestia -n $not_seen -a 'install' -d 'Install the Caelestia dotfiles'
 
 # Shell
 set -l commands mpris drawers wallpaper notifs
@@ -126,3 +127,9 @@ complete -c caelestia -n "$seen emoji" -s 'f' -l 'fetch' -d 'Fetch emoji/glyph d
 complete -c caelestia -n "$seen resizer" -s 'd' -l 'daemon' -d 'Start in daemon mode'
 complete -c caelestia -n "$seen resizer" -a 'pip' -d 'Quick pip mode'
 complete -c caelestia -n "$seen resizer" -a 'active' -d 'Select the active window'
+
+# Install (component flags come from the manifest, so are not completed statically)
+complete -c caelestia -n "$seen install" -l 'aur-helper' -d 'The AUR helper to use' -a 'yay paru' -r
+complete -c caelestia -n "$seen install" -l 'enable-components' -d 'List of components to enable' -r
+complete -c caelestia -n "$seen install" -l 'disable-components' -d 'List of components to disable' -r
+complete -c caelestia -n "$seen install" -l 'noconfirm' -d 'Use defaults for all prompts'

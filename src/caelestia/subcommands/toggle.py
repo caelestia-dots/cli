@@ -6,7 +6,7 @@ from collections import ChainMap
 from typing import Any, Callable, cast
 
 from caelestia.utils import hypr
-from caelestia.utils.paths import user_config_path
+from caelestia.utils.paths import get_config
 
 
 def is_subset(superset, subset):
@@ -103,8 +103,8 @@ class Command:
             },
         }
         try:
-            self.cfg = DeepChainMap(json.loads(user_config_path.read_text())["toggles"], self.cfg)
-        except (FileNotFoundError, json.JSONDecodeError, KeyError):
+            self.cfg = DeepChainMap(get_config()["toggles"], self.cfg)
+        except KeyError:
             pass
 
     def run(self) -> None:

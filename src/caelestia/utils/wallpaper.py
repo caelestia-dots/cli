@@ -2,7 +2,6 @@ import json
 import os
 import random
 import subprocess
-
 from argparse import Namespace
 from pathlib import Path
 from typing import cast
@@ -11,12 +10,12 @@ from materialyoucolor.hct import Hct
 from materialyoucolor.utils.color_utils import argb_from_rgb
 from PIL import Image
 
+from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
-from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.paths import (
     compute_hash,
-    user_config_path,
+    get_config,
     wallpaper_link_path,
     wallpaper_path_path,
     wallpaper_thumbnail_path,
@@ -186,26 +185,23 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     apply_colours(scheme.colours, scheme.mode)
 
     # Run custom post-hook if configured
-    try:
-        cfg = json.loads(user_config_path.read_text()).get("wallpaper", {})
-        if post_hook := cfg.get("postHook"):
-            subprocess.run(
-                post_hook,
-                shell=True,
-                env={
-                    **os.environ,
-                    "WALLPAPER_PATH": str(wall),
-                    "SCHEME_NAME": scheme.name,
-                    "SCHEME_FLAVOUR": scheme.flavour,
-                    "SCHEME_MODE": scheme.mode,
-                    "SCHEME_VARIANT": scheme.variant,
-                    "SCHEME_COLOURS": json.dumps(scheme.colours),
-                    "THUMBNAIL_PATH": str(thumb),
-                },
-                stderr=subprocess.DEVNULL,
-            )
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass
+    cfg = get_config().get("wallpaper", {})
+    if post_hook := cfg.get("postHook"):
+        subprocess.run(
+            post_hook,
+            shell=True,
+            env={
+                **os.environ,
+                "WALLPAPER_PATH": str(wall),
+                "SCHEME_NAME": scheme.name,
+                "SCHEME_FLAVOUR": scheme.flavour,
+                "SCHEME_MODE": scheme.mode,
+                "SCHEME_VARIANT": scheme.variant,
+                "SCHEME_COLOURS": json.dumps(scheme.colours),
+                "THUMBNAIL_PATH": str(thumb),
+            },
+            stderr=subprocess.DEVNULL,
+        )
 
 
 def set_random(args: Namespace) -> None:

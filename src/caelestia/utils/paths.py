@@ -1,10 +1,11 @@
 import hashlib
 import json
 import os
-import shutil
 import tempfile
 from pathlib import Path
 from typing import Any
+
+from caelestia.utils.io import warn
 
 config_dir: Path = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config"))
 data_dir: Path = Path(os.getenv("XDG_DATA_HOME", Path.home() / ".local/share"))
@@ -23,6 +24,10 @@ cli_data_dir: Path = Path(__file__).parent.parent / "data"
 templates_dir: Path = cli_data_dir / "templates"
 user_templates_dir: Path = c_config_dir / "templates"
 theme_dir: Path = c_state_dir / "theme"
+
+config_backup_dir: Path = config_dir.parent / f"{config_dir.name}.bak"
+dots_dir: Path = c_state_dir / "dots"
+dots_state_path: Path = c_state_dir / "dots-state.json"
 
 scheme_path: Path = c_state_dir / "scheme.json"
 scheme_data_dir: Path = cli_data_dir / "schemes"
@@ -52,8 +57,29 @@ def compute_hash(path: Path | str) -> str:
     return sha.hexdigest()
 
 
+def atomic_write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    f = tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False)
+    try:
+        with f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(f.name, path)
+    except BaseException:
+        os.unlink(f.name)
+        raise
+
+
 def atomic_dump(path: Path, content: dict[str, Any]) -> None:
-    with tempfile.NamedTemporaryFile("w") as f:
-        json.dump(content, f)
-        f.flush()
-        shutil.move(f.name, path)
+    atomic_write(path, json.dumps(content))
+
+
+def get_config() -> dict[str, Any]:
+    try:
+        return json.loads(user_config_path.read_text())
+    except json.JSONDecodeError:
+        warn("failed to parse config, invalid JSON")
+    except FileNotFoundError:
+        pass
+    return {}
