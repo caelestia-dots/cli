@@ -95,9 +95,8 @@ class Manifest:
         except tomllib.TOMLDecodeError as e:
             raise ManifestError(f"invalid TOML: {e}") from e
 
-        hooks = raw.get("hooks", {})
-        post_install = _validate_str_list(hooks.get("post_install", []), "hooks.post_install")
-        post_update = _validate_str_list(hooks.get("post_update", []), "hooks.post_update")
+        post_install = _validate_str_list(raw.get("post_install", []), "post_install")
+        post_update = _validate_str_list(raw.get("post_update", []), "post_update")
 
         packages = _validate_str_list(raw.get("packages", []), "packages")
 
