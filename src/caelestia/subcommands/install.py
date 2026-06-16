@@ -38,7 +38,7 @@ class Command:
         self.create_backup()
 
         source, tip, manifest = self.fetch_manifest()
-        self.deploy_configs(source, manifest)
+        deployed = self.deploy_configs(source, manifest)
         helper, packages, local_packages = self.install_packages(source, manifest)
         self.run_hooks(manifest)
 
@@ -48,6 +48,7 @@ class Command:
             enabled_components=manifest.enabled_components,
             packages=packages,
             local_packages=local_packages,
+            deployed_files=deployed,
         ).save()
 
         self.print_done()
@@ -175,7 +176,7 @@ class Command:
                 manifest.resolve_components(enable=enabled)
             return
 
-    def deploy_configs(self, source: DotsSource, manifest: Manifest) -> None:
+    def deploy_configs(self, source: DotsSource, manifest: Manifest) -> dict[str, str]:
         print()
         log("Installing configs...")
         deployer = Deployer()
@@ -193,6 +194,8 @@ class Command:
             for dest in dests:
                 deployer.place(src, Path(dest))
                 info(f"{entry.src} -> {dest}")
+
+        return deployer.deployed_files
 
     def install_packages(self, source: DotsSource, manifest: Manifest) -> tuple[str, list[str], dict[str, list[str]]]:
         installer = PackageInstaller.get(self.args.aur_helper, self.args.noconfirm)
