@@ -25,35 +25,37 @@ class ComponentError(Exception):
     """Raised when component flags are invalid or contradictory."""
 
 
-def expand(text: str) -> Path:
+def _expand(text: str) -> Path:
     """Expand $VAR/${VAR} env vars (with XDG defaults) and ~ in a path."""
 
     env = {**_XDG_DEFAULTS, **os.environ}
     return Path(Template(text).safe_substitute(env)).expanduser()
 
 
-def expand_dests(dest: str) -> list[Path]:
-    """Expand globs within a dest path.
-
-    Globs from the start until the segment with the last glob so subdirs are
-    created if they didn't exist previously.
-    """
-
-    expanded = expand(dest)
-    if not _GLOB_MAGIC.search(str(expanded)):
-        return [expanded]
-
-    parts = expanded.parts
-    glob_idx = max(i for i, part in enumerate(parts) if _GLOB_MAGIC.search(part))
-    pattern = str(Path(*parts[: glob_idx + 1]))
-    tail = parts[glob_idx + 1 :]
-    return [Path(match, *tail) for match in sorted(glob.glob(pattern))]
-
-
 @dataclass(frozen=True)
 class ManifestEntry:
     src: str
     dest: str
+
+    def expanded_src(self) -> Path:
+        return _expand(self.src)
+
+    def expanded_dests(self) -> list[Path]:
+        """The dest path with globs expanded.
+
+        Globs from the start until the segment with the last glob so subdirs are
+        created if they didn't exist previously.
+        """
+
+        expanded = _expand(self.dest)
+        if not _GLOB_MAGIC.search(str(expanded)):
+            return [expanded]
+
+        parts = expanded.parts
+        glob_idx = max(i for i, part in enumerate(parts) if _GLOB_MAGIC.search(part))
+        pattern = str(Path(*parts[: glob_idx + 1]))
+        tail = parts[glob_idx + 1 :]
+        return [Path(match, *tail) for match in sorted(glob.glob(pattern))]
 
 
 @dataclass(frozen=True)

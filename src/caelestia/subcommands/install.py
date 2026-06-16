@@ -6,7 +6,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
-from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError, expand, expand_dests
+from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
@@ -180,12 +180,12 @@ class Command:
         log("Installing configs...")
         deployer = Deployer()
         for entry in manifest.enabled_entries():
-            src = source.working_path(expand(entry.src))
+            src = source.working_path(entry.expanded_src())
             if not src.exists():
                 warn(f"missing in source, skipping: {entry.src}")
                 continue
 
-            dests = expand_dests(entry.dest)
+            dests = entry.expanded_dests()
             if not dests:
                 warn(f"dest glob matched nothing, skipping: {entry.dest}")
                 continue
