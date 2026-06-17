@@ -17,6 +17,7 @@ class Changeset:
     deletes: list[Path] = field(default_factory=list)  # We placed it, upstream removed it, unmodified
     stale: list[Path] = field(default_factory=list)  # Upstream removed it but user modified it
     deleted_changed: list[tuple[str, Path]] = field(default_factory=list)  # User deleted it, upstream changed -> .new
+    untracked: list[Path] = field(default_factory=list)  # Gone + no longer managed; drop from state
 
     def is_empty(self) -> bool:
         return not (self.place or self.conflicts or self.deletes or self.stale or self.deleted_changed)
@@ -44,6 +45,7 @@ class Changeset:
         deletes: list[Path] = []
         stale: list[Path] = []
         deleted_changed: list[tuple[str, Path]] = []
+        untracked: list[Path] = []
 
         # Collect all files to deploy (entry sources can be dirs so we recurse into them)
         to_deploy: dict[Path, str] = {}
@@ -70,6 +72,8 @@ class Changeset:
             try:
                 if dest_path not in files_to_deploy:  # No longer managed by any entry
                     if not dest_path.exists():
+                        # Gone from disk and no entry manages it
+                        untracked.append(dest_path)
                         continue
 
                     if has_base and try_read(applied_rev, src) == dest_path.read_bytes():
@@ -117,5 +121,10 @@ class Changeset:
                 conflicts.append((src, dest))
 
         return Changeset(
-            place=place, conflicts=conflicts, deletes=deletes, stale=stale, deleted_changed=deleted_changed
+            place=place,
+            conflicts=conflicts,
+            deletes=deletes,
+            stale=stale,
+            deleted_changed=deleted_changed,
+            untracked=untracked,
         )

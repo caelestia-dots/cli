@@ -44,7 +44,7 @@ class Command:
 
         # Persist file changes immediately so a later failure can't lose track of them
         deployed = dict(state.deployed_files)
-        for dest in (*changeset.deletes, *changeset.stale):
+        for dest in (*changeset.deletes, *changeset.stale, *changeset.untracked):
             deployed.pop(str(dest), None)
         deployed.update(placed)
         state.deployed_files = deployed
