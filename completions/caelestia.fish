@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer install
+set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer install update
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -21,6 +21,7 @@ complete -c caelestia -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
 complete -c caelestia -n $not_seen -a 'resizer' -d 'Window resizer'
 complete -c caelestia -n $not_seen -a 'install' -d 'Install the Caelestia dotfiles'
+complete -c caelestia -n $not_seen -a 'update' -d 'Update the Caelestia dotfiles'
 
 # Shell
 set -l commands mpris drawers wallpaper notifs
@@ -133,3 +134,7 @@ complete -c caelestia -n "$seen install" -l 'aur-helper' -d 'The AUR helper to u
 complete -c caelestia -n "$seen install" -l 'enable-components' -d 'List of components to enable' -r
 complete -c caelestia -n "$seen install" -l 'disable-components' -d 'List of components to disable' -r
 complete -c caelestia -n "$seen install" -l 'noconfirm' -d 'Use defaults for all prompts'
+
+# Update
+complete -c caelestia -n "$seen update" -l 'aur-helper' -d 'The AUR helper to use' -a 'yay paru' -r
+complete -c caelestia -n "$seen update" -l 'noconfirm' -d 'Use defaults for all prompts'
