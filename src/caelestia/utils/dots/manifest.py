@@ -7,6 +7,8 @@ from pathlib import Path
 from string import Template
 from typing import Any
 
+from caelestia.utils.io import warn
+
 _XDG_DEFAULTS = {
     "XDG_CONFIG_HOME": str(Path.home() / ".config"),
     "XDG_DATA_HOME": str(Path.home() / ".local/share"),
@@ -105,6 +107,8 @@ class Manifest:
         components = {}
         for comp in raw.get("components", []):
             parsed = _parse_component(comp)
+            if parsed.name in components:
+                warn(f"duplicate component '{parsed.name}'; using the last definition")
             components[parsed.name] = parsed
 
         return Manifest(
