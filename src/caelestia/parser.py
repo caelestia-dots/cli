@@ -11,9 +11,11 @@ from caelestia.subcommands import (
     screenshot,
     shell,
     toggle,
+    update,
     wallpaper,
 )
 from caelestia.utils.dots.manifest import Manifest
+from caelestia.utils.dots.packages import AUR_HELPERS
 from caelestia.utils.dots.source import DotsSource
 from caelestia.utils.io import warn
 from caelestia.utils.paths import wallpapers_dir
@@ -150,7 +152,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     install_parser.set_defaults(cls=install.Command)
-    install_parser.add_argument("--aur-helper", choices=["yay", "paru"], help="the AUR helper to use")
+    install_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
     install_parser.add_argument(
         "--enable-components", metavar="LIST", help="comma-separated list of components to enable"
     )
@@ -159,6 +161,12 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     )
     install_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
     _set_install_epilog(install_parser)
+
+    # Create parser for update opts
+    update_parser = command_parser.add_parser("update", help="update the Caelestia dotfiles")
+    update_parser.set_defaults(cls=update.Command)
+    update_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
+    update_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
 
     return parser, parser.parse_args()
 

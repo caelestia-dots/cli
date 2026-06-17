@@ -17,6 +17,8 @@ class DotsSource:
         cfg = get_config().get("dots", {})
         self.url = cfg.get("url", "https://github.com/caelestia-dots/caelestia.git")
         self.branch = cfg.get("branch", "main")
+        # Cache git blobs by (ref, relpath); objects are immutable for a given rev
+        self._blob_cache: dict[tuple[str, str], bytes] = {}
 
     @property
     def remote_ref(self) -> str:
@@ -68,6 +70,15 @@ class DotsSource:
         out = self._git("diff", "--name-only", base, head)
         return [line for line in out.splitlines() if line]
 
+    def has_rev(self, rev: str) -> bool:
+        """Whether `rev` resolves to a commit."""
+
+        try:
+            self._git("rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}")
+            return True
+        except SourceError:
+            return False
+
     def clean(self) -> None:
         """Remove all untracked files in the git repo."""
         self._git("clean", "-fdx")
@@ -81,7 +92,10 @@ class DotsSource:
         return self._git("show", f"{ref}:{relpath}")
 
     def blob_at(self, ref: str, relpath: str) -> bytes:
-        return self._git_bytes("show", f"{ref}:{relpath}")
+        key = (ref, relpath)
+        if key not in self._blob_cache:
+            self._blob_cache[key] = self._git_bytes("show", f"{ref}:{relpath}")
+        return self._blob_cache[key]
 
     def files_at(self, ref: str, relpath: str) -> list[str]:
         """Repo-relative paths of all files under relpath at ref (the path itself if it is a file)."""
@@ -92,10 +106,12 @@ class DotsSource:
     # --- Helpers ---
 
     def _git(self, *args: str) -> str:
-        return self._run("git", "-C", str(dots_dir), *args)
+        # core.quotePath=false so non-ASCII paths come back verbatim, not octal-escaped
+        return self._run("git", "-C", str(dots_dir), "-c", "core.quotePath=false", *args)
 
     def _git_bytes(self, *args: str) -> bytes:
-        result = subprocess.run(["git", "-C", str(dots_dir), *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["git", "-C", str(dots_dir), "-c", "core.quotePath=false", *args]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise SourceError(result.stderr.decode().strip() or f"git {' '.join(args)} failed")
         return result.stdout

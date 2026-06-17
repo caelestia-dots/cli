@@ -2,9 +2,17 @@ import shutil
 import tempfile
 from pathlib import Path
 
+from caelestia.utils.paths import cache_dir, config_dir, data_dir, dots_dir, state_dir
+
+# Dirs to never prune even if empty
+_PROTECTED_DIRS = frozenset({Path.home(), config_dir, data_dir, state_dir, cache_dir})
+
 
 class Deployer:
     """Places files from the dots clone into their destinations."""
+
+    def __init__(self):
+        self.deployed_files: dict[str, str] = {}
 
     def place(self, src: Path, dest: Path) -> None:
         """Place a whole entry (file or directory tree), replacing any existing dest."""
@@ -27,7 +35,7 @@ class Deployer:
             elif path.is_dir():
                 (dest / path.relative_to(src)).mkdir(parents=True, exist_ok=True)
 
-    def place_file(self, src: Path, dest: Path) -> None:
+    def place_file(self, src: Path, dest: Path, record: bool = True) -> None:
         """Atomically place a single file, replacing any existing dest."""
 
         if dest.is_dir() and not dest.is_symlink():
@@ -44,11 +52,15 @@ class Deployer:
             Path(f.name).unlink()
             raise
 
+        if record:
+            # Keep relative to dots dir
+            self.deployed_files[str(dest)] = str(src.relative_to(dots_dir))
+
     def write_new(self, src: Path, dest: Path) -> Path:
         """Write the upstream version alongside dest as <dest>.new and return that path."""
 
         new_path = dest.parent / f"{dest.name}.new"
-        self.place_file(src, new_path)
+        self.place_file(src, new_path, record=False)
         return new_path
 
     def remove(self, path: Path) -> None:
@@ -56,3 +68,17 @@ class Deployer:
             path.unlink()
         elif path.is_dir():
             shutil.rmtree(path)
+
+    def prune_empty_dirs(self, start: Path, stop: Path) -> None:
+        """Removes dirs recursively from start to stop.
+
+        Will never prune protected dirs (home, config, cache, etc).
+        """
+
+        parent = start.parent
+        while parent != stop and stop in parent.parents and parent not in _PROTECTED_DIRS:
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+            parent = parent.parent

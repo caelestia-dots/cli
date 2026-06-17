@@ -73,6 +73,9 @@ class PackageInstaller(ABC):
     def build_install(self, directory: Path) -> list[str]:
         """Build and install the PKGBUILD in `directory`, returning the installed package names."""
 
+    @abstractmethod
+    def system_update(self) -> None: ...
+
 
 class NoopInstaller(PackageInstaller):
     """Used off Arch, where the dots' packages are not available via pacman/AUR."""
@@ -88,6 +91,9 @@ class NoopInstaller(PackageInstaller):
     def build_install(self, directory: Path) -> list[str]:
         info(f"Skipping local package build (not on Arch): {directory}")
         return []
+
+    def system_update(self) -> None:
+        info("Skipping system update (not on Arch)")
 
 
 class ArchInstaller(PackageInstaller):
@@ -128,3 +134,6 @@ class ArchInstaller(PackageInstaller):
         subprocess.run(["makepkg", "-fsi", *self.flags], cwd=directory, env=env, check=True)
 
         return names
+
+    def system_update(self) -> None:
+        subprocess.run([self.helper, "-Syu", *self.flags], check=True)

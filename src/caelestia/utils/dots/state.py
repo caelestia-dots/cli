@@ -21,6 +21,10 @@ class DotsState:
     packages: list[str] = field(default_factory=list)
     local_packages: dict[str, list[str]] = field(default_factory=dict)
 
+    # Files placed by the last deploy. Only files, not directories
+    # Maps dest -> src
+    deployed_files: dict[str, str] = field(default_factory=dict)
+
     @staticmethod
     def load() -> "DotsState":
         try:
@@ -37,6 +41,7 @@ class DotsState:
             enabled_components=data.get("enabled_components", []),
             packages=data.get("packages", []),
             local_packages=data.get("local_packages", {}),
+            deployed_files=data.get("deployed_files", {}),
         )
 
     def save(self) -> None:
@@ -48,5 +53,6 @@ class DotsState:
                 "enabled_components": self.enabled_components,
                 "packages": self.packages,
                 "local_packages": self.local_packages,
+                "deployed_files": self.deployed_files,
             },
         )
