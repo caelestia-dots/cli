@@ -40,31 +40,36 @@ class Command:
             source.checkout_tip()
         except SourceError as e:
             fatal(e)
-        new_files, placed = self.deploy_changeset(source, changeset)
+        new_files, revived_files, placed = self.deploy_changeset(source, changeset)
 
-        # Install new/remove old packages
-        desired = manifest.enabled_packages()
-        state.packages = self.sync_packages(installer, state.packages, desired)
-
-        # Install new/remove old local PKGBUILD packages
-        desired_local = manifest.enabled_local_packages()
-        state.local_packages = self.sync_local_packages(installer, source, state.local_packages, desired_local)
-
-        # Run hooks
-        run_hooks(manifest, "post_update")
-
-        # Update state
+        # Persist file changes immediately so a later failure can't lose track of them
         deployed = dict(state.deployed_files)
         for dest in (*changeset.deletes, *changeset.stale):
             deployed.pop(str(dest), None)
         deployed.update(placed)
         state.deployed_files = deployed
+        state.save()
+
+        # Install new/remove old packages
+        desired = manifest.enabled_packages()
+        state.packages = self.sync_packages(installer, state.packages, desired)
+        state.save()
+
+        # Install new/remove old local PKGBUILD packages
+        desired_local = manifest.enabled_local_packages()
+        state.local_packages = self.sync_local_packages(installer, source, state.local_packages, desired_local)
+        state.save()
+
+        # Run hooks
+        run_hooks(manifest, "post_update")
+
+        # Mark the new revision applied
         state.applied_rev = tip
         state.enabled_components = manifest.enabled_components
         state.aur_helper = getattr(installer, "helper", state.aur_helper)
         state.save()
 
-        self.summarize(changeset, new_files)
+        self.summarize(changeset, new_files, revived_files)
 
     def fetch_manifest(self, state: DotsState, applied_rev: str) -> tuple[DotsSource, str, Manifest]:
         print()
@@ -109,12 +114,14 @@ class Command:
 
         return source, tip, manifest
 
-    def deploy_changeset(self, source: DotsSource, changeset: Changeset) -> tuple[list[Path], dict[str, str]]:
+    def deploy_changeset(
+        self, source: DotsSource, changeset: Changeset
+    ) -> tuple[list[Path], list[Path], dict[str, str]]:
         print()
 
         if changeset.is_empty():
             info("No configs to update.")
-            return [], {}
+            return [], [], {}
 
         log("Updating configs...")
         deployer = Deployer()
@@ -137,12 +144,22 @@ class Command:
             new_files.append(new_path)
             warn(f"{dest} has local changes; upstream version written as {new_path.name}")
 
+        revived_files = []
+        for repofile, dest in changeset.deleted_changed:
+            src = source.working_path(repofile)
+            if not src.exists():
+                warn(f"missing in source, skipping: {repofile}")
+                continue
+            new_path = deployer.write_new(src, dest)
+            revived_files.append(new_path)
+            warn(f"{dest} was removed but changed upstream; upstream version written as {new_path.name}")
+
         for dest in changeset.deletes:
             deployer.remove(dest)
             deployer.prune_empty_dirs(dest, Path.home())
             info(f"Removed {dest}")
 
-        return new_files, deployer.deployed_files
+        return new_files, revived_files, deployer.deployed_files
 
     def sync_packages(self, installer: PackageInstaller, current: list[str], desired: list[str]) -> list[str]:
         to_install = [p for p in desired if p not in current]
@@ -188,13 +205,19 @@ class Command:
 
         return installed
 
-    def summarize(self, changeset: Changeset, new_files: list[Path]) -> None:
+    def summarize(self, changeset: Changeset, new_files: list[Path], revived_files: list[Path]) -> None:
         print()
-        info(f"Updated {len(changeset.place)} file(s), removed {len(changeset.deletes)}, {len(new_files)} conflict(s).")
+        conflicts = len(new_files) + len(revived_files)
+        info(f"Updated {len(changeset.place)} file(s), removed {len(changeset.deletes)}, {conflicts} conflict(s).")
         if new_files:
             info("The following files were changed upstream but you had edited them locally.")
             info("Your versions were kept; the upstream versions were written alongside as .new:")
             for path in new_files:
+                info(f"  {path}")
+        if revived_files:
+            info("These files were removed by you but changed upstream, so were not restored.")
+            info("The upstream versions were written alongside as .new:")
+            for path in revived_files:
                 info(f"  {path}")
         if changeset.stale:
             info("These files are no longer managed but differ from what was installed, so were kept:")
