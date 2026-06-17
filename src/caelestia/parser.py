@@ -14,6 +14,7 @@ from caelestia.subcommands import (
     wallpaper,
 )
 from caelestia.utils.dots.manifest import Manifest
+from caelestia.utils.dots.packages import AUR_HELPERS
 from caelestia.utils.dots.source import DotsSource
 from caelestia.utils.io import warn
 from caelestia.utils.paths import wallpapers_dir
@@ -150,7 +151,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     install_parser.set_defaults(cls=install.Command)
-    install_parser.add_argument("--aur-helper", choices=["yay", "paru"], help="the AUR helper to use")
+    install_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
     install_parser.add_argument(
         "--enable-components", metavar="LIST", help="comma-separated list of components to enable"
     )
