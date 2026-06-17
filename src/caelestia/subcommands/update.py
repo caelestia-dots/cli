@@ -46,6 +46,8 @@ class Command:
         deployed = dict(state.deployed_files)
         for dest in (*changeset.deletes, *changeset.stale, *changeset.untracked):
             deployed.pop(str(dest), None)
+        for repofile, dest in changeset.remap:
+            deployed[str(dest)] = repofile
         deployed.update(placed)
         state.deployed_files = deployed
         state.save()

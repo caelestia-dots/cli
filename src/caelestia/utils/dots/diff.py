@@ -18,6 +18,7 @@ class Changeset:
     stale: list[Path] = field(default_factory=list)  # Upstream removed it but user modified it
     deleted_changed: list[tuple[str, Path]] = field(default_factory=list)  # User deleted it, upstream changed -> .new
     untracked: list[Path] = field(default_factory=list)  # Gone + no longer managed; drop from state
+    remap: list[tuple[str, Path]] = field(default_factory=list)  # Up to date but source path moved; restate mapping
 
     def is_empty(self) -> bool:
         return not (self.place or self.conflicts or self.deletes or self.stale or self.deleted_changed)
@@ -46,6 +47,7 @@ class Changeset:
         stale: list[Path] = []
         deleted_changed: list[tuple[str, Path]] = []
         untracked: list[Path] = []
+        remap: list[tuple[str, Path]] = []
 
         # Collect all files to deploy (entry sources can be dirs so we recurse into them)
         to_deploy: dict[Path, str] = {}
@@ -95,7 +97,10 @@ class Changeset:
 
                     dest_content = dest_path.read_bytes()
                     if try_read(tip, new_src) == dest_content:
-                        continue  # File is already up to date
+                        # Already up to date; restate the mapping if the source path moved
+                        if new_src != src:
+                            remap.append((new_src, dest_path))
+                        continue
 
                     # Fast-forward only when the user hasn't edited since last deploy
                     if has_base and try_read(applied_rev, src) == dest_content:
@@ -127,4 +132,5 @@ class Changeset:
             stale=stale,
             deleted_changed=deleted_changed,
             untracked=untracked,
+            remap=remap,
         )
