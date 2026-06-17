@@ -107,10 +107,14 @@ class Command:
         disable = _parse_list_arg(self.args.disable_components)
         try:
             manifest = source.manifest_at(tip)
-            manifest.resolve_components(enable=enable, disable=disable)
 
+            # No flags given, prompt user for non-default components
             if enable is None and disable is None:
-                self.prompt_optional_components(manifest)
+                optional = [name for name, comp in manifest.components.items() if not comp.default]
+                if optional:
+                    enable = prompt_selection(optional, "Components to enable?")
+
+            manifest.resolve_components(enable=enable, disable=disable)
         except (SourceError, ManifestError, ComponentError) as e:
             fatal(e)
 
@@ -118,15 +122,6 @@ class Command:
         info(f"Enabled components: {names}")
 
         return source, tip, manifest
-
-    def prompt_optional_components(self, manifest: Manifest) -> None:
-        comp_arr = manifest.disabled_components
-        if not comp_arr:
-            return
-
-        selected = prompt_selection(comp_arr, "Components to enable?")
-        if selected:
-            manifest.resolve_components(enable=selected)
 
     def deploy_configs(self, source: DotsSource, manifest: Manifest) -> dict[str, str]:
         print()
