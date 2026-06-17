@@ -101,10 +101,12 @@ class DotsSource:
     # --- Helpers ---
 
     def _git(self, *args: str) -> str:
-        return self._run("git", "-C", str(dots_dir), *args)
+        # core.quotePath=false so non-ASCII paths come back verbatim, not octal-escaped
+        return self._run("git", "-C", str(dots_dir), "-c", "core.quotePath=false", *args)
 
     def _git_bytes(self, *args: str) -> bytes:
-        result = subprocess.run(["git", "-C", str(dots_dir), *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["git", "-C", str(dots_dir), "-c", "core.quotePath=false", *args]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise SourceError(result.stderr.decode().strip() or f"git {' '.join(args)} failed")
         return result.stdout
