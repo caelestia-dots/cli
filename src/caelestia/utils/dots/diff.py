@@ -3,6 +3,7 @@ from pathlib import Path
 
 from caelestia.utils.dots.manifest import ManifestEntry
 from caelestia.utils.dots.source import DotsSource, SourceError
+from caelestia.utils.io import warn
 
 
 class _Continue(Exception):
@@ -15,9 +16,10 @@ class Changeset:
     conflicts: list[tuple[str, Path]] = field(default_factory=list)  # (repofile, dest) -> write .new
     deletes: list[Path] = field(default_factory=list)  # We placed it, upstream removed it, unmodified
     stale: list[Path] = field(default_factory=list)  # Upstream removed it but user modified it
+    deleted_changed: list[tuple[str, Path]] = field(default_factory=list)  # User deleted it, upstream changed -> .new
 
     def is_empty(self) -> bool:
-        return not (self.place or self.conflicts or self.deletes or self.stale)
+        return not (self.place or self.conflicts or self.deletes or self.stale or self.deleted_changed)
 
     @staticmethod
     def compute(
@@ -30,11 +32,18 @@ class Changeset:
         """Collect all file changes needed into a Changeset."""
 
         has_base = source.has_rev(applied_rev)
+        if not has_base:
+            warn(
+                "the previously applied revision is missing from the dots clone; files that differ "
+                "from the latest version will be written as .new instead of updated in place."
+            )
+
         changed = set(source.changed_files(applied_rev, tip)) if has_base else set()
         place: list[tuple[str, Path]] = []
         conflicts: list[tuple[str, Path]] = []
         deletes: list[Path] = []
         stale: list[Path] = []
+        deleted_changed: list[tuple[str, Path]] = []
 
         # Collect all files to deploy (entry sources can be dirs so we recurse into them)
         to_deploy: dict[Path, str] = {}
@@ -69,12 +78,16 @@ class Changeset:
                         stale.append(dest_path)
                 else:  # Still managed; `src` is what we last placed, `new_src` the current source
                     new_src = to_deploy[dest_path]
+                    if not dest_path.exists():
+                        # User deleted a managed file locally
+                        if has_base and new_src == src and new_src not in changed:
+                            continue  # Respect the deletion; upstream has nothing new to offer
+                        # Upstream changed it (or base is unknown): surface as .new, don't restore
+                        deleted_changed.append((new_src, dest_path))
+                        continue
+
                     if has_base and new_src == src and new_src not in changed:
                         continue  # Unchanged upstream
-
-                    if not dest_path.exists():
-                        place.append((new_src, dest_path))
-                        continue
 
                     dest_content = dest_path.read_bytes()
                     if try_read(tip, new_src) == dest_content:
@@ -91,10 +104,18 @@ class Changeset:
         # New files to deploy
         for dest in files_to_deploy - set(Path(d) for d in deployed):
             src = to_deploy[dest]
-            if not dest.exists() or source.blob_at(tip, src) == dest.read_bytes():
+            try:
+                new_content = source.blob_at(tip, src)
+            except SourceError:
+                # Failed to read the upstream blob; skip rather than abort the whole update
+                warn(f"could not read from source, skipping: {src}")
+                continue
+            if not dest.exists() or new_content == dest.read_bytes():
                 # Dest nonexistent or already equal to new content
                 place.append((src, dest))
             else:
                 conflicts.append((src, dest))
 
-        return Changeset(place=place, conflicts=conflicts, deletes=deletes, stale=stale)
+        return Changeset(
+            place=place, conflicts=conflicts, deletes=deletes, stale=stale, deleted_changed=deleted_changed
+        )
