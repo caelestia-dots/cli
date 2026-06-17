@@ -10,6 +10,15 @@ class _Continue(Exception):
     """Signals the deployed-files loop to skip to the next entry."""
 
 
+def _read_local(path: Path) -> bytes | None:
+    """Read a local file, returning None if it can't be read (perms, is a dir, etc.)."""
+
+    try:
+        return path.read_bytes()
+    except OSError:
+        return None
+
+
 @dataclass(frozen=True)
 class Changeset:
     place: list[tuple[str, Path]] = field(default_factory=list)  # (repofile, dest) to fast-forward
@@ -78,9 +87,11 @@ class Changeset:
                         untracked.append(dest_path)
                         continue
 
-                    if has_base and try_read(applied_rev, src) == dest_path.read_bytes():
+                    local = _read_local(dest_path)
+                    if local is not None and has_base and try_read(applied_rev, src) == local:
                         deletes.append(dest_path)
                     else:
+                        # Modified, or unreadable so we can't verify; keep it just in case
                         stale.append(dest_path)
                 else:  # Still managed; `src` is what we last placed, `new_src` the current source
                     new_src = to_deploy[dest_path]
@@ -95,7 +106,12 @@ class Changeset:
                     if has_base and new_src == src and new_src not in changed:
                         continue  # Unchanged upstream
 
-                    dest_content = dest_path.read_bytes()
+                    dest_content = _read_local(dest_path)
+                    if dest_content is None:
+                        # Unreadable (perms, became a dir, ...); surface upstream as .new, don't clobber
+                        conflicts.append((new_src, dest_path))
+                        continue
+
                     if try_read(tip, new_src) == dest_content:
                         # Already up to date; restate the mapping if the source path moved
                         if new_src != src:
@@ -119,10 +135,11 @@ class Changeset:
                 # Failed to read the upstream blob; skip rather than abort the whole update
                 warn(f"could not read from source, skipping: {src}")
                 continue
-            if not dest.exists() or new_content == dest.read_bytes():
+            if not dest.exists() or new_content == _read_local(dest):
                 # Dest nonexistent or already equal to new content
                 place.append((src, dest))
             else:
+                # Differs, or exists but unreadable; surface upstream as .new
                 conflicts.append((src, dest))
 
         return Changeset(
