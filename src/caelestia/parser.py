@@ -11,6 +11,7 @@ from caelestia.subcommands import (
     screenshot,
     shell,
     toggle,
+    update,
     wallpaper,
 )
 from caelestia.utils.dots.manifest import Manifest
@@ -160,6 +161,12 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     )
     install_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
     _set_install_epilog(install_parser)
+
+    # Create parser for update opts
+    update_parser = command_parser.add_parser("update", help="update the Caelestia dotfiles")
+    update_parser.set_defaults(cls=update.Command)
+    update_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
+    update_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
 
     return parser, parser.parse_args()
 

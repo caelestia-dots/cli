@@ -2,7 +2,10 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from caelestia.utils.paths import dots_dir
+from caelestia.utils.paths import cache_dir, config_dir, data_dir, dots_dir, state_dir
+
+# Dirs to never prune even if empty
+_PROTECTED_DIRS = frozenset({Path.home(), config_dir, data_dir, state_dir, cache_dir})
 
 
 class Deployer:
@@ -65,3 +68,17 @@ class Deployer:
             path.unlink()
         elif path.is_dir():
             shutil.rmtree(path)
+
+    def prune_empty_dirs(self, start: Path, stop: Path) -> None:
+        """Removes dirs recursively from start to stop.
+
+        Will never prune protected dirs (home, config, cache, etc).
+        """
+
+        parent = start.parent
+        while parent != stop and stop in parent.parents and parent not in _PROTECTED_DIRS:
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+            parent = parent.parent
