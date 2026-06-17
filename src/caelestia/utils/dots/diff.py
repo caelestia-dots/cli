@@ -29,7 +29,8 @@ class Changeset:
     ) -> "Changeset":
         """Collect all file changes needed into a Changeset."""
 
-        changed = set(source.changed_files(applied_rev, tip))
+        has_base = source.has_rev(applied_rev)
+        changed = set(source.changed_files(applied_rev, tip)) if has_base else set()
         place: list[tuple[str, Path]] = []
         conflicts: list[tuple[str, Path]] = []
         deletes: list[Path] = []
@@ -58,27 +59,32 @@ class Changeset:
                     raise _Continue
 
             try:
-                if dest_path not in files_to_deploy:  # Removed file
+                if dest_path not in files_to_deploy:  # No longer managed by any entry
                     if not dest_path.exists():
                         continue
 
-                    if try_read(applied_rev, src) == dest_path.read_bytes():
+                    if has_base and try_read(applied_rev, src) == dest_path.read_bytes():
                         deletes.append(dest_path)
                     else:
                         stale.append(dest_path)
-                elif src in changed:  # Existing file that needs updating
+                else:  # Still managed; `src` is what we last placed, `new_src` the current source
+                    new_src = to_deploy[dest_path]
+                    if has_base and new_src == src and new_src not in changed:
+                        continue  # Unchanged upstream
+
                     if not dest_path.exists():
-                        place.append((src, dest_path))
+                        place.append((new_src, dest_path))
                         continue
 
                     dest_content = dest_path.read_bytes()
-                    if try_read(tip, src) == dest_content:
+                    if try_read(tip, new_src) == dest_content:
                         continue  # File is already up to date
 
-                    if try_read(applied_rev, src) == dest_content:
-                        place.append((src, dest_path))
+                    # Fast-forward only when the user hasn't edited since last deploy
+                    if has_base and try_read(applied_rev, src) == dest_content:
+                        place.append((new_src, dest_path))
                     else:
-                        conflicts.append((src, dest_path))
+                        conflicts.append((new_src, dest_path))
             except _Continue:
                 continue
 

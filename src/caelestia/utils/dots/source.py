@@ -68,6 +68,15 @@ class DotsSource:
         out = self._git("diff", "--name-only", base, head)
         return [line for line in out.splitlines() if line]
 
+    def has_rev(self, rev: str) -> bool:
+        """Whether `rev` resolves to a commit."""
+
+        try:
+            self._git("rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}")
+            return True
+        except SourceError:
+            return False
+
     def clean(self) -> None:
         """Remove all untracked files in the git repo."""
         self._git("clean", "-fdx")
