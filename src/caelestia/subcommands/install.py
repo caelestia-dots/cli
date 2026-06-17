@@ -1,20 +1,18 @@
-import os
 import shutil
-import subprocess
 import textwrap
 from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
 from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
+from caelestia.utils.dots.misc import build_local_packages, run_hooks
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
-from caelestia.utils.io import PROMPT_COLOUR, confirm, disable_input, fatal, format_msg, info, log, pause, prompt, warn
+from caelestia.utils.io import confirm, disable_input, fatal, info, log, pause, prompt_selection, warn
 from caelestia.utils.paths import (
     config_backup_dir,
     config_dir,
-    dots_dir,
 )
 
 
@@ -40,7 +38,7 @@ class Command:
         source, tip, manifest = self.fetch_manifest()
         deployed = self.deploy_configs(source, manifest)
         helper, packages, local_packages = self.install_packages(source, manifest)
-        self.run_hooks(manifest)
+        run_hooks(manifest, "post_install")
 
         DotsState(
             aur_helper=helper,
@@ -126,55 +124,9 @@ class Command:
         if not comp_arr:
             return
 
-        print(format_msg(PROMPT_COLOUR, True, "Components to enable?"))
-        max_idx_w = len(str(len(comp_arr)))
-        for i, comp in enumerate(comp_arr):
-            print(format_msg(PROMPT_COLOUR, True, f"  {i + 1:<{max_idx_w}}\t{comp}"))
-        print(format_msg(PROMPT_COLOUR, True, "[A]ll or (1 2 3, 1-3, ^4)"))
-
-        def _valid_v(v: str) -> int:
-            try:
-                i_v = int(v, base=10) - 1  # -1 to translate to 0 index
-            except ValueError:
-                raise ValueError(f'Given value "{v}" must be an integer.')
-            if i_v < 0 or i_v >= len(comp_arr):
-                raise ValueError(f'Given value "{v}" must be between 1 and {len(comp_arr)} inclusive.')
-            return i_v
-
-        def _parse(ans: str) -> list[str] | None:
-            if ans in ("a", "all"):
-                return list(manifest.components)
-            if not ans:
-                return None
-
-            enabled: list[str] = []
-            for tok in ans.split():
-                fr, sep, to = tok.partition("-")
-                if sep:
-                    fr = _valid_v(fr)
-                    to = _valid_v(to)
-                    if fr > to:
-                        raise ValueError(f'Given range "{tok}" must be lo-hi.')
-                    enabled += comp_arr[fr : to + 1]
-                elif tok.startswith("^"):
-                    t = _valid_v(tok[1:])
-                    enabled += comp_arr[:t] + comp_arr[t + 1 :]
-                else:
-                    t = _valid_v(tok)
-                    enabled.append(comp_arr[t])
-            return list(set(enabled))
-
-        while True:
-            ans = prompt("", end="").lower().strip()
-            try:
-                enabled = _parse(ans)
-            except ValueError as e:
-                warn(f"invalid input. {e} Please try again.")
-                continue
-
-            if enabled is not None:
-                manifest.resolve_components(enable=enabled)
-            return
+        selected = prompt_selection(comp_arr, "Components to enable?")
+        if selected:
+            manifest.resolve_components(enable=selected)
 
     def deploy_configs(self, source: DotsSource, manifest: Manifest) -> dict[str, str]:
         print()
@@ -211,30 +163,9 @@ class Command:
         if local_dirs:
             print()
             log("Building local packages...")
-            for path in local_dirs:
-                directory = source.working_path(path)
-                if not directory.is_dir():
-                    warn(f"missing in repo, skipping: {path}")
-                    continue
-
-                log(f"Building {path}...")
-                local_packages[path] = installer.build_install(directory)
+            local_packages = build_local_packages(installer, source, local_dirs)
 
         return getattr(installer, "helper", DEFAULT_AUR_HELPER), packages, local_packages
-
-    def run_hooks(self, manifest: Manifest) -> None:
-        hooks = manifest.enabled_hooks("post_install")
-        if not hooks:
-            return
-
-        print()
-        log("Running post-install hooks...")
-        env = {**os.environ, "CAELESTIA_DOTS": str(dots_dir)}
-        for hook in hooks:
-            info(f"Running hook: {hook}")
-            result = subprocess.run(hook, shell=True, env=env)
-            if result.returncode != 0:
-                warn(f"hook exited with {result.returncode}")
 
     def print_done(self) -> None:
         print()
