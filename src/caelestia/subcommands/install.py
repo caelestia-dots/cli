@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 import textwrap
 from argparse import Namespace
 from pathlib import Path
@@ -181,13 +182,16 @@ class Command:
             return
 
         deployer = Deployer()
-        for path in to_delete:
-            deployer.remove(path)
-            info(f"Deleted {path}")
+        try:
+            for path in to_delete:
+                deployer.remove(path)
+                info(f"Deleted {path}")
 
-        if meta_installed:
-            log("Deleting legacy meta package...")
-            installer.remove([LEGACY_META_PKG])
+            if meta_installed:
+                log("Removing legacy meta package...")
+                installer.remove([LEGACY_META_PKG])
+        except (OSError, subprocess.CalledProcessError) as e:
+            warn(f"could not fully clear the legacy installation: {e}")
 
     def print_done(self) -> None:
         print()
