@@ -74,6 +74,9 @@ class PackageInstaller(ABC):
         """Build and install the PKGBUILD in `directory`, returning the installed package names."""
 
     @abstractmethod
+    def is_installed(self, package: str) -> bool: ...
+
+    @abstractmethod
     def system_update(self) -> None: ...
 
 
@@ -91,6 +94,9 @@ class NoopInstaller(PackageInstaller):
     def build_install(self, directory: Path) -> list[str]:
         info(f"Skipping local package build (not on Arch): {directory}")
         return []
+
+    def is_installed(self, package: str) -> bool:
+        return False
 
     def system_update(self) -> None:
         info("Skipping system update (not on Arch)")
@@ -134,6 +140,16 @@ class ArchInstaller(PackageInstaller):
         subprocess.run(["makepkg", "-fsi", *self.flags], cwd=directory, env=env, check=True)
 
         return names
+
+    def is_installed(self, package: str) -> bool:
+        return (
+            subprocess.run(
+                ["pacman", "-Q", package],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            ).returncode
+            == 0
+        )
 
     def system_update(self) -> None:
         subprocess.run([self.helper, "-Syu", *self.flags], check=True)
