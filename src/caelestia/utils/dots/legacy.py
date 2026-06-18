@@ -1,42 +1,67 @@
 import subprocess
 from pathlib import Path
 
-from caelestia.utils.paths import config_dir
+from caelestia.utils.paths import config_dir, state_dir
 
 LEGACY_META_PKG = "caelestia-meta"
 
+_confs = [
+    "hypr",
+    "starship.toml",
+    "foot",
+    "fish",
+    "fastfetch",
+    "uwsm",
+    "btop",
+    "spicetify",
+    "Code/User/settings.json",
+    "VSCodium/User/settings.json",
+    "Code/User/keybindings.json",
+    "VSCodium/User/keybindings.json",
+    "code-flags.conf",
+    "codium-flags.conf",
+]
+
+
+def _find_legacy_repo(path: Path) -> Path | None:
+    try:
+        remote = subprocess.check_output(["git", "-C", path, "remote", "get-url", "origin"], text=True)
+    except subprocess.CalledProcessError:
+        return
+
+    # Check remote
+    if remote.strip() != "https://github.com/caelestia-dots/caelestia.git":
+        return
+
+    # Walk up parents to try to find one that is a git repo
+    while path != Path.home() and not (path / ".git").is_dir():
+        path = path.parent
+
+    # Only return path if didn't hit home (we really don't want to nuke home)
+    if path != Path.home():
+        return path
+
 
 def legacy_to_delete() -> list[Path]:
-    legacy_dir = (config_dir / "hypr").resolve().parent
-    if not (legacy_dir / "install.fish").is_file():
-        return []
+    legacy_dir = None
+    for conf in _confs:
+        path = config_dir / conf
+        if not path.is_symlink():
+            continue
 
-    try:
-        remote = subprocess.check_output(["git", "-C", legacy_dir, "remote", "get-url", "origin"], text=True)
-    except subprocess.CalledProcessError:
-        return []
+        legacy_dir = _find_legacy_repo(path.resolve())
+        if legacy_dir:
+            break
 
-    if remote != "https://github.com/caelestia-dots/caelestia.git":
+    if not legacy_dir:
+        legacy_dir = _find_legacy_repo(state_dir / "caelestia")
+
+    if not legacy_dir:
         return []
 
     to_delete = []
-    confs = [
-        "hypr",
-        "starship.toml",
-        "foot",
-        "fish",
-        "fastfetch",
-        "uwsm",
-        "btop",
-        "spicetify",
-        "Code/User/settings.json",
-        "VSCodium/User/settings.json",
-        "Code/User/keybindings.json",
-        "VSCodium/User/keybindings.json",
-        "code-flags.conf",
-        "codium-flags.conf",
-    ]
-    for conf in confs:
+
+    for conf in _confs:
         path = config_dir / conf
         if path.is_symlink() and legacy_dir in path.resolve().parents:
             to_delete.append(path)
