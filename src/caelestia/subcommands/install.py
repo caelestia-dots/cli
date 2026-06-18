@@ -4,7 +4,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
-from caelestia.utils.dots.legacy import LEGACY_META_PKG, legacy_to_delete
+from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo, legacy_to_delete
 from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
 from caelestia.utils.dots.misc import build_local_packages, run_hooks
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
@@ -35,7 +35,7 @@ class Command:
 
         self.print_greeting()
         self.create_backup()
-        legacy_delete = legacy_to_delete()  # Detect legacy repo first cause deploy overwrites legacy syms
+        legacy_dir = detect_legacy_repo()  # Detect legacy repo first cause deploy overwrites legacy syms
 
         source, tip, manifest = self.fetch_manifest()
         deployed = self.deploy_configs(source, manifest)
@@ -51,7 +51,7 @@ class Command:
             deployed_files=deployed,
         ).save()
 
-        self.migrate_legacy(installer, legacy_delete)
+        self.migrate_legacy(installer, legacy_dir)
         self.print_done()
 
     def print_greeting(self) -> None:
@@ -167,9 +167,10 @@ class Command:
 
         return installer, packages, local_packages
 
-    def migrate_legacy(self, installer: PackageInstaller, to_delete: list[Path]) -> None:
+    def migrate_legacy(self, installer: PackageInstaller, legacy_dir: Path) -> None:
         """Clean up a previous install.fish setup (repo, symlinks and metapackage)."""
 
+        to_delete = legacy_to_delete(legacy_dir)
         meta_installed = installer.is_installed(LEGACY_META_PKG)
         if not to_delete and not meta_installed:
             return

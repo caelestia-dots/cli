@@ -42,8 +42,7 @@ def _find_legacy_repo(path: Path) -> Path | None:
         return path
 
 
-def legacy_to_delete() -> list[Path]:
-    legacy_dir = None
+def detect_legacy_repo() -> Path | None:
     for conf in _confs:
         path = config_dir / conf
         if not path.is_symlink():
@@ -51,14 +50,12 @@ def legacy_to_delete() -> list[Path]:
 
         legacy_dir = _find_legacy_repo(path.resolve())
         if legacy_dir:
-            break
+            return legacy_dir
 
-    if not legacy_dir:
-        legacy_dir = _find_legacy_repo(state_dir / "caelestia")
+    return _find_legacy_repo(state_dir / "caelestia")
 
-    if not legacy_dir:
-        return []
 
+def legacy_to_delete(legacy_dir: Path) -> list[Path]:
     to_delete = []
 
     for conf in _confs:
