@@ -35,6 +35,7 @@ class Command:
 
         self.print_greeting()
         self.create_backup()
+        legacy_delete = legacy_to_delete()  # Detect legacy repo first cause deploy overwrites legacy syms
 
         source, tip, manifest = self.fetch_manifest()
         deployed = self.deploy_configs(source, manifest)
@@ -50,7 +51,7 @@ class Command:
             deployed_files=deployed,
         ).save()
 
-        self.migrate_legacy(installer)
+        self.migrate_legacy(installer, legacy_delete)
         self.print_done()
 
     def print_greeting(self) -> None:
@@ -166,10 +167,9 @@ class Command:
 
         return installer, packages, local_packages
 
-    def migrate_legacy(self, installer: PackageInstaller) -> None:
+    def migrate_legacy(self, installer: PackageInstaller, to_delete: list[Path]) -> None:
         """Clean up a previous install.fish setup (repo, symlinks and metapackage)."""
 
-        to_delete = legacy_to_delete()
         meta_installed = installer.is_installed(LEGACY_META_PKG)
         if not to_delete and not meta_installed:
             return
@@ -179,8 +179,9 @@ class Command:
         if not confirm("Clear legacy installation?"):
             return
 
+        deployer = Deployer()
         for path in to_delete:
-            path.unlink()
+            deployer.remove(path)
             info(f"Deleted {path}")
 
         if meta_installed:
