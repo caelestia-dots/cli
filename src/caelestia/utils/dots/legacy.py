@@ -33,7 +33,11 @@ def _find_legacy_repo(path: Path) -> Path | None:
     if remote.strip() != "https://github.com/caelestia-dots/caelestia.git":
         return
 
-    # Walk up parents to try to find one that is a git repo
+    # Ignore anything outside home
+    if Path.home() not in path.parents:
+        return
+
+    # Walk up parents (capped at home) to find the repo root
     while path != Path.home() and not (path / ".git").is_dir():
         path = path.parent
 
