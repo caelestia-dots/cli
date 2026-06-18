@@ -167,7 +167,7 @@ class Command:
 
         return installer, packages, local_packages
 
-    def migrate_legacy(self, installer: PackageInstaller, legacy_dir: Path) -> None:
+    def migrate_legacy(self, installer: PackageInstaller, legacy_dir: Path | None) -> None:
         """Clean up a previous install.fish setup (repo, symlinks and metapackage)."""
 
         to_delete = legacy_to_delete(legacy_dir)

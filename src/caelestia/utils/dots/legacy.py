@@ -55,7 +55,10 @@ def detect_legacy_repo() -> Path | None:
     return _find_legacy_repo(state_dir / "caelestia")
 
 
-def legacy_to_delete(legacy_dir: Path) -> list[Path]:
+def legacy_to_delete(legacy_dir: Path | None) -> list[Path]:
+    if not legacy_dir:
+        return []
+
     to_delete = []
 
     for conf in _confs:
