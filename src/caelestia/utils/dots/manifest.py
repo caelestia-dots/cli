@@ -57,7 +57,10 @@ class ManifestEntry:
         glob_idx = max(i for i, part in enumerate(parts) if _GLOB_MAGIC.search(part))
         pattern = str(Path(*parts[: glob_idx + 1]))
         tail = parts[glob_idx + 1 :]
-        return [Path(match, *tail) for match in sorted(glob.glob(pattern))]
+        matches = sorted(glob.glob(pattern))
+        if tail:  # Only match dirs if a tail exists
+            matches = [match for match in matches if Path(match).is_dir()]
+        return [Path(match, *tail) for match in matches]
 
 
 @dataclass(frozen=True)
