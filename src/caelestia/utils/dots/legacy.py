@@ -42,7 +42,7 @@ def legacy_to_delete() -> list[Path]:
             to_delete.append(path)
 
     others = [
-        (Path.home() / ".zen").glob("*/chrome/userChrome.css"),
+        *(Path.home() / ".zen").glob("*/chrome/userChrome.css"),
         Path.home() / ".local/lib/caelestia/caelestiafox",
     ]
     for path in others:
