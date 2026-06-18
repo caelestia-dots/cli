@@ -1,9 +1,11 @@
 import shutil
+import subprocess
 import textwrap
 from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
+from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo, legacy_to_delete
 from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
 from caelestia.utils.dots.misc import build_local_packages, run_hooks
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
@@ -34,14 +36,15 @@ class Command:
 
         self.print_greeting()
         self.create_backup()
+        legacy_dir = detect_legacy_repo()  # Detect legacy repo first cause deploy overwrites legacy syms
 
         source, tip, manifest = self.fetch_manifest()
         deployed = self.deploy_configs(source, manifest)
-        helper, packages, local_packages = self.install_packages(source, manifest)
+        installer, packages, local_packages = self.install_packages(source, manifest)
         run_hooks(manifest, "post_install")
 
         DotsState(
-            aur_helper=helper,
+            aur_helper=getattr(installer, "helper", DEFAULT_AUR_HELPER),
             applied_rev=tip,
             enabled_components=manifest.enabled_components,
             packages=packages,
@@ -49,6 +52,7 @@ class Command:
             deployed_files=deployed,
         ).save()
 
+        self.migrate_legacy(installer, legacy_dir)
         self.print_done()
 
     def print_greeting(self) -> None:
@@ -144,7 +148,9 @@ class Command:
 
         return deployer.deployed_files
 
-    def install_packages(self, source: DotsSource, manifest: Manifest) -> tuple[str, list[str], dict[str, list[str]]]:
+    def install_packages(
+        self, source: DotsSource, manifest: Manifest
+    ) -> tuple[PackageInstaller, list[str], dict[str, list[str]]]:
         installer = PackageInstaller.get(self.args.aur_helper, self.args.noconfirm)
 
         packages = manifest.enabled_packages()
@@ -160,7 +166,32 @@ class Command:
             log("Building local packages...")
             local_packages = build_local_packages(installer, source, local_dirs)
 
-        return getattr(installer, "helper", DEFAULT_AUR_HELPER), packages, local_packages
+        return installer, packages, local_packages
+
+    def migrate_legacy(self, installer: PackageInstaller, legacy_dir: Path | None) -> None:
+        """Clean up a previous install.fish setup (repo, symlinks and metapackage)."""
+
+        to_delete = legacy_to_delete(legacy_dir)
+        meta_installed = installer.is_installed(LEGACY_META_PKG)
+        if not to_delete and not meta_installed:
+            return
+
+        print()
+        log("Found a legacy Caelestia installation...")
+        if not confirm("Clear legacy installation?"):
+            return
+
+        deployer = Deployer()
+        try:
+            for path in to_delete:
+                deployer.remove(path)
+                info(f"Deleted {path}")
+
+            if meta_installed:
+                log("Removing legacy meta package...")
+                installer.remove([LEGACY_META_PKG])
+        except (OSError, subprocess.CalledProcessError) as e:
+            warn(f"could not fully clear the legacy installation: {e}")
 
     def print_done(self) -> None:
         print()
