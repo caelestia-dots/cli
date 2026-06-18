@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from caelestia.utils.paths import config_dir, state_dir
+from caelestia.utils.paths import config_dir, data_dir
 
 LEGACY_META_PKG = "caelestia-meta"
 
@@ -56,7 +56,7 @@ def detect_legacy_repo() -> Path | None:
         if legacy_dir:
             return legacy_dir
 
-    return _find_legacy_repo(state_dir / "caelestia")
+    return _find_legacy_repo(data_dir / "caelestia")
 
 
 def legacy_to_delete(legacy_dir: Path | None) -> list[Path]:
