@@ -38,11 +38,12 @@ class Command:
         legacy_dir = detect_legacy_repo()  # Detect legacy repo first cause deploy overwrites legacy syms
 
         source, tip, manifest = self.fetch_manifest()
-        deployed = self.deploy_configs(source, manifest)
         try:
             installer, packages, local_packages = self.install_packages(source, manifest)
         except PackageError as e:
             fatal(e)
+        run_hooks(manifest, "post_package")
+        deployed = self.deploy_configs(source, manifest)
         run_hooks(manifest, "post_install")
 
         DotsState(

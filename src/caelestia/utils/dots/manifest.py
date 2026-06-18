@@ -66,6 +66,7 @@ class ManifestComponent:
     default: bool = False
     packages: list[str] = field(default_factory=list)
     entries: list[ManifestEntry] = field(default_factory=list)
+    post_package: list[str] = field(default_factory=list)
     post_install: list[str] = field(default_factory=list)
     post_update: list[str] = field(default_factory=list)
 
@@ -80,8 +81,9 @@ class _ManifestData:
 class Manifest:
     components: dict[str, ManifestComponent] = field(default_factory=dict)
     packages: list[str] = field(default_factory=list)
-    post_install: list[str] = field(default_factory=list)
-    post_update: list[str] = field(default_factory=list)
+    post_package: list[str] = field(default_factory=list)  # Post package install (install cmd only)
+    post_install: list[str] = field(default_factory=list)  # Very end of install cmd
+    post_update: list[str] = field(default_factory=list)  # Very end of update cmd
     _data: _ManifestData = field(default_factory=_ManifestData, init=False, repr=False)
 
     @property
@@ -99,6 +101,7 @@ class Manifest:
         except tomllib.TOMLDecodeError as e:
             raise ManifestError(f"invalid TOML: {e}") from e
 
+        post_package = _validate_str_list(raw.get("post_package", []), "post_package")
         post_install = _validate_str_list(raw.get("post_install", []), "post_install")
         post_update = _validate_str_list(raw.get("post_update", []), "post_update")
 
@@ -114,6 +117,7 @@ class Manifest:
         return Manifest(
             components=components,
             packages=packages,
+            post_package=post_package,
             post_install=post_install,
             post_update=post_update,
         )
@@ -218,6 +222,7 @@ def _parse_component(d: dict[str, Any]) -> ManifestComponent:
         default=bool(d.get("default", False)),
         packages=_validate_str_list(d.get("packages", []), f"component '{name}' packages"),
         entries=[_parse_entry(e) for e in d.get("entries", [])],
+        post_package=_validate_str_list(d.get("post_package", []), f"component '{name}' post_package"),
         post_install=_validate_str_list(d.get("post_install", []), f"component '{name}' post_install"),
         post_update=_validate_str_list(d.get("post_update", []), f"component '{name}' post_update"),
     )
