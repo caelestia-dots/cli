@@ -107,10 +107,18 @@ class ArchInstaller(PackageInstaller):
         self.helper = helper
         self.flags = ["--noconfirm"] if noconfirm else []
 
-    def install(self, packages: list[str], extra_flags: list[str] | None = None) -> None:
+    def install(self, packages: list[str], explicit: bool = True) -> None:
         if not packages:
             return
-        subprocess.run([self.helper, "-S", "--needed", *self.flags, *(extra_flags or []), *packages], check=True)
+
+        cmd = [self.helper, "-S", "--needed", *self.flags]
+        if not explicit:
+            cmd.append("--asdeps")  # Set install reason to dep (does not affect already installed packages)
+        subprocess.run(cmd + packages, check=True)
+
+        # Force install reason to explicit install
+        if explicit:
+            subprocess.run([self.helper, "-D", "--asexplicit", *self.flags, *packages], check=True)
 
     def remove(self, packages: list[str]) -> None:
         if not packages:
@@ -132,7 +140,7 @@ class ArchInstaller(PackageInstaller):
             elif key == "depends":
                 depends.append(value.strip())
 
-        self.install(depends, extra_flags=["--asdeps"])
+        self.install(depends, explicit=False)
 
         # Stop makepkg from resetting sudo
         env = {**os.environ, "PACMAN_AUTH": "sudo"}
