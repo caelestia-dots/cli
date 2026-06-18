@@ -1,5 +1,4 @@
 import shutil
-import subprocess
 import textwrap
 from argparse import Namespace
 from pathlib import Path
@@ -8,7 +7,7 @@ from caelestia.utils.dots.deployer import Deployer
 from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo, legacy_to_delete
 from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
 from caelestia.utils.dots.misc import build_local_packages, run_hooks
-from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageInstaller
+from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageError, PackageInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
 from caelestia.utils.io import confirm, disable_input, fatal, info, log, pause, prompt_selection, warn
@@ -40,7 +39,10 @@ class Command:
 
         source, tip, manifest = self.fetch_manifest()
         deployed = self.deploy_configs(source, manifest)
-        installer, packages, local_packages = self.install_packages(source, manifest)
+        try:
+            installer, packages, local_packages = self.install_packages(source, manifest)
+        except PackageError as e:
+            fatal(e)
         run_hooks(manifest, "post_install")
 
         DotsState(
@@ -190,7 +192,7 @@ class Command:
             if meta_installed:
                 log("Removing legacy meta package...")
                 installer.remove([LEGACY_META_PKG])
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, PackageError) as e:
             warn(f"could not fully clear the legacy installation: {e}")
 
     def print_done(self) -> None:

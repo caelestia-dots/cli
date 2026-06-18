@@ -5,32 +5,48 @@ import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from caelestia.utils.io import fatal, info
+from caelestia.utils.io import fatal, info, warn
 
 DEFAULT_AUR_HELPER = "paru"
 AUR_HELPERS = DEFAULT_AUR_HELPER, "yay"
+
+
+class PackageError(Exception):
+    """Raised when a package operation (install/remove/build/update) fails."""
+
+
+def _try_run(cmd: list[str], error_msg: str, **kwargs) -> None:
+    """Run a subprocess, raising `PackageError` if it fails."""
+
+    try:
+        subprocess.run(cmd, check=True, **kwargs)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        raise PackageError(error_msg) from e
 
 
 def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
     pacman_cmd = ["sudo", "pacman", "-S", "--needed", "git", "base-devel"]
     if noconfirm:
         pacman_cmd.append("--noconfirm")
-    subprocess.run(pacman_cmd, check=True)
+    _try_run(pacman_cmd, "failed to install AUR helper build dependencies")
 
     repo_url = f"https://aur.archlinux.org/{helper}.git"
     with tempfile.TemporaryDirectory() as repo_dir:
-        subprocess.run(["git", "clone", repo_url, repo_dir], check=True)
+        _try_run(["git", "clone", repo_url, repo_dir], f"failed to clone {helper} from the AUR")
 
         makepkg_cmd = ["makepkg", "-si"]
         if noconfirm:
             makepkg_cmd.append("--noconfirm")
-        subprocess.run(makepkg_cmd, cwd=repo_dir, check=True)
+        _try_run(makepkg_cmd, f"failed to build and install {helper}", cwd=repo_dir)
 
-    if helper == "yay":
-        subprocess.run(["yay", "-Y", "--gendb"], check=True)
-        subprocess.run(["yay", "-Y", "--devel", "--save"], check=True)
-    elif helper == "paru":
-        subprocess.run(["paru", "--gendb"], check=True)
+    try:
+        if helper == "yay":
+            subprocess.run(["yay", "-Y", "--gendb"], check=True)
+            subprocess.run(["yay", "-Y", "--devel", "--save"], check=True)
+        elif helper == "paru":
+            subprocess.run(["paru", "--gendb"], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        warn(f"failed to run AUR helper post install actions: {e}")
 
 
 class PackageInstaller(ABC):
@@ -114,19 +130,26 @@ class ArchInstaller(PackageInstaller):
         cmd = [self.helper, "-S", "--needed", *self.flags]
         if not explicit:
             cmd.append("--asdeps")  # Set install reason to dep (does not affect already installed packages)
-        subprocess.run(cmd + packages, check=True)
+        _try_run(cmd + packages, f"failed to install packages: {', '.join(packages)}")
 
         # Force install reason to explicit install
         if explicit:
-            subprocess.run([self.helper, "-D", "--asexplicit", *self.flags, *packages], check=True)
+            try:
+                subprocess.run([self.helper, "-D", "--asexplicit", *self.flags, *packages], check=True)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                warn(f"failed to mark packages as explicitly installed: {', '.join(packages)}")
 
     def remove(self, packages: list[str]) -> None:
         if not packages:
             return
-        subprocess.run([self.helper, "-Rns", *self.flags, *packages], check=True)
+        _try_run([self.helper, "-Rns", *self.flags, *packages], f"failed to remove packages: {', '.join(packages)}")
 
     def build_install(self, directory: Path) -> list[str]:
-        srcinfo = subprocess.check_output(["makepkg", "--printsrcinfo"], cwd=directory, text=True)
+        try:
+            srcinfo = subprocess.check_output(["makepkg", "--printsrcinfo"], cwd=directory, text=True)
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            raise PackageError(f"failed to read package metadata in {directory}") from e
+
         names = []
         depends = []
         for line in srcinfo.splitlines():
@@ -145,7 +168,9 @@ class ArchInstaller(PackageInstaller):
         # Stop makepkg from resetting sudo
         env = {**os.environ, "PACMAN_AUTH": "sudo"}
         # -f = force, -s = sync deps, -i = install
-        subprocess.run(["makepkg", "-fsi", *self.flags], cwd=directory, env=env, check=True)
+        _try_run(
+            ["makepkg", "-fsi", *self.flags], f"failed to build local package in {directory}", cwd=directory, env=env
+        )
 
         return names
 
@@ -160,4 +185,4 @@ class ArchInstaller(PackageInstaller):
         )
 
     def system_update(self) -> None:
-        subprocess.run([self.helper, "-Syu", *self.flags], check=True)
+        _try_run([self.helper, "-Syu", *self.flags], "failed to perform system update")
