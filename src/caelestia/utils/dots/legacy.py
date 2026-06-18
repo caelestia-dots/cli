@@ -12,7 +12,7 @@ def legacy_to_delete() -> list[Path]:
         return []
 
     try:
-        remote = subprocess.check_output(["git", "-C", legacy_dir, "ls-remote"], text=True)
+        remote = subprocess.check_output(["git", "-C", legacy_dir, "remote", "get-url", "origin"], text=True)
     except subprocess.CalledProcessError:
         return []
 
