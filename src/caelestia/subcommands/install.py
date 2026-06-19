@@ -32,11 +32,16 @@ def _parse_list_arg(value: str | None) -> list[str] | None:
 def _deref_symlink(link: Path, target: Path) -> None:
     """Replace symlink `link` with a real copy of `target`'s content."""
 
-    link.unlink()
-    if target.is_dir():
-        shutil.copytree(target, link, symlinks=True)
-    else:
-        shutil.copy2(target, link)
+    bak = link.rename(link.parent / f"{link.name}.bak")
+    try:
+        if target.is_dir():
+            shutil.copytree(target, link, symlinks=True)
+        else:
+            shutil.copy2(target, link)
+    except OSError:
+        bak.rename(link)
+        raise
+    bak.unlink()
 
 
 class Command:
