@@ -60,8 +60,8 @@ def _vercmp(a: str, b: str) -> int:
     try:
         return int(subprocess.check_output(["vercmp", a, b], text=True).strip())
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
-        warn(f"vercmp failed, doing manual check: {e}")
-        return 0 if a == b else 1
+        warn(f"vercmp failed, assuming equal: {e}")
+        return 0  # Don't rebuild when unable to check version
 
 
 def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
