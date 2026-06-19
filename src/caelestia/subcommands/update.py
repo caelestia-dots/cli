@@ -192,6 +192,7 @@ class Command:
         self, installer: PackageInstaller, source: DotsSource, current: dict[str, list[str]], desired: list[str]
     ) -> dict[str, list[str]]:
         to_build = [p for p in desired if p not in current]
+        to_rebuild = self.outdated_local_packages(installer, source, current, desired)
         to_remove = [p for p in current if p not in desired]
         installed = dict(current)
 
@@ -199,6 +200,11 @@ class Command:
             print()
             log(f"Building new local packages: {', '.join(to_build)}")
             installed.update(build_local_packages(installer, source, to_build))
+
+        if to_rebuild:
+            print()
+            log(f"Rebuilding updated local packages: {', '.join(to_rebuild)}")
+            installed.update(build_local_packages(installer, source, to_rebuild))
 
         if to_remove:
             print()
@@ -210,6 +216,29 @@ class Command:
                     installed.pop(path, None)
 
         return installed
+
+    def outdated_local_packages(
+        self, installer: PackageInstaller, source: DotsSource, current: dict[str, list[str]], desired: list[str]
+    ) -> list[str]:
+        """Repo paths whose installed packages are older than what the repo would build (skipped when off Arch)."""
+
+        outdated = []
+        for path in desired:
+            if path not in current:
+                continue
+
+            directory = source.working_path(path)
+            if not directory.is_dir():
+                continue
+
+            try:
+                if installer.needs_rebuild(directory, current[path]):
+                    outdated.append(path)
+            except PackageError as e:
+                # Failed to read PKGBUILD, leave it as-is
+                warn(f"could not check {path} for updates, leaving as-is: {e}")
+
+        return outdated
 
     def summarize(self, changeset: Changeset, new_files: list[Path], revived_files: list[Path]) -> None:
         print()
