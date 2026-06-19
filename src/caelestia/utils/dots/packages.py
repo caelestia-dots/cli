@@ -54,6 +54,16 @@ def _srcinfo_version(fields: dict[str, list[str]]) -> str | None:
     return f"{epoch}:{version}" if epoch else version
 
 
+def _vercmp(a: str, b: str) -> int:
+    """Use pacman's `vercmp` to compare to package versions."""
+
+    try:
+        return int(subprocess.check_output(["vercmp", a, b], text=True).strip())
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
+        warn(f"vercmp failed, doing manual check: {e}")
+        return 0 if a == b else 1
+
+
 def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
     pacman_cmd = ["sudo", "pacman", "-S", "--needed", "git", "base-devel"]
     if noconfirm:
@@ -120,15 +130,15 @@ class PackageInstaller(ABC):
         """Build and install the PKGBUILD in `directory`, returning the installed package names."""
 
     @abstractmethod
-    def is_installed(self, package: str) -> bool: ...
-
-    @abstractmethod
-    def source_version(self, directory: Path) -> str | None:
-        """Return the `[epoch:]pkgver-pkgrel` the PKGBUILD in `directory` would build, or None if unavailable."""
-
-    @abstractmethod
     def installed_version(self, package: str) -> str | None:
         """Return the installed version of `package`, or None if it is not installed."""
+
+    def is_installed(self, package: str) -> bool:
+        return self.installed_version(package) is not None
+
+    @abstractmethod
+    def needs_rebuild(self, directory: Path, packages: list[str]) -> bool:
+        """Whether the PKGBUILD in `directory` would build a version differing from the installed `packages`."""
 
     @abstractmethod
     def system_update(self) -> None: ...
@@ -149,14 +159,11 @@ class NoopInstaller(PackageInstaller):
         info(f"Skipping local package build (not on Arch): {directory}")
         return []
 
-    def is_installed(self, package: str) -> bool:
-        return False
-
-    def source_version(self, directory: Path) -> str | None:
-        return None
-
     def installed_version(self, package: str) -> str | None:
         return None
+
+    def needs_rebuild(self, directory: Path, packages: list[str]) -> bool:
+        return False
 
     def system_update(self) -> None:
         info("Skipping system update (not on Arch)")
@@ -211,12 +218,6 @@ class ArchInstaller(PackageInstaller):
 
         return names
 
-    def is_installed(self, package: str) -> bool:
-        return self.installed_version(package) is not None
-
-    def source_version(self, directory: Path) -> str | None:
-        return _srcinfo_version(_read_srcinfo(directory))
-
     def installed_version(self, package: str) -> str | None:
         result = subprocess.run(
             ["pacman", "-Q", package],
@@ -229,6 +230,17 @@ class ArchInstaller(PackageInstaller):
         # `pacman -Q` prints "<name> <version>"
         parts = result.stdout.split()
         return parts[1] if len(parts) >= 2 else None
+
+    def needs_rebuild(self, directory: Path, packages: list[str]) -> bool:
+        built = _srcinfo_version(_read_srcinfo(directory))
+        if built is None:
+            return False  # Can't determine the source version, leave as is
+
+        # Rebuild when installed version < repo version
+        # Don't rebuild packages that have been removed
+        return any(
+            (installed := self.installed_version(pkg)) is not None and _vercmp(built, installed) > 0 for pkg in packages
+        )
 
     def system_update(self) -> None:
         _try_run([self.helper, "-Syu", *self.flags], "failed to perform system update")

@@ -220,7 +220,7 @@ class Command:
     def outdated_local_packages(
         self, installer: PackageInstaller, source: DotsSource, current: dict[str, list[str]], desired: list[str]
     ) -> list[str]:
-        """Repo paths whose built version differs from what's installed (skipped cleanly off Arch)."""
+        """Repo paths whose installed packages are older than what the repo would build (skipped when off Arch)."""
 
         outdated = []
         for path in desired:
@@ -231,12 +231,12 @@ class Command:
             if not directory.is_dir():
                 continue
 
-            built_version = installer.source_version(directory)
-            if built_version is None:
-                continue  # Can't determine version (e.g. off Arch); leave the package as-is
-
-            if any(installer.installed_version(pkg) != built_version for pkg in current[path]):
-                outdated.append(path)
+            try:
+                if installer.needs_rebuild(directory, current[path]):
+                    outdated.append(path)
+            except PackageError as e:
+                # Failed to read PKGBUILD, leave it as-is
+                warn(f"could not check {path} for updates, leaving as-is: {e}")
 
         return outdated
 
