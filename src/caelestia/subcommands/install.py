@@ -4,7 +4,13 @@ from argparse import Namespace
 from pathlib import Path
 
 from caelestia.utils.dots.deployer import Deployer
-from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo, legacy_to_delete
+from caelestia.utils.dots.legacy import (
+    LEGACY_META_PKG,
+    detect_legacy_repo,
+    legacy_config_symlinks,
+    legacy_symlinks,
+    legacy_to_delete,
+)
 from caelestia.utils.dots.manifest import ComponentError, Manifest, ManifestError
 from caelestia.utils.dots.misc import build_local_packages, run_hooks
 from caelestia.utils.dots.packages import DEFAULT_AUR_HELPER, PackageError, PackageInstaller
@@ -21,6 +27,21 @@ def _parse_list_arg(value: str | None) -> list[str] | None:
     if value is None:
         return None
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _deref_symlink(link: Path, target: Path) -> None:
+    """Replace symlink `link` with a real copy of `target`'s content."""
+
+    bak = link.rename(link.parent / f"{link.name}.bak")
+    try:
+        if target.is_dir():
+            shutil.copytree(target, link, symlinks=True)
+        else:
+            shutil.copy2(target, link)
+    except OSError:
+        bak.rename(link)
+        raise
+    bak.unlink()
 
 
 class Command:
@@ -43,6 +64,7 @@ class Command:
         except PackageError as e:
             fatal(e)
         run_hooks(manifest, "post_package")
+        self.dereference_legacy(legacy_dir)  # Copy legacy content into place before deploy overwrites the symlinks
         deployed = self.deploy_configs(source, manifest)
         run_hooks(manifest, "post_install")
 
@@ -171,6 +193,42 @@ class Command:
 
         return installer, packages, local_packages
 
+    def dereference_legacy(self, legacy_dir: Path | None) -> None:
+        """Replace legacy symlinks with real copies of their targets."""
+
+        symlinks = legacy_symlinks(legacy_dir)
+        if not symlinks:
+            return
+
+        print()
+        log("Preserving content from legacy symlinks...")
+        for path in symlinks:
+            target = path.resolve()
+            if not target.exists():
+                continue
+
+            try:
+                _deref_symlink(path, target)
+                info(f"Copied {target} -> {path}")
+            except OSError as e:
+                warn(f"failed to preserve {path}: {e}")
+
+    def deref_backup_syms(self, legacy_dir: Path | None) -> None:
+        """Deref the backup's legacy symlinks before the repo is cleared, so the backup keeps real content."""
+
+        if not config_backup_dir.is_dir():
+            return
+
+        for link in legacy_config_symlinks(config_backup_dir, legacy_dir):
+            target = link.resolve()
+            if not target.exists():
+                continue
+
+            try:
+                _deref_symlink(link, target)
+            except OSError as e:
+                warn(f"failed to preserve {link} in backup: {e}")
+
     def migrate_legacy(self, installer: PackageInstaller, legacy_dir: Path | None) -> None:
         """Clean up a previous install.fish setup (repo, symlinks and metapackage)."""
 
@@ -186,6 +244,7 @@ class Command:
 
         deployer = Deployer()
         try:
+            self.deref_backup_syms(legacy_dir)
             for path in to_delete:
                 deployer.remove(path)
                 info(f"Deleted {path}")

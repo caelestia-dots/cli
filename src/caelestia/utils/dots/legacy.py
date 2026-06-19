@@ -46,6 +46,10 @@ def _find_legacy_repo(path: Path) -> Path | None:
         return path
 
 
+def _filter_candidates(candidates: list[Path], legacy_dir: Path) -> list[Path]:
+    return [path for path in candidates if path.is_symlink() and legacy_dir in path.resolve().parents]
+
+
 def detect_legacy_repo() -> Path | None:
     for conf in _confs:
         path = config_dir / conf
@@ -59,25 +63,32 @@ def detect_legacy_repo() -> Path | None:
     return _find_legacy_repo(data_dir / "caelestia")
 
 
+def legacy_config_symlinks(base: Path, legacy_dir: Path | None) -> list[Path]:
+    """Config-relative links install.fish created, resolved under `base` (the live config or a backup of it)."""
+
+    if not legacy_dir:
+        return []
+
+    candidates = [base / conf for conf in _confs]
+    return _filter_candidates(candidates, legacy_dir)
+
+
+def legacy_symlinks(legacy_dir: Path | None) -> list[Path]:
+    """All paths symlinked into the legacy repo (the links install.fish created)."""
+
+    if not legacy_dir:
+        return []
+
+    extras = [
+        *(Path.home() / ".zen").glob("*/chrome/userChrome.css"),
+        Path.home() / ".local/lib/caelestia/caelestiafox",
+    ]
+
+    return [*legacy_config_symlinks(config_dir, legacy_dir), *_filter_candidates(extras, legacy_dir)]
+
+
 def legacy_to_delete(legacy_dir: Path | None) -> list[Path]:
     if not legacy_dir:
         return []
 
-    to_delete = []
-
-    for conf in _confs:
-        path = config_dir / conf
-        if path.is_symlink() and legacy_dir in path.resolve().parents:
-            to_delete.append(path)
-
-    others = [
-        *(Path.home() / ".zen").glob("*/chrome/userChrome.css"),
-        Path.home() / ".local/lib/caelestia/caelestiafox",
-    ]
-    for path in others:
-        if path.is_symlink() and legacy_dir in path.resolve().parents:
-            to_delete.append(path)
-
-    to_delete.append(legacy_dir)
-
-    return to_delete
+    return [*legacy_symlinks(legacy_dir), legacy_dir]
