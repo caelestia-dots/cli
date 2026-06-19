@@ -24,6 +24,36 @@ def _try_run(cmd: list[str], error_msg: str, **kwargs) -> None:
         raise PackageError(error_msg) from e
 
 
+def _read_srcinfo(directory: Path) -> dict[str, list[str]]:
+    """Run `makepkg --printsrcinfo` in `directory`, grouping each key to its list of values."""
+
+    try:
+        srcinfo = subprocess.check_output(["makepkg", "--printsrcinfo"], cwd=directory, text=True)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        raise PackageError(f"failed to read package metadata in {directory}") from e
+
+    fields: dict[str, list[str]] = {}
+    for line in srcinfo.splitlines():
+        key, sep, value = line.partition("=")
+        if not sep:
+            continue
+        fields.setdefault(key.strip(), []).append(value.strip())
+    return fields
+
+
+def _srcinfo_version(fields: dict[str, list[str]]) -> str | None:
+    """Build the `[epoch:]pkgver-pkgrel` version string from parsed .SRCINFO fields, or None if absent."""
+
+    pkgver = next(iter(fields.get("pkgver", [])), None)
+    pkgrel = next(iter(fields.get("pkgrel", [])), None)
+    if pkgver is None or pkgrel is None:
+        return None
+
+    version = f"{pkgver}-{pkgrel}"
+    epoch = next(iter(fields.get("epoch", [])), None)
+    return f"{epoch}:{version}" if epoch else version
+
+
 def _install_aur_helper(helper: str, noconfirm: bool = False) -> None:
     pacman_cmd = ["sudo", "pacman", "-S", "--needed", "git", "base-devel"]
     if noconfirm:
@@ -93,6 +123,14 @@ class PackageInstaller(ABC):
     def is_installed(self, package: str) -> bool: ...
 
     @abstractmethod
+    def source_version(self, directory: Path) -> str | None:
+        """Return the `[epoch:]pkgver-pkgrel` the PKGBUILD in `directory` would build, or None if unavailable."""
+
+    @abstractmethod
+    def installed_version(self, package: str) -> str | None:
+        """Return the installed version of `package`, or None if it is not installed."""
+
+    @abstractmethod
     def system_update(self) -> None: ...
 
 
@@ -113,6 +151,12 @@ class NoopInstaller(PackageInstaller):
 
     def is_installed(self, package: str) -> bool:
         return False
+
+    def source_version(self, directory: Path) -> str | None:
+        return None
+
+    def installed_version(self, package: str) -> str | None:
+        return None
 
     def system_update(self) -> None:
         info("Skipping system update (not on Arch)")
@@ -145,23 +189,9 @@ class ArchInstaller(PackageInstaller):
         _try_run([self.helper, "-Rns", *self.flags, *packages], f"failed to remove packages: {', '.join(packages)}")
 
     def build_install(self, directory: Path) -> list[str]:
-        try:
-            srcinfo = subprocess.check_output(["makepkg", "--printsrcinfo"], cwd=directory, text=True)
-        except (subprocess.CalledProcessError, FileNotFoundError) as e:
-            raise PackageError(f"failed to read package metadata in {directory}") from e
-
-        names = []
-        depends = []
-        for line in srcinfo.splitlines():
-            key, sep, value = line.partition("=")
-            if not sep:
-                continue
-
-            key = key.strip()
-            if key == "pkgname":
-                names.append(value.strip())
-            elif key == "depends":
-                depends.append(value.strip())
+        fields = _read_srcinfo(directory)
+        names = fields.get("pkgname", [])
+        depends = fields.get("depends", [])
 
         self.install(depends, explicit=False)
 
@@ -172,17 +202,33 @@ class ArchInstaller(PackageInstaller):
             ["makepkg", "-fsi", *self.flags], f"failed to build local package in {directory}", cwd=directory, env=env
         )
 
+        # Clean build artifacts
+        for artifact in directory.glob("*.pkg.tar*"):
+            try:
+                artifact.unlink()
+            except OSError as e:
+                warn(f"failed to remove build artifact {artifact}: {e}")
+
         return names
 
     def is_installed(self, package: str) -> bool:
-        return (
-            subprocess.run(
-                ["pacman", "-Q", package],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            ).returncode
-            == 0
+        return self.installed_version(package) is not None
+
+    def source_version(self, directory: Path) -> str | None:
+        return _srcinfo_version(_read_srcinfo(directory))
+
+    def installed_version(self, package: str) -> str | None:
+        result = subprocess.run(
+            ["pacman", "-Q", package],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
         )
+        if result.returncode != 0:
+            return None
+        # `pacman -Q` prints "<name> <version>"
+        parts = result.stdout.split()
+        return parts[1] if len(parts) >= 2 else None
 
     def system_update(self) -> None:
         _try_run([self.helper, "-Syu", *self.flags], "failed to perform system update")
