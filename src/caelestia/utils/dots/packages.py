@@ -185,10 +185,12 @@ class ArchInstaller(PackageInstaller):
 
         # Force install reason to explicit install
         if explicit:
+            # `-D` only accepts real installed names, so resolve any virtual/`provides` names (e.g. awk -> gawk)
+            resolved = [self._installed_name(pkg) for pkg in packages]
             try:
-                subprocess.run([self.helper, "-D", "--asexplicit", *self.flags, *packages], check=True)
+                subprocess.run([self.helper, "-D", "--asexplicit", *self.flags, *resolved], check=True)
             except (subprocess.CalledProcessError, FileNotFoundError):
-                warn(f"failed to mark packages as explicitly installed: {', '.join(packages)}")
+                warn(f"failed to mark packages as explicitly installed: {', '.join(resolved)}")
 
     def remove(self, packages: list[str]) -> None:
         if not packages:
@@ -218,7 +220,9 @@ class ArchInstaller(PackageInstaller):
 
         return names
 
-    def installed_version(self, package: str) -> str | None:
+    def _query(self, package: str) -> tuple[str, str] | None:
+        """Return the installed (name, version) of `package`, resolving `provides` (e.g. awk -> gawk), or None."""
+
         result = subprocess.run(
             ["pacman", "-Q", package],
             stdout=subprocess.PIPE,
@@ -227,9 +231,19 @@ class ArchInstaller(PackageInstaller):
         )
         if result.returncode != 0:
             return None
-        # `pacman -Q` prints "<name> <version>"
+        # `pacman -Q` resolves provides and prints "<real name> <version>"
         parts = result.stdout.split()
-        return parts[1] if len(parts) >= 2 else None
+        return (parts[0], parts[1]) if len(parts) >= 2 else None
+
+    def _installed_name(self, package: str) -> str:
+        """Resolve `package` to its real installed name (handles provides), falling back to the given name."""
+
+        query = self._query(package)
+        return query[0] if query else package
+
+    def installed_version(self, package: str) -> str | None:
+        query = self._query(package)
+        return query[1] if query else None
 
     def needs_rebuild(self, directory: Path, packages: list[str]) -> bool:
         built = _srcinfo_version(_read_srcinfo(directory))
