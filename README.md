@@ -158,6 +158,8 @@ subcommands:
     emoji        emoji/glyph utilities
     wallpaper    manage the wallpaper
     resizer      window resizer daemon
+    install      install the Caelestia dotfiles
+    update       update the Caelestia dotfiles
 ```
 
 ### User templates
@@ -255,6 +257,10 @@ All configuration options are in `~/.config/caelestia/cli.json`.
                 "move": true
             }
         }
+    },
+    "dots": {
+        "url": "https://github.com/caelestia-dots/caelestia.git",
+        "branch": "main"
     }
 }
 ```
