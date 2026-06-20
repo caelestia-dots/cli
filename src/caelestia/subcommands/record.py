@@ -120,7 +120,7 @@ class Command:
         )
 
         if action == "watch":
-            subprocess.Popen(["app2unit", "-O", new_path], start_new_session=True)
+            subprocess.Popen(["xdg-open", new_path], start_new_session=True)
         elif action == "open":
             p = subprocess.run(
                 [
@@ -135,6 +135,6 @@ class Command:
                 ]
             )
             if p.returncode != 0:
-                subprocess.Popen(["app2unit", "-O", new_path.parent], start_new_session=True)
+                subprocess.Popen(["xdg-open", new_path.parent], start_new_session=True)
         elif action == "delete":
             new_path.unlink()

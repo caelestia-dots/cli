@@ -8,7 +8,7 @@
   slurp,
   wl-clipboard,
   cliphist,
-  app2unit,
+  xdg-utils,
   dart-sass,
   grim,
   fuzzel,
@@ -46,7 +46,7 @@ python3.pkgs.buildPythonApplication {
       slurp
       wl-clipboard
       cliphist
-      app2unit
+      xdg-utils
       dart-sass
       grim
       fuzzel
@@ -65,11 +65,10 @@ python3.pkgs.buildPythonApplication {
     substituteInPlace src/caelestia/subcommands/screenshot.py \
     	--replace-fail '"qs", "-c", "caelestia"' '"caelestia-shell"'
 
-    # Use config bin instead of discord + fix todoist + fix app2unit
+    # Use config bin instead of discord + fix todoist
     substituteInPlace src/caelestia/subcommands/toggle.py \
     	--replace-fail 'discord' ${discordBin} \
-      --replace-fail '["todoist"]' '["todoist.desktop"]'\
-      --replace-fail 'app2unit' ${app2unit}/bin/app2unit
+      --replace-fail '["todoist"]' '["todoist.desktop"]'
 
     # Use config style instead of darkly
     substituteInPlace src/caelestia/data/templates/qtengine.json \

@@ -135,7 +135,7 @@ class Command:
         if (spawn[0].endswith(".desktop") or shutil.which(spawn[0])) and not any(
             selector(client) for client in self.get_clients()
         ):
-            hypr.dispatch("exec", f"[workspace special:{self.args.workspace}] app2unit -- {shlex.join(spawn)}")
+            hypr.dispatch("exec", f"[workspace special:{self.args.workspace}] {shlex.join(spawn)}")
             return True
         else:
             return False
