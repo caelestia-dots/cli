@@ -91,4 +91,10 @@ def legacy_to_delete(legacy_dir: Path | None) -> list[Path]:
     if not legacy_dir:
         return []
 
-    return [*legacy_symlinks(legacy_dir), legacy_dir]
+    non_syms = [Path.home() / ".mozilla/native-messaging-hosts/caelestiafox.json"]
+
+    return [
+        *legacy_symlinks(legacy_dir),
+        *(p for p in non_syms if p.exists()),
+        legacy_dir,
+    ]
