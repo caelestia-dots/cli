@@ -9,6 +9,7 @@ socket2_path = f"{socket_base}/.socket2.sock"
 
 _lua_config_cache: bool | None = None
 
+
 def message(msg: str, is_json: bool = True) -> str | dict[str, Any]:
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
         sock.connect(socket_path)
@@ -32,24 +33,25 @@ def is_lua_config() -> bool:
     if _lua_config_cache is not None:
         return _lua_config_cache
     try:
-        result = message("systeminfo", is_json=False)
-        for line in result.splitlines():
-            if "configProvider:" in line:
-                _lua_config_cache = "lua" in line.lower()
-                return _lua_config_cache
-        _lua_config_cache = False
-        return False
+        result = message("status")
+        if isinstance(result, dict):
+            _lua_config_cache = bool(result["configProvider"] == "lua")
+        else:
+            _lua_config_cache = False
+        return _lua_config_cache
     except Exception:
         _lua_config_cache = False
         return False
 
 
 DISPATCHER_MAP_LUA = {
-    "togglespecialworkspace": lambda *a: f'hl.dsp.workspace.toggle_special("{a[0]}")' if a else 'hl.dsp.workspace.toggle_special()',
+    "togglespecialworkspace": lambda *a: (
+        f'hl.dsp.workspace.toggle_special("{a[0]}")' if a else "hl.dsp.workspace.toggle_special()"
+    ),
     "movetoworkspacesilent": lambda *a: (
-    f'hl.dsp.window.move({{window = "address:{a[0].split(",")[1].replace("address:", "")}", workspace = "{a[0].split(",")[0]}", follow = false}})'
-),
-    "exec": lambda *a: 'hl.dsp.exec_cmd("' + ' '.join(a).replace('\\', '\\\\').replace('"', '\\"') + '")',
+        f'hl.dsp.window.move({{window = "address:{a[0].split(",")[1].replace("address:", "")}", workspace = "{a[0].split(",")[0]}", follow = false}})'
+    ),
+    "exec": lambda *a: 'hl.dsp.exec_cmd("' + " ".join(a).replace("\\", "\\\\").replace('"', '\\"') + '")',
 }
 
 
