@@ -10,11 +10,11 @@
         "quickshell": "quickshell"
       },
       "locked": {
-        "lastModified": 1782199910,
-        "narHash": "sha256-X6vRUvqDxrUr++U8RE+VSuBseKvlVhXSzSnjDS6CzoQ=",
+        "lastModified": 1782315637,
+        "narHash": "sha256-U7dKuK8RktvN5W89qMj+lBNAjTtWyPRIx7qvYbtyK+k=",
         "owner": "caelestia-dots",
         "repo": "shell",
-        "rev": "c488b8ede89a4e322324e34b04523e45090e7cc7",
+        "rev": "ebb01721a33722195b929e7105401cebe2e119d8",
         "type": "github"
       },
       "original": {
