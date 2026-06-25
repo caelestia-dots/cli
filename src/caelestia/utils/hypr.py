@@ -32,7 +32,7 @@ def is_lua_config() -> bool:
     if _lua_config_cache is not None:
         return _lua_config_cache
     try:
-        result = message("systeminfo", is_json=False)
+        result = message("status", is_json=False)
         for line in result.splitlines():
             if "configProvider:" in line:
                 _lua_config_cache = "lua" in line.lower()
