@@ -1,23 +1,6 @@
 import argparse
-import sys
 
-from caelestia.subcommands import (
-    clipboard,
-    emoji,
-    install,
-    record,
-    resizer,
-    scheme,
-    screenshot,
-    shell,
-    toggle,
-    update,
-    wallpaper,
-)
-from caelestia.utils.dots.manifest import Manifest
-from caelestia.utils.dots.packages import AUR_HELPERS
-from caelestia.utils.dots.source import DotsSource
-from caelestia.utils.io import warn
+from caelestia.subcommands import clipboard, emoji, record, resizer, scheme, screenshot, shell, toggle, wallpaper
 from caelestia.utils.paths import wallpapers_dir
 from caelestia.utils.scheme import get_scheme_names, scheme_variants
 from caelestia.utils.wallpaper import get_wallpaper
@@ -124,6 +107,12 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
         action="store_true",
         help="do not automatically change the scheme mode based on wallpaper colour",
     )
+    # thumbnail extractor args
+    wallpaper_parser.add_argument(
+        "--extract-thumbs",
+        action="store_true",
+        help="extract thumbnails for all videos in wallpapers directory",
+    )
 
     # Create parser for resizer opts
     resizer_parser = command_parser.add_parser("resizer", help="window resizer daemon")
@@ -145,62 +134,4 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     resizer_parser.add_argument("height", nargs="?", help="height to resize to")
     resizer_parser.add_argument("actions", nargs="?", help="comma-separated actions to apply (float,center,pip)")
 
-    # Create parser for install opts
-    install_parser = command_parser.add_parser(
-        "install",
-        help="install the Caelestia dotfiles",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    install_parser.set_defaults(cls=install.Command)
-    install_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
-    install_parser.add_argument(
-        "--enable-components", metavar="LIST", help="comma-separated list of components to enable"
-    )
-    install_parser.add_argument(
-        "--disable-components", metavar="LIST", help="comma-separated list of components to disable"
-    )
-    install_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
-    _set_install_epilog(install_parser)
-
-    # Create parser for update opts
-    update_parser = command_parser.add_parser("update", help="update the Caelestia dotfiles")
-    update_parser.set_defaults(cls=update.Command)
-    update_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
-    update_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
-
     return parser, parser.parse_args()
-
-
-def _set_install_epilog(install_parser: argparse.ArgumentParser) -> None:
-    """Add components if using install subcommand"""
-
-    if len(sys.argv) > 1 and sys.argv[1] == "install":
-        manifest = _load_install_manifest()
-        if manifest is not None and manifest.components:
-            install_parser.epilog = _components_epilog(manifest)
-
-
-def _load_install_manifest() -> Manifest | None:
-    source = DotsSource()
-    try:
-        source.ensure()
-        return source.manifest_at(source.remote_ref)
-    except Exception as e:
-        warn(f"failed to load manifest from dots repo ({e})\n", prefix=False)
-        return None
-
-
-def _components_epilog(manifest: Manifest) -> str:
-    def e(*v: int) -> str:
-        return f"\033[{';'.join(str(c) for c in v)}m"
-
-    def b(c: int) -> str:
-        return e(1, c)
-
-    reset = e(0)
-
-    width = max(len(name) for name in manifest.components)
-    lines = [f"{b(34)}available components (for --enable-components / --disable-components):{reset}"]
-    for name, comp in manifest.components.items():
-        lines.append(f"  {b(32)}{name:<{width}}{reset}\t{'(default)' if comp.default else '(off)'}")
-    return "\n".join(lines)
