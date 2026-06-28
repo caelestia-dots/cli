@@ -1,10 +1,11 @@
 import json
 import random
+import re
 from pathlib import Path
 from typing import Any
 
 from caelestia.utils.notify import notify
-from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
+from caelestia.utils.paths import atomic_dump, manual_scheme_json, scheme_data_dir, scheme_path, wallpaper_path_path
 
 
 class Scheme:
@@ -155,23 +156,88 @@ class Scheme:
 
     def _update_colours(self) -> None:
         if self.name == "dynamic":
-            from caelestia.utils.material import get_colours_for_image
-
-            try:
-                self._colours = get_colours_for_image()
-            except FileNotFoundError:
-                if self.notify:
-                    notify(
-                        "-u",
-                        "critical",
-                        "Unable to set dynamic scheme",
-                        "No wallpaper set. Please set a wallpaper via `caelestia wallpaper` before setting a dynamic scheme.",
-                    )
-                raise ValueError(
-                    "No wallpaper set. Please set a wallpaper via `caelestia wallpaper` before setting a dynamic scheme."
-                )
+            self._update_colours_dynamic()
+        elif self.name == "manual":
+            self._update_colours_manual()
         else:
             self._colours = read_colours_from_file(self.get_colours_path())
+
+    def _update_colours_dynamic(self) -> None:
+        from caelestia.utils.material import get_colours_for_image
+
+        try:
+            self._colours = get_colours_for_image()
+        except FileNotFoundError:
+            if self.notify:
+                notify(
+                    "-u",
+                    "critical",
+                    "Unable to set dynamic scheme",
+                    "No wallpaper set. Please set a wallpaper via `caelestia wallpaper` before setting a dynamic scheme.",
+                )
+            raise ValueError(
+                "No wallpaper set. Please set a wallpaper via `caelestia wallpaper` before setting a dynamic scheme."
+            )
+
+    def _update_colours_manual(self) -> None:
+        """Look if there is a manual scheme for the current wallpaper.
+
+        Logic:
+            - Open `manual_scheme_json`
+            - Look for exact wallpaper name match
+            - If none, look for regex wallpaper path match
+            - If none, use dynamic coloring.
+        """
+
+        def fallback_to_dynamic(message: str) -> None:
+            """Fallback to dynamic scheme if there is no user scheme for the current wallpaper."""
+            if self.notify:
+                notify(
+                    "-u",
+                    "normal",
+                    "Cannot set manual scheme",
+                    message,
+                )
+            self._update_colours_dynamic()
+
+        wallpaper_path: Path = Path()
+        scheme_path: Path = Path()
+
+        try:
+            with wallpaper_path_path.open("r") as file_read:
+                wallpaper_path = Path(file_read.read())
+        except (IOError, json.JSONDecodeError):
+            fallback_to_dynamic("Cannot get wallpaper name.")
+            return
+
+        try:
+            with manual_scheme_json.open("r") as file_read:
+                schemes: dict = json.load(file_read)
+
+                wallpaper_name: str = wallpaper_path.name
+
+                # Look for wallpaper name exact match
+                if wallpaper_name in schemes.keys():
+                    scheme_path = Path(schemes[wallpaper_name]).expanduser()
+
+                # If none, look for regex match against path
+                elif match := next((k for k in schemes if re.search(k, str(wallpaper_path))), None):
+                    scheme_path = Path(schemes[match]).expanduser()
+                else:
+                    raise KeyError
+
+        except (IOError, json.JSONDecodeError):
+            fallback_to_dynamic("Cannot open manual-scheme.json.")
+            return
+        except KeyError:
+            fallback_to_dynamic(f"No manual scheme matching {wallpaper_path} found.")
+            return
+
+        try:
+            self._colours = read_colours_from_file(scheme_path)
+        except Exception:
+            fallback_to_dynamic(f"Failed to read colors from {scheme_path}.")
+            return
 
     def __str__(self) -> str:
         return (
@@ -223,16 +289,20 @@ def get_scheme() -> Scheme:
 
 
 def get_scheme_names() -> list[str]:
-    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic"]
+    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic", "manual"]
 
 
 def get_scheme_flavours(name: str | None = None) -> list[str]:
     if name is None:
         name = get_scheme().name
 
-    return (
-        ["default", "hard"] if name == "dynamic" else [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
-    )
+    if name == "dynamic":
+        return ["default", "hard"]
+    elif name == "manual":
+        # Shows the same flavors as dynamic as they are only used when falling back on dynamic scheme generation
+        return ["default", "hard"]
+    else:
+        return [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
 
 
 def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> list[str]:
@@ -242,6 +312,8 @@ def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> lis
         flavour = flavour or scheme.flavour
 
     if name == "dynamic":
+        return ["light", "dark"]
+    elif name == "manual":
         return ["light", "dark"]
     else:
         return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
