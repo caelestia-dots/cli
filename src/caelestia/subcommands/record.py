@@ -44,7 +44,7 @@ class Command:
                 region = self.args.region.strip()
             args += ["region", "-region", region]
 
-            m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)", region)
+            m = re.match(r"(\d+)x(\d+)\+(-?\d+)\+(-?\d+)", region)
             if not m:
                 raise ValueError(f"Invalid region: {region}")
 
