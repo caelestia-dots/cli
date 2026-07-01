@@ -195,7 +195,15 @@ class ArchInstaller(PackageInstaller):
     def remove(self, packages: list[str]) -> None:
         if not packages:
             return
-        _try_run([self.helper, "-Rns", *self.flags, *packages], f"failed to remove packages: {', '.join(packages)}")
+
+        # Skip packages that aren't installed
+        installed = [pkg for pkg in packages if self.is_installed(pkg)]
+        if skipped := [pkg for pkg in packages if pkg not in installed]:
+            info(f"Already removed, skipping: {', '.join(skipped)}")
+        if not installed:
+            return
+
+        _try_run([self.helper, "-Rns", *self.flags, *installed], f"failed to remove packages: {', '.join(installed)}")
 
     def build_install(self, directory: Path) -> list[str]:
         fields = _read_srcinfo(directory)
