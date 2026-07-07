@@ -4,6 +4,20 @@ import subprocess
 from caelestia.utils.paths import config_dir
 
 
+def fetch_git_metadata(repo_dir, branch="upstream/main") -> tuple[str, str] | None:
+    try:
+        output = subprocess.check_output(
+            ["git", "-C", repo_dir, "rev-list", "--format=%B", "--max-count=1", branch],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    lines = output.strip().splitlines()
+    return lines[0].split()[1], "".join(lines[1:])
+
+
 def print_version() -> None:
     if shutil.which("pacman"):
         print("Packages:")
@@ -20,15 +34,15 @@ def print_version() -> None:
         print("Packages: not on Arch")
 
     print()
-    try:
-        caelestia_dir = (config_dir / "hypr").resolve().parent
-        caelestia_ver = subprocess.check_output(
-            ["git", "--git-dir", caelestia_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"], text=True
-        )
+    caelestia_dir = (config_dir / "hypr").resolve().parent
+    caelestia_metadata = fetch_git_metadata(caelestia_dir, "HEAD")
+
+    if caelestia_metadata:
+        commit, message = caelestia_metadata
         print("Caelestia:")
-        print("    Last commit:", caelestia_ver.split()[1])
-        print("    Commit message:", *caelestia_ver.splitlines()[1:])
-    except subprocess.CalledProcessError:
+        print("    Last commit:", commit)
+        print("    Commit message:", message)
+    else:
         print("Caelestia: not installed")
 
     print()
@@ -49,29 +63,17 @@ def print_version() -> None:
     local_shell_dir = config_dir / "quickshell/caelestia"
     if local_shell_dir.exists():
         print("\nLocal copy of shell found:")
+        upstream_metadata = fetch_git_metadata(local_shell_dir)
 
-        try:
-            shell_ver = subprocess.check_output(
-                [
-                    "git",
-                    "--git-dir",
-                    local_shell_dir / ".git",
-                    "rev-list",
-                    "--format=%B",
-                    "--max-count=1",
-                    "upstream/main",
-                ],
-                text=True,
-                stderr=subprocess.DEVNULL,
-            )
-            print("    Last merged upstream commit:", shell_ver.split()[1])
-            print("    Commit message:", *shell_ver.splitlines()[1:])
-        except subprocess.CalledProcessError:
+        if upstream_metadata:
+            commit, message = upstream_metadata
+            print("    Last merged upstream commit:", commit)
+            print("    Commit message:", message)
+        else:
             print("    Unable to determine last merged upstream commit.")
 
-        shell_ver = subprocess.check_output(
-            ["git", "--git-dir", local_shell_dir / ".git", "rev-list", "--format=%B", "--max-count=1", "HEAD"],
-            text=True,
-        )
-        print("\n    Last commit:", shell_ver.split()[1])
-        print("    Commit message:", *shell_ver.splitlines()[1:])
+        local_metadata = fetch_git_metadata(local_shell_dir, "HEAD")
+        if local_metadata:
+            commit, message = local_metadata
+            print("\n    Last local commit:", commit)
+            print("    Commit message:", message)
