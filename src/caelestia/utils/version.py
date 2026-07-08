@@ -29,7 +29,9 @@ def print_version() -> None:
         for pkg in pkgs:
             if pkg not in versions:
                 print(f"    {pkg} not installed")
-        print("\n".join(f"    {pkg}" for pkg in versions.splitlines()))
+        version_lines = versions.splitlines()
+        if version_lines:
+            print("\n".join(f"    {pkg}" for pkg in version_lines))
     else:
         print("Packages: not on Arch")
 
