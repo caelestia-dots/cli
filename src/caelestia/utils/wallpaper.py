@@ -109,7 +109,13 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    if wall.suffix.lower() == ".gif":
+    if is_valid_video(wall):
+        thumb_path = wall.parent / ".thumbs" / f"{wall.stem}.jpg"
+        if thumb_path.exists():
+            wall = thumb_path
+        else:
+            wall = extract_video_frame(wall, cache)
+    elif wall.suffix.lower() == ".gif":
         wall = convert_gif(wall)
 
     name = "dynamic"
