@@ -24,9 +24,15 @@ from caelestia.utils.paths import (
 from caelestia.utils.scheme import Scheme, get_scheme
 from caelestia.utils.theme import apply_colours
 
+VIDEO_EXTENSIONS = [".mp4", ".webm", ".mkv", ".avi", ".mov", ".gif"]
+
 
 def is_valid_image(path: Path) -> bool:
     return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+
+
+def is_valid_video(path: Path) -> bool:
+    return path.is_file() and path.suffix in VIDEO_EXTENSIONS
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
@@ -47,7 +53,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     if not directory.is_dir():
         return []
 
-    walls = [f for f in directory.rglob("*") if is_valid_image(f)]
+    walls = [f for f in directory.rglob("*") if is_valid_image(f) or is_valid_video(f)]
 
     if args.no_filter:
         return walls
@@ -55,7 +61,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     monitors = cast(list[dict[str, int]], message("monitors"))
     filter_size = min(m["width"] for m in monitors), min(m["height"] for m in monitors)
 
-    return [f for f in walls if check_wall(f, filter_size, args.threshold)]
+    return [f for f in walls if is_valid_video(f) or check_wall(f, filter_size, args.threshold)]
 
 
 def get_thumb(wall: Path, cache: Path) -> Path:
@@ -129,6 +135,18 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     }
 
 
+def extract_video_frame(wall: Path, cache: Path) -> Path:
+    output_path = cache / "first_frame.png"
+    if not output_path.exists():
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            ["ffmpeg", "-i", str(wall), "-vframes", "1", "-q:v", "2", str(output_path)],
+            capture_output=True,
+            check=False
+        )
+    return output_path
+
+
 def convert_gif(wall: Path) -> Path:
     cache = wallpapers_cache_dir / compute_hash(wall)
     output_path = cache / "first_frame.png"
@@ -148,14 +166,17 @@ def convert_gif(wall: Path) -> Path:
 
 
 def set_wallpaper(wall: Path, no_smart: bool) -> None:
-    # Make path absolute
     wall = Path(wall).resolve()
 
-    if not is_valid_image(wall):
-        raise ValueError(f'"{wall}" is not a valid image')
+    if not is_valid_image(wall) and not is_valid_video(wall):
+        raise ValueError(f'"{wall}" is not a valid image or video')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    if is_valid_video(wall):
+        wall_cache = extract_video_frame(wall, wallpapers_cache_dir / compute_hash(wall))
+    elif wall.suffix.lower() == ".gif":
+        wall_cache = convert_gif(wall)
+    else:
+        wall_cache = wall
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,6 +192,14 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
+
+    # Copy full-res frame to video dir for QML carousel access
+    if is_valid_video(wall):
+        thumbs_dir = wall.parent / ".thumbs"
+        thumbs_dir.mkdir(parents=True, exist_ok=True)
+        dest = thumbs_dir / f"{wall.stem}.jpg"
+        with Image.open(wall_cache) as img:
+            img.convert("RGB").save(dest, "JPEG", quality=90)
 
     scheme = get_scheme()
 
