@@ -25,6 +25,9 @@ class Command:
             self.message(*self.args.message)
         else:
             # Start the shell
+            import os
+            # [AW Feature] Force QtMultimedia to use software decoding to prevent 2-second Vulkan init lag
+            os.environ["QT_FFMPEG_DECODING_HW_DEVICE_TYPES"] = "none"
             args = ["qs", "-c", "caelestia", "-n"]
             if self.args.log_rules:
                 args.extend(["--log-rules", self.args.log_rules])
