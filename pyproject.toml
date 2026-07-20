@@ -17,6 +17,11 @@ caelestia = "caelestia:main"
 [tool.hatch.version]
 source = "vcs"
 
+# Allow building from a source tree without git metadata (e.g. release
+# tarballs or AUR/paru build dirs), where hatch-vcs would otherwise fail
+[tool.hatch.version.raw-options]
+fallback_version = "0.0.0"
+
 [tool.hatch.build.targets.sdist]
 only-include = [
     "src",
