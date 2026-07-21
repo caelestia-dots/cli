@@ -1,51 +1,88 @@
 import shutil
 import subprocess
+from pathlib import Path
 
+from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo
+from caelestia.utils.dots.packages import query_installed_package
+from caelestia.utils.dots.source import DotsSource, SourceError
+from caelestia.utils.dots.state import DotsState
 from caelestia.utils.paths import config_dir
 
+PKGS = ("caelestia-shell", "caelestia-cli")
 
-def fetch_git_metadata(repo_dir, branch="upstream/main") -> tuple[str, str] | None:
+
+def fetch_git_metadata(repo_dir: Path, branch: str = "upstream/main") -> tuple[str, str] | None:
     try:
         output = subprocess.check_output(
-            ["git", "-C", repo_dir, "rev-list", "--format=%B", "--max-count=1", branch],
-            text=True,
+            ["git", "-C", repo_dir, "show", "-s", "--format=%H%x00%s", branch],
             stderr=subprocess.DEVNULL,
+            text=True,
         )
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
-    lines = output.strip().splitlines()
-    return lines[0].split()[1], "".join(lines[1:])
+    commit, separator, message = output.rstrip("\n").partition("\0")
+    return (commit, message) if separator else None
+
+
+def print_packages() -> tuple[str, str] | None:
+    if not shutil.which("pacman"):
+        print("Packages: not on Arch")
+        return None
+
+    print("Packages:")
+    installed = [(pkg, query_installed_package(pkg)) for pkg in PKGS]
+    for pkg, result in installed:
+        if result is None:
+            print(f"    {pkg}: not installed")
+    for _, result in installed:
+        if result is not None:
+            name, version = result
+            print(f"    {name}: {version}")
+
+    return query_installed_package(LEGACY_META_PKG)
+
+
+def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
+    legacy_path = detect_legacy_repo()
+    if legacy_path is None and meta_package is None:
+        return
+
+    print()
+    print("Legacy install detected:")
+    print("    Legacy dots path:", legacy_path or "not found")
+
+    if meta_package is None:
+        print(f"    {LEGACY_META_PKG}: not installed")
+    else:
+        name, version = meta_package
+        print(f"    {name}: {version}")
+    print("    Please update the CLI to the latest version and run 'caelestia install' to update the dots.")
+
+
+def print_caelestia_version() -> None:
+    applied_rev = DotsState.load().applied_rev
+    if applied_rev is None:
+        print("Caelestia: not installed")
+        return
+
+    print("Caelestia:")
+    print("    Last commit:", applied_rev)
+    source = DotsSource()
+    try:
+        message = source.commit_message_at(applied_rev)
+    except (SourceError, FileNotFoundError):
+        print("    Commit message: unavailable")
+    else:
+        print("    Commit message:", message)
 
 
 def print_version() -> None:
-    if shutil.which("pacman"):
-        print("Packages:")
-        pkgs = ["caelestia-shell", "caelestia-cli", "caelestia-meta"]
-        versions = subprocess.run(
-            ["pacman", "-Q", *pkgs], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
-        ).stdout
-
-        for pkg in pkgs:
-            if pkg not in versions:
-                print(f"    {pkg} not installed")
-        version_lines = versions.splitlines()
-        if version_lines:
-            print("\n".join(f"    {pkg}" for pkg in version_lines))
-    else:
-        print("Packages: not on Arch")
+    meta_package = print_packages()
+    print_legacy_install(meta_package)
 
     print()
-    caelestia_dir = (config_dir / "hypr").resolve().parent
-    caelestia_metadata = fetch_git_metadata(caelestia_dir, "HEAD")
-
-    if caelestia_metadata:
-        commit, message = caelestia_metadata
-        print("Caelestia:")
-        print("    Last commit:", commit)
-        print("    Commit message:", message)
-    else:
-        print("Caelestia: not installed")
+    print_caelestia_version()
 
     print()
     try:
