@@ -9,7 +9,7 @@ from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
 from caelestia.utils.paths import config_dir
 
-PKGS = ("caelestia-shell", "caelestia-cli")
+PKGS = ("caelestia-shell", "caelestia-cli", "quickshell")
 INDENT = "    "
 
 
