@@ -10,13 +10,15 @@ from caelestia.utils.dots.state import DotsState
 from caelestia.utils.paths import config_dir
 
 PKGS = ("caelestia-shell", "caelestia-cli")
+INDENT = "    "
 
 
-def _header(text: str) -> None:
+def _header(text: str, suffix: str = "") -> None:
+    suffix = f" {suffix}" if suffix else ""
     if sys.stdout.isatty():
-        print(f"\033[1m\033[36m{text}\033[0m")
+        print(f"\033[1;36m{text}\033[0m{suffix}")
     else:
-        print(text)
+        print(f"{text}{suffix}")
 
 
 def fetch_git_metadata(repo_dir: Path, branch: str = "upstream/main") -> tuple[str, str] | None:
@@ -43,11 +45,11 @@ def print_packages() -> tuple[str, str] | None:
     installed = [(pkg, installer.query(pkg)) for pkg in PKGS]
     for pkg, result in installed:
         if result is None:
-            print(f"    {pkg}: not installed")
+            print(f"{INDENT}{pkg}: not installed")
     for _, result in installed:
         if result is not None:
             name, version = result
-            print(f"    {name}: {version}")
+            print(f"{INDENT}{name}: {version}")
 
     return installer.query(LEGACY_META_PKG)
 
@@ -59,31 +61,31 @@ def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
 
     print()
     _header("Legacy install detected:")
-    print("    Legacy dots path:", legacy_path or "not found")
+    print(f"{INDENT}Legacy dots path: {legacy_path or 'not found'}")
 
     if meta_package is None:
-        print(f"    {LEGACY_META_PKG}: not installed")
+        print(f"{INDENT}{LEGACY_META_PKG}: not installed")
     else:
         name, version = meta_package
-        print(f"    {name}: {version}")
-    print("    Please update the CLI to the latest version and run 'caelestia install' to update the dots.")
+        print(f"{INDENT}{name}: {version}")
+    print(f"{INDENT}Please update the CLI to the latest version and run 'caelestia install' to update the dots.")
 
 
 def print_dots_version() -> None:
     applied_rev = DotsState.load().applied_rev
     if applied_rev is None:
-        _header("Dots:\033[0m not installed")
+        _header("Dots:", "not installed")
         return
 
     _header("Dots:")
-    print("    Last commit:", applied_rev)
+    print(f"{INDENT}Last commit: {applied_rev}")
     source = DotsSource()
     try:
         message = source.commit_message_at(applied_rev)
     except (SourceError, FileNotFoundError):
-        print("    Commit message: unavailable")
+        print(f"{INDENT}Commit message: unavailable")
     else:
-        print("    Commit message:", message)
+        print(f"{INDENT}Commit message: {message}")
 
 
 def print_version() -> None:
@@ -97,16 +99,17 @@ def print_version() -> None:
     try:
         shell_ver = subprocess.check_output(["/usr/lib/caelestia/version", "-s"], text=True).strip()
         _header("Shell:")
-        print("   ", shell_ver)
+        print(f"{INDENT}{shell_ver}")
     except FileNotFoundError:
-        _header("Shell:\033[0m version helper not available")
+        _header("Shell:", "version helper not available")
 
     print()
     if shutil.which("qs"):
+        qs_ver = subprocess.check_output(["qs", "--version"], text=True).strip()
         _header("Quickshell:")
-        print("   ", subprocess.check_output(["qs", "--version"], text=True).strip())
+        print(f"{INDENT}{qs_ver}")
     else:
-        _header("Quickshell:\033[0m not in PATH")
+        _header("Quickshell:", "not in PATH")
 
     local_shell_dir = config_dir / "quickshell/caelestia"
     if local_shell_dir.exists():
@@ -116,13 +119,13 @@ def print_version() -> None:
 
         if upstream_metadata:
             commit, message = upstream_metadata
-            print("    Last merged upstream commit:", commit)
-            print("    Commit message:", message)
+            print(f"{INDENT}Last merged upstream commit: {commit}")
+            print(f"{INDENT}Commit message: {message}")
         else:
-            print("    Unable to determine last merged upstream commit.")
+            print(f"{INDENT}Unable to determine last merged upstream commit.")
 
         local_metadata = fetch_git_metadata(local_shell_dir, "HEAD")
         if local_metadata:
             commit, message = local_metadata
-            print("\n    Last local commit:", commit)
-            print("    Commit message:", message)
+            print(f"\n{INDENT}Last local commit: {commit}")
+            print(f"{INDENT}Commit message: {message}")
