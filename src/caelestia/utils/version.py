@@ -32,8 +32,16 @@ def _rows(pairs: list[tuple[str, str]], align: bool = False) -> None:
 
 
 def _commit(commit: str, message: str) -> str:
+    sha = commit[:7]
     subject = message.splitlines()[0] if message else ""
-    return f"{commit[:7]} ({subject})"
+    return f"{sha} ({subject})" if subject else sha
+
+
+def _commit_from_meta(meta: tuple[str, str] | None) -> str:
+    if meta:
+        commit, message = meta
+        return _commit(commit, message)
+    return "unknown"
 
 
 def fetch_git_metadata(repo_dir: Path, branch: str = "upstream/main") -> tuple[str, str] | None:
@@ -130,14 +138,10 @@ def print_version() -> None:
         print()
         _header("Local copy of shell found:")
         upstream_metadata = fetch_git_metadata(local_shell_dir)
-
-        if upstream_metadata:
-            commit, message = upstream_metadata
-            _rows([("Last merged upstream commit", _commit(commit, message))])
-        else:
-            print(f"{INDENT}Unable to determine last merged upstream commit.")
-
         local_metadata = fetch_git_metadata(local_shell_dir, "HEAD")
-        if local_metadata:
-            commit, message = local_metadata
-            _rows([("Last local commit", _commit(commit, message))])
+        _rows(
+            [
+                ("Last merged upstream commit", _commit_from_meta(upstream_metadata)),
+                ("Last local commit", _commit_from_meta(local_metadata)),
+            ]
+        )
