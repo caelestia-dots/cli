@@ -21,6 +21,21 @@ def _header(text: str, suffix: str = "") -> None:
         print(f"{text}{suffix}")
 
 
+def _rows(pairs: list[tuple[str, str]], align: bool = False) -> None:
+    dim = sys.stdout.isatty()
+    width = max((len(key) for key, _ in pairs), default=0) if align else 0
+    for key, value in pairs:
+        if dim:
+            value = f"\033[2m{value}\033[0m"
+        label = key.ljust(width) if align else f"{key}:"
+        print(f"{INDENT}{label}  {value}" if align else f"{INDENT}{label} {value}")
+
+
+def _commit(commit: str, message: str) -> str:
+    subject = message.splitlines()[0] if message else ""
+    return f"{commit[:7]} ({subject})"
+
+
 def fetch_git_metadata(repo_dir: Path, branch: str = "upstream/main") -> tuple[str, str] | None:
     try:
         output = subprocess.check_output(
@@ -43,13 +58,9 @@ def print_packages() -> tuple[str, str] | None:
     _header("Packages:")
     installer = ArchInstaller("")  # Dummy helper cause we only use query
     installed = [(pkg, installer.query(pkg)) for pkg in PKGS]
-    for pkg, result in installed:
-        if result is None:
-            print(f"{INDENT}{pkg}: not installed")
-    for _, result in installed:
-        if result is not None:
-            name, version = result
-            print(f"{INDENT}{name}: {version}")
+    missing = [(pkg, "not installed") for pkg, result in installed if result is None]
+    present = [result for _, result in installed if result is not None]
+    _rows(missing + present, align=True)
 
     return installer.query(LEGACY_META_PKG)
 
@@ -61,14 +72,12 @@ def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
 
     print()
     _header("Legacy install detected:")
-    print(f"{INDENT}Legacy dots path: {legacy_path or 'not found'}")
-
-    if meta_package is None:
-        print(f"{INDENT}{LEGACY_META_PKG}: not installed")
-    else:
-        name, version = meta_package
-        print(f"{INDENT}{name}: {version}")
-    print(f"{INDENT}Please update the CLI to the latest version and run 'caelestia install' to update the dots.")
+    meta_row = (LEGACY_META_PKG, "not installed") if meta_package is None else meta_package
+    _rows([("Legacy dots path", str(legacy_path or "not found")), meta_row])
+    update_msg = "Please update the CLI to the latest version and run 'caelestia install' to update the dots."
+    if sys.stdout.isatty():
+        update_msg = f"\033[1m{update_msg}\033[0m"
+    print(f"{INDENT}{update_msg}")
 
 
 def print_dots_version() -> None:
@@ -78,14 +87,12 @@ def print_dots_version() -> None:
         return
 
     _header("Dots:")
-    print(f"{INDENT}Last commit: {applied_rev}")
     source = DotsSource()
     try:
         message = source.commit_message_at(applied_rev)
     except (SourceError, FileNotFoundError):
-        print(f"{INDENT}Commit message: unavailable")
-    else:
-        print(f"{INDENT}Commit message: {message}")
+        message = ""
+    _rows([("Commit", _commit(applied_rev, message))])
 
 
 def print_version() -> None:
@@ -119,13 +126,11 @@ def print_version() -> None:
 
         if upstream_metadata:
             commit, message = upstream_metadata
-            print(f"{INDENT}Last merged upstream commit: {commit}")
-            print(f"{INDENT}Commit message: {message}")
+            _rows([("Last merged upstream commit", _commit(commit, message))])
         else:
             print(f"{INDENT}Unable to determine last merged upstream commit.")
 
         local_metadata = fetch_git_metadata(local_shell_dir, "HEAD")
         if local_metadata:
             commit, message = local_metadata
-            print(f"\n{INDENT}Last local commit: {commit}")
-            print(f"{INDENT}Commit message: {message}")
+            _rows([("Last local commit", _commit(commit, message))])
