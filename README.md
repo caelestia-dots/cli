@@ -4,7 +4,7 @@ The main control script for the Caelestia dotfiles.
 
 <details><summary id="dependencies">External dependencies</summary>
 
-- [`libnotfy`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
+- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
 - [`swappy`](https://github.com/jtheoof/swappy) - screenshot editor
 - [`grim`](https://gitlab.freedesktop.org/emersion/grim) - taking screenshots
 - [`dart-sass`](https://github.com/sass/dart-sass) - discord theming
