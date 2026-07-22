@@ -15,26 +15,6 @@ class PackageError(Exception):
     """Raised when a package operation (install/remove/build/update) fails."""
 
 
-def query_installed_package(package: str) -> tuple[str, str] | None:
-    """Return the installed (name, version) of `package`, resolving provides, or None."""
-
-    if shutil.which("pacman") is None:
-        return None
-
-    result = subprocess.run(
-        ["pacman", "-Q", package],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-    )
-    if result.returncode != 0:
-        return None
-
-    # `pacman -Q` resolves provides and prints "<real name> <version>"
-    parts = result.stdout.split()
-    return (parts[0], parts[1]) if len(parts) >= 2 else None
-
-
 def _try_run(cmd: list[str], error_msg: str, **kwargs) -> None:
     """Run a subprocess, raising `PackageError` if it fails."""
 
@@ -248,19 +228,30 @@ class ArchInstaller(PackageInstaller):
 
         return names
 
-    def _query(self, package: str) -> tuple[str, str] | None:
+    def query(self, package: str) -> tuple[str, str] | None:
         """Return the installed (name, version) of `package`, resolving `provides` (e.g. awk -> gawk), or None."""
 
-        return query_installed_package(package)
+        result = subprocess.run(
+            ["pacman", "-Q", package],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        if result.returncode != 0:
+            return None
+
+        # `pacman -Q` resolves provides and prints "<real name> <version>"
+        parts = result.stdout.split()
+        return (parts[0], parts[1]) if len(parts) >= 2 else None
 
     def _installed_name(self, package: str) -> str:
         """Resolve `package` to its real installed name (handles provides), falling back to the given name."""
 
-        query = self._query(package)
+        query = self.query(package)
         return query[0] if query else package
 
     def installed_version(self, package: str) -> str | None:
-        query = self._query(package)
+        query = self.query(package)
         return query[1] if query else None
 
     def needs_rebuild(self, directory: Path, packages: list[str]) -> bool:

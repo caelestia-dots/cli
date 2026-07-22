@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 from caelestia.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo
-from caelestia.utils.dots.packages import query_installed_package
+from caelestia.utils.dots.packages import ArchInstaller
 from caelestia.utils.dots.source import DotsSource, SourceError
 from caelestia.utils.dots.state import DotsState
 from caelestia.utils.paths import config_dir
@@ -31,7 +31,8 @@ def print_packages() -> tuple[str, str] | None:
         return None
 
     print("Packages:")
-    installed = [(pkg, query_installed_package(pkg)) for pkg in PKGS]
+    installer = ArchInstaller("")  # Dummy helper cause we only use query
+    installed = [(pkg, installer.query(pkg)) for pkg in PKGS]
     for pkg, result in installed:
         if result is None:
             print(f"    {pkg}: not installed")
@@ -40,7 +41,7 @@ def print_packages() -> tuple[str, str] | None:
             name, version = result
             print(f"    {name}: {version}")
 
-    return query_installed_package(LEGACY_META_PKG)
+    return installer.query(LEGACY_META_PKG)
 
 
 def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
@@ -60,13 +61,13 @@ def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
     print("    Please update the CLI to the latest version and run 'caelestia install' to update the dots.")
 
 
-def print_caelestia_version() -> None:
+def print_dots_version() -> None:
     applied_rev = DotsState.load().applied_rev
     if applied_rev is None:
-        print("Caelestia: not installed")
+        print("Dots: not installed")
         return
 
-    print("Caelestia:")
+    print("Dots:")
     print("    Last commit:", applied_rev)
     source = DotsSource()
     try:
@@ -82,7 +83,7 @@ def print_version() -> None:
     print_legacy_install(meta_package)
 
     print()
-    print_caelestia_version()
+    print_dots_version()
 
     print()
     try:
