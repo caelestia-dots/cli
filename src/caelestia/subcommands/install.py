@@ -175,14 +175,16 @@ class Command:
 
     def install_packages(
         self, source: DotsSource, manifest: Manifest
-    ) -> tuple[PackageInstaller, list[str], dict[str, list[str]]]:
+    ) -> tuple[PackageInstaller, dict[str, str], dict[str, list[str]]]:
         installer = PackageInstaller.get(self.args.aur_helper, self.args.noconfirm)
 
-        packages = manifest.enabled_packages()
-        if packages:
+        packages = {}
+        desired = manifest.enabled_packages()
+        if desired:
             print()
             log("Installing packages...")
-            installer.install(packages)
+            # Record each desired name -> its real installed name so removal later is exact
+            packages = dict(zip(desired, installer.install(desired)))
 
         local_packages = {}
         local_dirs = manifest.enabled_local_packages()

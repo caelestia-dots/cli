@@ -18,7 +18,8 @@ class DotsState:
     enabled_components: list[str] = field(default_factory=list)
 
     # Previously installed packages/local packages
-    packages: list[str] = field(default_factory=list)
+    # `packages` maps each desired (manifest) name -> its real installed name (resolving provides, e.g. awk -> gawk)
+    packages: dict[str, str] = field(default_factory=dict)
     local_packages: dict[str, list[str]] = field(default_factory=dict)
 
     # Files placed by the last deploy. Only files, not directories
@@ -35,11 +36,16 @@ class DotsState:
             warn("failed to parse current dots state.")
             return DotsState()
 
+        # Migrate the old list format (name only) to the name -> real-name mapping
+        packages = data.get("packages", {})
+        if isinstance(packages, list):
+            packages = {pkg: pkg for pkg in packages}
+
         return DotsState(
             aur_helper=data.get("aur_helper", DEFAULT_AUR_HELPER),
             applied_rev=data.get("applied_rev"),
             enabled_components=data.get("enabled_components", []),
-            packages=data.get("packages", []),
+            packages=packages,
             local_packages=data.get("local_packages", {}),
             deployed_files=data.get("deployed_files", {}),
         )
