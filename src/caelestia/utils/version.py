@@ -52,7 +52,7 @@ def fetch_git_metadata(repo_dir: Path, branch: str = "upstream/main") -> tuple[s
 
 def print_packages() -> tuple[str, str] | None:
     if not shutil.which("pacman"):
-        print("Packages: not on Arch")
+        _header("Packages:", "not on Arch")
         return None
 
     _header("Packages:")
@@ -97,7 +97,7 @@ def print_dots_version() -> None:
         [
             ("Commit", _commit(state.applied_rev, message)),
             ("Components", components),
-            ("AUR helper", state.aur_helper),
+            ("AUR helper", state.aur_helper if shutil.which("pacman") else "not on Arch"),
         ]
     )
 
