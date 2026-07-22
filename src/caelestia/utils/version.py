@@ -81,18 +81,25 @@ def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
 
 
 def print_dots_version() -> None:
-    applied_rev = DotsState.load().applied_rev
-    if applied_rev is None:
+    state = DotsState.load()
+    if state.applied_rev is None:
         _header("Dots:", "not installed")
         return
 
     _header("Dots:")
     source = DotsSource()
     try:
-        message = source.commit_message_at(applied_rev)
+        message = source.commit_message_at(state.applied_rev)
     except (SourceError, FileNotFoundError):
         message = ""
-    _rows([("Commit", _commit(applied_rev, message))])
+    components = ", ".join(state.enabled_components) or "none"
+    _rows(
+        [
+            ("Commit", _commit(state.applied_rev, message)),
+            ("Components", components),
+            ("AUR helper", state.aur_helper),
+        ]
+    )
 
 
 def print_version() -> None:
