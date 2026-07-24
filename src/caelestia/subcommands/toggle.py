@@ -113,12 +113,17 @@ class Command:
             return
 
         spawned = False
+        toggle_after_spawn = False
         if self.args.workspace in self.cfg:
             for client in self.cfg[self.args.workspace].values():
                 if "enable" in client and client["enable"] and self.handle_client_config(client):
                     spawned = True
+                    # Windows spawned via IPC ignore the [workspace special:X] exec rule,
+                    # so the workspace has to be toggled open explicitly after spawning
+                    if client.get("spawnThenToggle"):
+                        toggle_after_spawn = True
 
-        if not spawned:
+        if not spawned or toggle_after_spawn:
             hypr.dispatch("togglespecialworkspace", self.args.workspace)
 
     def get_clients(self) -> list[dict[str, Any]]:
