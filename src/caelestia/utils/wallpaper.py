@@ -16,6 +16,7 @@ from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.paths import (
     compute_hash,
     get_config,
+    videowallpapers_dir,
     wallpaper_link_path,
     wallpaper_path_path,
     wallpaper_thumbnail_path,
@@ -241,6 +242,11 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
 
 def set_random(args: Namespace) -> None:
     wallpapers = get_wallpapers(args)
+
+    if videowallpapers_dir.is_dir():
+        for f in videowallpapers_dir.iterdir():
+            if is_valid_video(f):
+                wallpapers.append(f)
 
     if not wallpapers:
         raise ValueError("No valid wallpapers found")
