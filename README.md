@@ -194,8 +194,8 @@ Custom user colour schemes can be added in `~/.config/caelestia/schemes/`.
 
 Once created, these schemes will then be available in the launcher `>scheme`, in `caelestia scheme list`, and in shell autocompletions.
 
-> [!NOTE]
-> User scheme names should not be the same with bundled schemes (for example, `catppuccin`, `dracula`). If they are the same user schemes are ignored.
+> [!TIP]
+> User scheme will replace any existing one with the same name. You can also extend existing scheme by creating new flavours or modes (for example new flavour for catpuccin, `~/.config/caelestia/schemes/catppuccin/newflavour/dark.txt`).
 
 #### Examples
 
