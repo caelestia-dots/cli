@@ -4,7 +4,14 @@ from pathlib import Path
 from typing import Any
 
 from caelestia.utils.notify import notify
-from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path
+from caelestia.utils.paths import atomic_dump, scheme_data_dir, scheme_path, user_scheme_data_dir
+
+
+def _scheme_root(name: str) -> Path:
+    bundled = scheme_data_dir / name
+    if bundled.is_dir():
+        return bundled
+    return user_scheme_data_dir / name
 
 
 class Scheme:
@@ -118,7 +125,7 @@ class Scheme:
         return self._colours
 
     def get_colours_path(self) -> Path:
-        return (scheme_data_dir / self.name / self.flavour / self.mode).with_suffix(".txt")
+        return (_scheme_root(self.name) / self.flavour / self.mode).with_suffix(".txt")
 
     def save(self) -> None:
         scheme_path.parent.mkdir(parents=True, exist_ok=True)
@@ -223,16 +230,36 @@ def get_scheme() -> Scheme:
 
 
 def get_scheme_names() -> list[str]:
-    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic"]
+    try:
+        bundled = [f.name for f in scheme_data_dir.iterdir() if f.is_dir()]
+    except OSError:
+        bundled = []
+
+    user = []
+    if user_scheme_data_dir.is_dir():
+        try:
+            user = [
+                f.name
+                for f in user_scheme_data_dir.iterdir()
+                if f.is_dir() and f.name not in bundled and f.name != "dynamic"
+            ]
+        except OSError:
+            pass
+
+    return [*bundled, *user, "dynamic"]
 
 
 def get_scheme_flavours(name: str | None = None) -> list[str]:
     if name is None:
         name = get_scheme().name
 
-    return (
-        ["default", "hard"] if name == "dynamic" else [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
-    )
+    if name == "dynamic":
+        return ["default", "hard"]
+
+    try:
+        return [f.name for f in _scheme_root(name).iterdir() if f.is_dir()]
+    except OSError:
+        return []
 
 
 def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> list[str]:
@@ -243,5 +270,8 @@ def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> lis
 
     if name == "dynamic":
         return ["light", "dark"]
-    else:
-        return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
+
+    try:
+        return [f.stem for f in (_scheme_root(name) / flavour).iterdir() if f.is_file()]
+    except OSError:
+        return []

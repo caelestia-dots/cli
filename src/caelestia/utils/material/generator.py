@@ -20,6 +20,7 @@ from typing import Protocol, Any
 class SchemeConstructor(Protocol):
     def __call__(self, source_color_hct: Any, is_dark: bool, contrast_level: float) -> "DynamicScheme": ...
 
+
 try:
     from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme
 except ImportError:
