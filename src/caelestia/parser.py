@@ -94,6 +94,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
     clipboard_parser.set_defaults(cls=clipboard.Command)
     clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
+    clipboard_parser.add_argument("-l", "--paste-latest", action="store_true", help="type the most recent clipboard entry")
 
     # Create parser for emoji-picker opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
