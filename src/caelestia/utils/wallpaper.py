@@ -240,6 +240,23 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
         )
 
 
+def update_video_thumbs() -> None:
+    if not videowallpapers_dir.is_dir():
+        return
+    for f in videowallpapers_dir.iterdir():
+        if not is_valid_video(f):
+            continue
+        thumbs_dir = f.parent / ".thumbs"
+        dest = thumbs_dir / f"{f.stem}.jpg"
+        if dest.exists():
+            continue
+        thumbs_dir.mkdir(parents=True, exist_ok=True)
+        cache = wallpapers_cache_dir / compute_hash(f)
+        frame = extract_video_frame(f, cache)
+        with Image.open(frame) as img:
+            img.convert("RGB").save(dest, "JPEG", quality=90)
+
+
 def set_random(args: Namespace) -> None:
     wallpapers = get_wallpapers(args)
 
