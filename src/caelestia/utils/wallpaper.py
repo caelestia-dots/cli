@@ -4,6 +4,7 @@ import random
 import shutil
 import subprocess
 from argparse import Namespace
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import cast
 
@@ -242,7 +243,7 @@ def generate_video_thumb(video: Path, dest: Path) -> None:
         return
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "0", "-q", "10"],
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "5"],
         capture_output=True,
         check=False,
     )
@@ -251,12 +252,18 @@ def generate_video_thumb(video: Path, dest: Path) -> None:
 def update_video_thumbs() -> None:
     if not videowallpapers_dir.is_dir():
         return
+    missing = []
     for f in videowallpapers_dir.iterdir():
         if not is_valid_video(f):
             continue
         dest = f.parent / ".thumbs" / f"{f.stem}.jpg"
         if not dest.exists():
-            generate_video_thumb(f, dest)
+            missing.append((f, dest))
+    if not missing:
+        return
+    with ThreadPoolExecutor() as pool:
+        for f, dest in missing:
+            pool.submit(generate_video_thumb, f, dest)
 
 
 def set_random(args: Namespace) -> None:
