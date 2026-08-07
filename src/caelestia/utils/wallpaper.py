@@ -107,20 +107,25 @@ def get_smart_opts(wall: Path, cache: Path) -> dict:
     return opts
 
 
-def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
-    wall = Path(wall)
+def video_thumb_path(wall: Path) -> Path:
+    return wall.parent / ".thumbs" / f"{wall.stem}.jpg"
+
+
+def colour_source(wall: Path) -> Path:
+    if is_valid_video(wall):
+        thumb_path = video_thumb_path(wall)
+        if thumb_path.exists():
+            return thumb_path
+        return extract_video_frame(wall, wallpapers_cache_dir / compute_hash(wall))
+    if wall.suffix.lower() == ".gif":
+        return convert_gif(wall)
+    return wall
+
+
+def get_colours_for_wall(wall: Path | str, no_smart: bool) -> dict:
+    wall = colour_source(Path(wall))
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
-
-    if is_valid_video(wall):
-        thumb_path = wall.parent / ".thumbs" / f"{wall.stem}.jpg"
-        if thumb_path.exists():
-            wall = thumb_path
-        else:
-            wall = extract_video_frame(wall, cache)
-    elif wall.suffix.lower() == ".gif":
-        wall = convert_gif(wall)
-
     name = "dynamic"
 
     if not no_smart:
@@ -180,12 +185,7 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     if not is_valid_image(wall) and not is_valid_video(wall):
         raise ValueError(f'"{wall}" is not a valid image or video')
 
-    if is_valid_video(wall):
-        wall_cache = extract_video_frame(wall, wallpapers_cache_dir / compute_hash(wall))
-    elif wall.suffix.lower() == ".gif":
-        wall_cache = convert_gif(wall)
-    else:
-        wall_cache = wall
+    wall_cache = colour_source(wall)
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
@@ -202,9 +202,9 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
 
-    # Copy full-res frame to video dir for QML carousel access
-    if is_valid_video(wall):
-        generate_video_thumb(wall, wall.parent / ".thumbs" / f"{wall.stem}.jpg")
+    thumb_path = video_thumb_path(wall)
+    if is_valid_video(wall) and not thumb_path.exists():
+        generate_video_thumb(wall, thumb_path)
 
     scheme = get_scheme()
 
@@ -243,7 +243,7 @@ def generate_video_thumb(video: Path, dest: Path) -> None:
         return
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "5"],
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "8"],
         capture_output=True,
         check=False,
     )
