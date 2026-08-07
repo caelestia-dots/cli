@@ -242,7 +242,7 @@ def generate_video_thumb(video: Path, dest: Path) -> None:
         return
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-t", "0", "-q", "8", "-s", "0"],
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "0", "-q", "10"],
         capture_output=True,
         check=False,
     )
