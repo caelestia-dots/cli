@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import shutil
 import subprocess
 from argparse import Namespace
 from pathlib import Path
@@ -202,11 +203,7 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
 
     # Copy full-res frame to video dir for QML carousel access
     if is_valid_video(wall):
-        thumbs_dir = wall.parent / ".thumbs"
-        thumbs_dir.mkdir(parents=True, exist_ok=True)
-        dest = thumbs_dir / f"{wall.stem}.jpg"
-        with Image.open(wall_cache) as img:
-            img.convert("RGB").save(dest, "JPEG", quality=90)
+        generate_video_thumb(wall, wall.parent / ".thumbs" / f"{wall.stem}.jpg")
 
     scheme = get_scheme()
 
@@ -240,21 +237,26 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
         )
 
 
+def generate_video_thumb(video: Path, dest: Path) -> None:
+    if shutil.which("ffmpegthumbnailer") is None:
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-t", "0", "-q", "8", "-s", "0"],
+        capture_output=True,
+        check=False,
+    )
+
+
 def update_video_thumbs() -> None:
     if not videowallpapers_dir.is_dir():
         return
     for f in videowallpapers_dir.iterdir():
         if not is_valid_video(f):
             continue
-        thumbs_dir = f.parent / ".thumbs"
-        dest = thumbs_dir / f"{f.stem}.jpg"
-        if dest.exists():
-            continue
-        thumbs_dir.mkdir(parents=True, exist_ok=True)
-        cache = wallpapers_cache_dir / compute_hash(f)
-        frame = extract_video_frame(f, cache)
-        with Image.open(frame) as img:
-            img.convert("RGB").save(dest, "JPEG", quality=90)
+        dest = f.parent / ".thumbs" / f"{f.stem}.jpg"
+        if not dest.exists():
+            generate_video_thumb(f, dest)
 
 
 def set_random(args: Namespace) -> None:
