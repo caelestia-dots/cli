@@ -111,12 +111,23 @@ def video_thumb_path(wall: Path) -> Path:
     return wall.parent / ".thumbs" / f"{wall.stem}.jpg"
 
 
+def generate_video_thumb(video: Path, dest: Path) -> None:
+    if shutil.which("ffmpegthumbnailer") is None:
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "8"],
+        capture_output=True,
+        check=False,
+    )
+
+
 def colour_source(wall: Path) -> Path:
     if is_valid_video(wall):
         thumb_path = video_thumb_path(wall)
-        if thumb_path.exists():
-            return thumb_path
-        return extract_video_frame(wall, wallpapers_cache_dir / compute_hash(wall))
+        if not thumb_path.exists():
+            generate_video_thumb(wall, thumb_path)
+        return thumb_path
     if wall.suffix.lower() == ".gif":
         return convert_gif(wall)
     return wall
@@ -147,18 +158,6 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> dict:
         "variant": scheme.variant,
         "colours": get_colours_for_image(get_thumb(wall, cache), scheme),
     }
-
-
-def extract_video_frame(wall: Path, cache: Path) -> Path:
-    output_path = cache / "first_frame.png"
-    if not output_path.exists():
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(
-            ["ffmpeg", "-i", str(wall), "-vframes", "1", "-q:v", "2", str(output_path)],
-            capture_output=True,
-            check=False
-        )
-    return output_path
 
 
 def convert_gif(wall: Path) -> Path:
@@ -201,10 +200,6 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     wallpaper_thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     wallpaper_thumbnail_path.unlink(missing_ok=True)
     wallpaper_thumbnail_path.symlink_to(thumb)
-
-    thumb_path = video_thumb_path(wall)
-    if is_valid_video(wall) and not thumb_path.exists():
-        generate_video_thumb(wall, thumb_path)
 
     scheme = get_scheme()
 
