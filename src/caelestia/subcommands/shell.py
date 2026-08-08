@@ -1,6 +1,11 @@
+import json
+import os
+import signal
 import subprocess
+import time
 from argparse import Namespace
 
+from caelestia.utils.io import warn
 from caelestia.utils.paths import c_cache_dir
 
 
@@ -24,6 +29,11 @@ class Command:
             # Send a message
             self.message(*self.args.message)
         else:
+            # Kill any running instance and wait for it to exit, otherwise `-n`
+            # will silently skip the relaunch
+            if self.args.restart:
+                self.stop_instances()
+
             # Start the shell
             args = ["qs", "-c", "caelestia", "-n"]
             if self.args.log_rules:
@@ -42,6 +52,43 @@ class Command:
 
     def shell(self, *args: str) -> str:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
+
+    def list_instances(self) -> list[dict]:
+        proc = subprocess.run(["qs", "-c", "caelestia", "list", "-j"], capture_output=True, text=True)
+        try:
+            return json.loads(proc.stdout) if proc.returncode == 0 else []
+        except json.JSONDecodeError:
+            return []
+
+    def wait_for_exit(self, timeout: float) -> bool:
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            if not self.list_instances():
+                return True
+            time.sleep(0.1)
+        return False
+
+    def stop_instances(self) -> None:
+        instances = self.list_instances()
+        if not instances:
+            return
+
+        subprocess.run(["qs", "-c", "caelestia", "kill"], capture_output=True)
+
+        # Teardown is not instant (and slowest while a session lock is up)
+        if self.wait_for_exit(5):
+            return
+
+        # The instance is stuck; force kill it so the restart still happens
+        warn("shell did not exit gracefully, killing")
+        for instance in instances:
+            try:
+                os.kill(instance["pid"], signal.SIGKILL)
+            except (KeyError, ProcessLookupError):
+                pass
+
+        if not self.wait_for_exit(2):
+            warn("an instance of the shell is still running")
 
     def filter_log(self, line: str) -> bool:
         return f"Cannot open: file://{c_cache_dir}/imagecache/" not in line
