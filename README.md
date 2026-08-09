@@ -171,12 +171,15 @@ Custom user templates can be defined in `~/.config/caelestia/templates/`.
 `{{ <color>.<format> }}`
 
 - `<color>` is a theme color role derived from the Material You color system (e.g. `primary`, `secondary`, `background`)
-- `<format>` is the output format: `hex` or `rgb`
+- `<format>` is the output format: `hex`, `rgb`, `hsl`, or a single channel (`red`, `green`, `blue`, `hue`, `saturation`, `lightness`)
 
 #### Examples
 
 - `{{ primary.hex }}` outputs `3f4ba2`
 - `{{ primary.rgb }}` outputs `rgb(193, 132, 207)`
+- `{{ primary.red }}` outputs `193`
+- `{{ primary.hsl }}` outputs `hsl(268,41%,66%)`
+- `{{ primary.hue }}` outputs `268`
 
 Output files are written to `~/.local/state/caelestia/theme/`. You can symlink them to your desired locations.
 
