@@ -5,7 +5,7 @@ import subprocess
 import time
 from argparse import Namespace
 
-from caelestia.utils.io import warn
+from caelestia.utils.io import fatal, warn
 from caelestia.utils.paths import c_cache_dir
 
 
@@ -54,11 +54,20 @@ class Command:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
 
     def list_instances(self) -> list[dict]:
-        proc = subprocess.run(["qs", "-c", "caelestia", "list", "-j"], capture_output=True, text=True)
-        try:
-            return json.loads(proc.stdout) if proc.returncode == 0 else []
-        except json.JSONDecodeError:
+        proc = subprocess.run(["qs", "-c", "caelestia", "list", "-j"], check=False, capture_output=True, text=True)
+        if proc.returncode != 0:
+            fatal(f"failed to list shell instances: {(proc.stderr or proc.stdout).strip()}")
+
+        # `qs list` exits 0 and prints a plain text notice instead of JSON when
+        # there are no instances, so only treat that exact case as empty
+        out = proc.stdout.strip()
+        if out.startswith("No running instances"):
             return []
+
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            fatal(f"failed to parse shell instance list: {out}")
 
     def wait_for_exit(self, timeout: float) -> bool:
         end = time.monotonic() + timeout
@@ -73,7 +82,7 @@ class Command:
         if not instances:
             return
 
-        subprocess.run(["qs", "-c", "caelestia", "kill"], capture_output=True)
+        subprocess.run(["qs", "-c", "caelestia", "kill"], check=False, capture_output=True)
 
         # Teardown is not instant (and slowest while a session lock is up)
         if self.wait_for_exit(5):
@@ -81,6 +90,7 @@ class Command:
 
         # The instance is stuck; force kill it so the restart still happens
         warn("shell did not exit gracefully, killing")
+        instances = self.list_instances()
         for instance in instances:
             try:
                 os.kill(instance["pid"], signal.SIGKILL)
@@ -88,7 +98,7 @@ class Command:
                 pass
 
         if not self.wait_for_exit(2):
-            warn("an instance of the shell is still running")
+            fatal("an instance of the shell is still running")
 
     def filter_log(self, line: str) -> bool:
         return f"Cannot open: file://{c_cache_dir}/imagecache/" not in line
