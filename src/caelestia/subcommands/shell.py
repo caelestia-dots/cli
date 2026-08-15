@@ -82,9 +82,9 @@ class Command:
         if not instances:
             return
 
-        subprocess.run(["qs", "-c", "caelestia", "kill"], check=False, capture_output=True)
+        subprocess.run(["qs", "-c", "caelestia", "kill"], check=False, stdout=subprocess.DEVNULL)
 
-        # Teardown is not instant (and slowest while a session lock is up)
+        # Teardown is not instant, so wait for the instance to actually disappear
         if self.wait_for_exit(5):
             return
 
