@@ -85,9 +85,24 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     # Create parser for record opts
     record_parser = command_parser.add_parser("record", help="start a screen recording")
     record_parser.set_defaults(cls=record.Command)
+    record_parser.add_argument(
+        "-m",
+        "--mode",
+        choices=["fullscreen", "region", "window"],
+        default="fullscreen",
+        help="what to record (default: fullscreen)",
+    )
+    record_parser.add_argument(
+        "-a",
+        "--audio",
+        choices=["none", "system", "mic", "combined"],
+        default="none",
+        help="what to record audio from (default: none)",
+    )
     record_parser.add_argument("-r", "--region", nargs="?", const="slurp", help="record a region")
     record_parser.add_argument("-s", "--sound", action="store_true", help="record audio")
     record_parser.add_argument("-p", "--pause", action="store_true", help="pause/resume the recording")
+    record_parser.add_argument("--stop", action="store_true", help="stop the recording instead of toggling")
     record_parser.add_argument("-c", "--clipboard", action="store_true", help="copy recording path to clipboard")
 
     # Create parser for clipboard opts
