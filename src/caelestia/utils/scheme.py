@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from caelestia.utils.notify import notify
-from caelestia.utils.paths import atomic_dump, manual_scheme_json, scheme_data_dir, scheme_path, wallpaper_path_path
+from caelestia.utils.paths import atomic_dump, scheme_override_json, scheme_data_dir, scheme_path, wallpaper_path_path
 
 
 class Scheme:
@@ -157,12 +157,14 @@ class Scheme:
     def _update_colours(self) -> None:
         if self.name == "dynamic":
             self._update_colours_dynamic()
-        elif self.name == "manual":
-            self._update_colours_manual()
         else:
             self._colours = read_colours_from_file(self.get_colours_path())
 
     def _update_colours_dynamic(self) -> None:
+
+        if (self._update_colours_override()):
+            return
+
         from caelestia.utils.material import get_colours_for_image
 
         try:
@@ -179,26 +181,21 @@ class Scheme:
                 "No wallpaper set. Please set a wallpaper via `caelestia wallpaper` before setting a dynamic scheme."
             )
 
-    def _update_colours_manual(self) -> None:
-        """Look if there is a manual scheme for the current wallpaper.
-
-        Logic:
-            - Open `manual_scheme_json`
-            - Look for exact wallpaper name match
-            - If none, look for regex wallpaper path match
-            - If none, use dynamic coloring.
+    def _update_colours_override(self) -> bool:
+        """Tries to load a custom scheme from the scheme-override.json file.
+        Returns true if the override succeeds, and false otherwise.
         """
 
-        def fallback_to_dynamic(message: str) -> None:
-            """Fallback to dynamic scheme if there is no user scheme for the current wallpaper."""
+        def error_notification(message: str) -> None:
+            """Shows a custom notification to let the user know why the override failed."""
+
             if self.notify:
                 notify(
                     "-u",
                     "normal",
-                    "Cannot set manual scheme",
+                    "No overriding scheme found",
                     message,
                 )
-            self._update_colours_dynamic()
 
         wallpaper_path: Path = Path()
         scheme_path: Path = Path()
@@ -206,18 +203,18 @@ class Scheme:
         try:
             with wallpaper_path_path.open("r") as file_read:
                 wallpaper_path = Path(file_read.read())
-        except (IOError, json.JSONDecodeError):
-            fallback_to_dynamic("Cannot get wallpaper name.")
-            return
+        except (OSError, json.JSONDecodeError):
+            error_notification("Cannot get wallpaper name.")
+            return False
 
         try:
-            with manual_scheme_json.open("r") as file_read:
-                schemes: dict = json.load(file_read)
+            with scheme_override_json.open("r") as file_read:
+                schemes: dict[str, str] = json.load(file_read)
 
                 wallpaper_name: str = wallpaper_path.name
 
                 # Look for wallpaper name exact match
-                if wallpaper_name in schemes.keys():
+                if wallpaper_name in schemes:
                     scheme_path = Path(schemes[wallpaper_name]).expanduser()
 
                 # If none, look for regex match against path
@@ -226,18 +223,20 @@ class Scheme:
                 else:
                     raise KeyError
 
-        except (IOError, json.JSONDecodeError):
-            fallback_to_dynamic("Cannot open manual-scheme.json.")
-            return
+        except (OSError, json.JSONDecodeError):
+            error_notification("Cannot open manual-scheme.json.")
+            return False
         except KeyError:
-            fallback_to_dynamic(f"No manual scheme matching {wallpaper_path} found.")
-            return
+            error_notification(f"No manual scheme matching {wallpaper_path} found.")
+            return False
 
         try:
             self._colours = read_colours_from_file(scheme_path)
         except Exception:
-            fallback_to_dynamic(f"Failed to read colors from {scheme_path}.")
-            return
+            error_notification(f"Failed to read colors from {scheme_path}.")
+            return False
+
+        return True
 
     def __str__(self) -> str:
         return (
@@ -289,7 +288,7 @@ def get_scheme() -> Scheme:
 
 
 def get_scheme_names() -> list[str]:
-    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic", "manual"]
+    return [*(f.name for f in scheme_data_dir.iterdir() if f.is_dir()), "dynamic"]
 
 
 def get_scheme_flavours(name: str | None = None) -> list[str]:
@@ -297,9 +296,6 @@ def get_scheme_flavours(name: str | None = None) -> list[str]:
         name = get_scheme().name
 
     if name == "dynamic":
-        return ["default", "hard"]
-    elif name == "manual":
-        # Shows the same flavors as dynamic as they are only used when falling back on dynamic scheme generation
         return ["default", "hard"]
     else:
         return [f.name for f in (scheme_data_dir / name).iterdir() if f.is_dir()]
@@ -312,8 +308,6 @@ def get_scheme_modes(name: str | None = None, flavour: str | None = None) -> lis
         flavour = flavour or scheme.flavour
 
     if name == "dynamic":
-        return ["light", "dark"]
-    elif name == "manual":
         return ["light", "dark"]
     else:
         return [f.stem for f in (scheme_data_dir / name / flavour).iterdir() if f.is_file()]
