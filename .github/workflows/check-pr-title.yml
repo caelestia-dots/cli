@@ -1,0 +1,44 @@
+name: Check PR title
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+jobs:
+  check-pr-title:
+    runs-on: ubuntu-slim
+
+    permissions:
+      pull-requests: read
+
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scopes: |
+            clipboard
+            emoji
+            install
+            record
+            resizer
+            scheme
+            screenshot
+            shell
+            update
+            wallpaper
+
+            dots
+            colour
+            nix
+            parser
+            schemes
+            templates
+            theme
+            utils
+          subjectPattern: ^(?![A-Z]).+$ # No starting with uppercase
+          subjectPatternError: The subject must not start with an uppercase character.
