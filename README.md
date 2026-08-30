@@ -19,12 +19,78 @@ The Python CLI control script, system manager, and upstream synchronization suit
   * Pushes clean merges directly to GitHub (`origin/xiu`).
 * **Clipboard Manager Integration (`xiu clipboard`)**:
   * Seamless adapter for `clipvault` with fallback to `cliphist`.
+* **Dotfiles Deployment (`xiu install`)**:
+  * Manifest-driven interactive component installer and updater.
 * **Desktop Control Suite**:
   * `xiu shell`: Start, daemonize, inspect, or send IPC calls to the shell.
   * `xiu scheme`: Dynamic Material You color scheme generation and switching.
   * `xiu wallpaper`: Wallpaper management with color palette extraction.
   * `xiu screenshot`: Fullscreen, interactive region, or freeze screenshot captures.
   * `xiu record`: Screen and audio recording triggers.
+
+---
+
+## Installation Guide
+
+### Method 1: Arch Linux (AUR)
+
+```sh
+# Using paru:
+paru -S xiu-cli
+
+# Or using yay:
+yay -S xiu-cli
+```
+
+---
+
+### Method 2: Nix Flake
+
+Run directly without installing:
+```sh
+nix run github:yrpcaro/xiu-cli -- check
+```
+
+Or add to your NixOS / Home Manager flake inputs:
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    xiu-cli = {
+      url = "github:yrpcaro/xiu-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { self, nixpkgs, xiu-cli, ... }: {
+    # Add to system packages:
+    environment.systemPackages = [
+      xiu-cli.packages.x86_64-linux.default
+    ];
+  };
+}
+```
+
+---
+
+### Method 3: Python pip / pipx / Local Source
+
+On any Linux distribution with Python 3.13+:
+
+```sh
+# 1. Clone repository
+git clone -b xiu https://github.com/yrpcaro/xiu-cli.git ~/dots/xiu-cli
+cd ~/dots/xiu-cli
+
+# 2. Install using pip:
+pip install --user .
+
+# Or using pipx:
+pipx install .
+
+# Or run directly from local source:
+./bin/xiu --help
+```
 
 ---
 
@@ -48,41 +114,6 @@ xiu scheme set dark-oceanic  # Switch color scheme
 xiu screenshot -r            # Capture region screenshot
 xiu record -r                # Record selected screen region
 xiu clipboard                # Launch fuzzy clipboard history selector
-```
-
----
-
-## Installation
-
-### 1. Arch Linux (AUR)
-```sh
-paru -S xiu-cli
-```
-
-### 2. Nix Flake
-Run directly:
-```sh
-nix run github:yrpcaro/xiu-cli -- check
-```
-
-Or add to your flake inputs:
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    xiu-cli = {
-      url = "github:yrpcaro/xiu-cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-}
-```
-
-### 3. Generic Python Install (pip / pipx)
-```sh
-pip install .
-# or run directly from the source repo:
-./bin/xiu --help
 ```
 
 ---
