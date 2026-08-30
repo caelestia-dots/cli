@@ -1,63 +1,50 @@
-# caelestia-cli
+# xiu-cli
 
-The main control script for the Caelestia dotfiles.
+The Python CLI control script and system manager for the **xiu** ecosystem.
 
-<details><summary id="dependencies">External dependencies</summary>
+## Credits & License
 
-- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
-- [`swappy`](https://github.com/jtheoof/swappy) - screenshot editor
-- [`grim`](https://gitlab.freedesktop.org/emersion/grim) - taking screenshots
-- [`dart-sass`](https://github.com/sass/dart-sass) - discord theming
-- [`wl-clipboard`](https://github.com/bugaevc/wl-clipboard) - copying to clipboard
-- [`slurp`](https://github.com/emersion/slurp) - selecting an area
-- [`gpu-screen-recorder`](https://git.dec05eba.com/gpu-screen-recorder/about) - screen recording
-- `glib2` - closing notifications
-- [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
-- [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
+- **Upstream Base**: [caelestia-dots/cli](https://github.com/caelestia-dots/cli) (GNU GPL-3.0)
+- **License**: [GNU General Public License v3.0 (GPL-3.0)](/LICENSE)
 
-</details>
+## Upstream Drift Check & Sync
+
+`xiu-cli` provides built-in tools to manage and monitor upstream sync across all three xiu repositories:
+
+```sh
+# Report upstream drift, ahead/behind counts, and core file modifications
+xiu check
+
+# Automatically fetch upstream, merge upstream/main into xiu, and push to origin
+xiu sync
+```
 
 ## Installation
 
-### Arch linux
+`xiu-cli` is distro-agnostic:
 
-The CLI is available from the AUR as `caelestia-cli`. You can install it with an AUR helper
-like [`yay`](https://github.com/Jguer/yay) or manually downloading the PKGBUILD and running `makepkg -si`.
-
-A package following the latest commit also exists as `caelestia-cli-git`. This is bleeding edge
-and likely to be unstable/have bugs. Regular users are recommended to use the stable package
-(`caelestia-cli`).
-
-### Nix
-
-You can run the CLI directly via `nix run`:
+### 1. Arch Linux / AUR
+Install `xiu-cli` (or `caelestia-cli`):
 
 ```sh
-nix run github:caelestia-dots/cli
+paru -S xiu-cli
 ```
 
-Or add it to your system configuration:
+### 2. Nix Flake
+Run directly or import via flake:
 
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    caelestia-cli = {
-      url = "github:caelestia-dots/cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-}
+```sh
+nix run github:yrpcaro/xiu-cli
 ```
 
-The package is available as `caelestia-cli.packages.<system>.default`, which can be added to your
-`environment.systemPackages`, `users.users.<username>.packages`, `home.packages` if using home-manager,
-or a devshell. The CLI can then be used via the `caelestia` command.
+### 3. Generic Python Install (pip / pipx)
+Install on any Linux distribution:
 
-> [!TIP]
-> The default package does not have the shell enabled by default, which is required for full functionality.
-> To enable the shell, use the `with-shell` package. This is the recommended installation method, as
+```sh
+pip install .
+# or run directly from source via:
+./bin/xiu --help
+```
 > the CLI exposes the shell via the `shell` subcommand, meaning there is no need for the shell package
 > to be exposed.
 
