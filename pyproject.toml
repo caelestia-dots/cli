@@ -12,6 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
+xiu = "caelestia:main"
 caelestia = "caelestia:main"
 
 [tool.hatch.version]

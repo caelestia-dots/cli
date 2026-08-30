@@ -2,6 +2,7 @@ import argparse
 import sys
 
 from caelestia.subcommands import (
+    check,
     clipboard,
     emoji,
     install,
@@ -10,6 +11,7 @@ from caelestia.subcommands import (
     scheme,
     screenshot,
     shell,
+    sync,
     toggle,
     update,
     wallpaper,
@@ -167,6 +169,15 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     update_parser.set_defaults(cls=update.Command)
     update_parser.add_argument("--aur-helper", choices=AUR_HELPERS, help="the AUR helper to use")
     update_parser.add_argument("--noconfirm", action="store_true", help="use defaults for all prompts")
+
+    # Create parser for check opts (upstream drift report)
+    check_parser = command_parser.add_parser("check", help="check upstream drift and branch health across all xiu repos")
+    check_parser.set_defaults(cls=check.Command)
+
+    # Create parser for sync opts (upstream sync automation)
+    sync_parser = command_parser.add_parser("sync", help="fetch, merge, and push upstream/main updates across all xiu repos")
+    sync_parser.set_defaults(cls=sync.Command)
+    sync_parser.add_argument("--no-push", action="store_true", help="merge upstream/main locally without pushing to origin/xiu")
 
     return parser, parser.parse_args()
 
