@@ -24,5 +24,8 @@ only-include = [
     "README.md"
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/caelestia"]
+
 [tool.ruff]
 line-length = 120
