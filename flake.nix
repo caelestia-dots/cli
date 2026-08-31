@@ -24,12 +24,12 @@
     formatter = forAllSystems (pkgs: pkgs.alejandra);
 
     packages = forAllSystems (pkgs: rec {
-      caelestia-cli = pkgs.callPackage ./default.nix {
+      xiu-cli = pkgs.callPackage ./default.nix {
         rev = self.rev or self.dirtyRev;
         caelestia-shell = inputs.caelestia-shell.packages.${pkgs.system}.default;
       };
-      with-shell = caelestia-cli.override {withShell = true;};
-      default = caelestia-cli;
+      with-shell = xiu-cli.override {withShell = true;};
+      default = xiu-cli;
     });
 
     devShells = forAllSystems (pkgs: {

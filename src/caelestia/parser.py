@@ -26,7 +26,8 @@ from caelestia.utils.wallpaper import get_wallpaper
 
 
 def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
-    parser = argparse.ArgumentParser(prog="caelestia", description="Main control script for the Caelestia dotfiles")
+    prog = sys.argv[0].split("/")[-1] if len(sys.argv) > 0 and sys.argv[0] else "xiu"
+    parser = argparse.ArgumentParser(prog=prog, description="Main control script for the xiu dotfiles")
     parser.add_argument("-v", "--version", action="store_true", help="print the current version")
 
     # Add subcommand parsers

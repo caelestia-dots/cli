@@ -21,7 +21,7 @@
   qtctStyle ? "Darkly",
 }:
 python3.pkgs.buildPythonApplication {
-  pname = "caelestia-cli";
+  pname = "xiu-cli";
   version = "${rev}";
   src = ./.;
   pyproject = true;
@@ -78,10 +78,10 @@ python3.pkgs.buildPythonApplication {
   postInstall = "installShellCompletion completions/caelestia.fish";
 
   meta = {
-    description = "The main control script for the Caelestia dotfiles";
-    homepage = "https://github.com/caelestia-dots/cli";
+    description = "The main control script for the xiu dotfiles";
+    homepage = "https://github.com/yrpcaro/xiu-cli";
     license = lib.licenses.gpl3Only;
-    mainProgram = "caelestia";
+    mainProgram = "xiu";
     platforms = lib.platforms.linux;
   };
 }
