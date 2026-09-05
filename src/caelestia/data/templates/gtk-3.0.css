@@ -1,7 +1,3 @@
-/*
- * GTK 3.0 colors and components
- */
-
 /* Accents */
 @define-color accent_color #{{ primary.hex }};
 @define-color accent_fg_color #{{ onPrimary.hex }};
@@ -34,7 +30,7 @@
 @define-color headerbar_fg_color #{{ onSurface.hex }};
 @define-color card_bg_color #{{ surfaceContainer.hex }};
 @define-color card_fg_color #{{ onSurface.hex }};
-@define-color sidebar_bg_color #{{ background.hex }};
+@define-color sidebar_bg_color #{{ surfaceContainer.hex }};
 @define-color sidebar_fg_color #{{ onSurface.hex }};
 @define-color sidebar_row_active_bg_color #{{ secondaryContainer.hex }};
 @define-color sidebar_row_active_fg_color #{{ onSecondaryContainer.hex }};
@@ -43,9 +39,9 @@
 @define-color secondary_sidebar_fg_color #{{ onSurfaceVariant.hex }};
 @define-color sidebar_border_color @sidebar_bg_color;
 @define-color sidebar_backdrop_color @sidebar_bg_color;
-@define-color view_bg_color #{{ surfaceContainerLowest.hex }};
+@define-color view_bg_color #{{ surface.hex }};
 @define-color view_fg_color #{{ onSurface.hex }};
-@define-color overview_bg_color #{{ surfaceContainerLowest.hex }};
+@define-color overview_bg_color #{{ surface.hex }};
 @define-color overview_fg_color #{{ onSurface.hex }};
 
 /* Popups */
@@ -64,6 +60,9 @@
 @define-color inverse_surface #{{ inverseSurface.hex }};
 @define-color surface_container_highest #{{ surfaceContainerHighest.hex }};
 @define-color surface_container_high #{{ surfaceContainerHigh.hex }};
+@define-color surface_container #{{ surfaceContainer.hex }};
+@define-color surface_container_low #{{ surfaceContainerLow.hex }};
+@define-color surface_container_lowest #{{ surfaceContainerLowest.hex }};
 @define-color on_surface_variant #{{ onSurfaceVariant.hex }};
 @define-color surface_variant #{{ surfaceVariant.hex }};
 @define-color outline #{{ outline.hex }};
@@ -81,9 +80,7 @@ window {
   background: @window_bg_color;
 }
 
-/* =============================================================================
-   Sliders (Material 3 Expressive Scale matching StyledSlider.qml)
-   ============================================================================= */
+/* Sliders */
 
 scale {
   min-height: 36px;
@@ -94,22 +91,22 @@ scale {
 scale.horizontal trough,
 scale:not(.vertical) trough {
   min-height: 16px;
-  border-radius: 4px;
+  border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 2px, transparent 2.5px);
+  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.horizontal highlight,
 scale:not(.vertical) highlight {
   min-height: 16px;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   background-color: @accent_color;
   border: none;
   box-shadow: none;
@@ -127,8 +124,7 @@ scale:not(.vertical) slider {
   border: none;
   outline: none;
   transition: min-height 150ms cubic-bezier(0.2, 0, 0, 1),
-              margin 150ms cubic-bezier(0.2, 0, 0, 1),
-              transform 150ms cubic-bezier(0.2, 0, 0, 1);
+              margin 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 scale.horizontal slider:hover,
@@ -143,24 +139,26 @@ scale:not(.vertical):active slider {
   min-width: 4px;
   min-height: 40px;
   margin: -12px 0;
-  transform: scaleY(1.25);
 }
 
 /* Vertical scale */
 scale.vertical trough {
   min-width: 16px;
-  border-radius: 4px;
+  border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 2px, transparent 2.5px);
+  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.vertical highlight {
   min-width: 16px;
-  border-radius: 4px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
   background-color: @accent_color;
   border: none;
   box-shadow: none;
@@ -177,8 +175,7 @@ scale.vertical slider {
   border: none;
   outline: none;
   transition: min-width 150ms cubic-bezier(0.2, 0, 0, 1),
-              margin 150ms cubic-bezier(0.2, 0, 0, 1),
-              transform 150ms cubic-bezier(0.2, 0, 0, 1);
+              margin 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 scale.vertical slider:hover {
@@ -191,7 +188,6 @@ scale.vertical:active slider {
   min-height: 4px;
   min-width: 40px;
   margin: 0 -12px;
-  transform: scaleX(1.25);
 }
 
 /* Disabled scale */
@@ -209,9 +205,48 @@ scale:disabled slider {
   box-shadow: 0 0 0 3px @window_bg_color;
 }
 
-/* =============================================================================
-   Toggles (Switch, CheckButton, RadioButton matching StyledSwitch / StyledRadioButton)
-   ============================================================================= */
+/* Progress bars */
+
+progressbar {
+  min-height: 4px;
+  padding: 0;
+}
+
+progressbar:not(.vertical) trough,
+progressbar.horizontal trough {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at calc(100% - 4px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar:not(.vertical) progress,
+progressbar.horizontal progress {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-right: 4px;
+}
+
+progressbar.vertical trough {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at 50% 4px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar.vertical progress {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-bottom: 4px;
+}
+
+/* Toggles */
 
 /* Switch */
 switch {
@@ -237,7 +272,6 @@ switch:checked {
 
 switch:checked:hover {
   background-color: @accent_color;
-  filter: brightness(1.06);
 }
 
 switch slider {
@@ -357,6 +391,7 @@ radio {
   background-color: transparent;
   color: transparent;
   box-shadow: none;
+  -gtk-icon-source: none;
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -368,24 +403,23 @@ radio:hover {
 checkbutton radio:checked,
 radio:checked {
   border-color: @accent_color;
-  color: @accent_color;
   background-color: transparent;
+  background-image: radial-gradient(circle, @accent_color 0px, @accent_color 4px, transparent 4.5px);
 }
 
 checkbutton radio:disabled,
 radio:disabled {
   border-color: alpha(@on_surface_variant, 0.38);
+  background-image: none;
 }
 
 checkbutton radio:checked:disabled,
 radio:checked:disabled {
   border-color: alpha(@accent_color, 0.38);
-  color: alpha(@accent_color, 0.38);
+  background-image: radial-gradient(circle, alpha(@accent_color, 0.38) 0px, alpha(@accent_color, 0.38) 4px, transparent 4.5px);
 }
 
-/* =============================================================================
-   Drop Downs (ComboBox, Popovers, Menus matching SelectRow / SplitButton / Menu.qml)
-   ============================================================================= */
+/* Dropdowns */
 
 /* ComboBox & Dropdown trigger buttons */
 combobox {
@@ -398,101 +432,94 @@ combobox {
 
 combobox button.combo,
 combobox button {
-  background: transparent;
+  border-radius: 999px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 16px;
   border: none;
   box-shadow: none;
-  padding: 0;
-  margin: 0;
-  min-height: 32px;
+  min-height: 36px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox button.combo:hover,
+combobox button:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @sidebar_row_active_fg_color;
+}
+
+combobox button.combo:active,
+combobox button:active,
+combobox button.combo:checked,
+combobox button:checked {
+  background-color: @tonal_active_bg_color;
+  color: @sidebar_row_active_fg_color;
 }
 
 combobox button.combo label,
 combobox button label {
-  border-radius: 16px 4px 4px 16px;
-  background-color: @sidebar_row_active_bg_color;
-  color: @sidebar_row_active_fg_color;
-  padding: 0 14px;
-  margin-right: 2px;
+  background: transparent;
+  color: inherit;
   font-weight: 500;
-  min-height: 32px;
+  padding: 0;
+  margin: 0;
 }
 
 combobox arrow,
 combobox button arrow {
-  border-radius: 4px 16px 16px 4px;
-  background-color: @sidebar_row_active_bg_color;
-  color: @sidebar_row_active_fg_color;
-  padding: 9px;
-  margin: 0;
-  min-width: 14px;
-  min-height: 14px;
-  -gtk-icon-size: 14px;
-  transform-origin: center center;
-  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1),
-              -gtk-icon-transform 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-combobox button:checked arrow,
-combobox button:active arrow {
-  border-radius: 16px;
-  -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
-  transform: rotate(180deg);
-  -gtk-icon-transform: rotate(180deg);
-}
-
-combobox button.combo:hover label,
-combobox button:hover label,
-combobox button.combo:hover arrow,
-combobox button:hover arrow {
-  background-color: @accent_hover_color;
-  color: @accent_color;
+  background: transparent;
+  color: inherit;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  margin-left: 8px;
 }
 
 .linked > button:first-child {
-  border-radius: 16px 4px 4px 16px;
+  border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
   border: none;
   box-shadow: none;
   margin-right: 2px;
   padding: 0 14px;
-  min-height: 32px;
+  min-height: 36px;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .linked > button:last-child {
-  border-radius: 4px 16px 16px 4px;
+  border-radius: 4px 18px 18px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
   border: none;
   box-shadow: none;
   margin-left: 0;
-  padding: 0;
-  min-width: 32px;
-  min-height: 32px;
+  padding: 0 8px;
+  min-width: 36px;
+  min-height: 36px;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.linked > button:first-child:hover,
+.linked > button:last-child:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @sidebar_row_active_fg_color;
+}
+
+.linked > button:first-child:active,
+.linked > button:last-child:active,
+.linked > button:last-child:checked {
+  background-color: @tonal_active_bg_color;
+  color: @sidebar_row_active_fg_color;
 }
 
 .linked > button:last-child arrow {
-  min-width: 14px;
-  min-height: 14px;
-  -gtk-icon-size: 14px;
-  transform-origin: center center;
-  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1),
-              -gtk-icon-transform 200ms cubic-bezier(0.2, 0, 0, 1);
+  min-width: 16px;
+  min-height: 16px;
 }
 
-.linked > button:last-child:checked,
-.linked > button:last-child:active {
-  border-radius: 16px;
-}
-
-.linked > button:last-child:checked arrow,
-.linked > button:last-child:active arrow {
-  -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
-  transform: rotate(180deg);
-  -gtk-icon-transform: rotate(180deg);
-}
-
-/* Popover & Menus (matching quickshell Menu.qml & media_1788458933825.png) */
+/* Popovers and menus */
 popover > arrow,
 .menu > arrow,
 menu > arrow {
@@ -511,7 +538,7 @@ menu {
   border-radius: 16px;
   padding: 4px;
   min-width: 200px;
-  box-shadow: none;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 }
 
 menu box,
@@ -519,19 +546,6 @@ menu box,
   padding: 0;
   margin: 0;
   border: none;
-}
-
-menu check,
-menu radio,
-.menu check,
-.menu radio {
-  -gtk-icon-source: none;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  margin: 0;
-  border: none;
-  opacity: 0;
 }
 
 menu menuitem,
@@ -546,218 +560,192 @@ menu menuitem,
   transition: all 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-menu menuitem:last-child,
-.menu menuitem:last-child {
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-menu menuitem:first-child,
-menu menuitem:active,
-menu menuitem:checked,
-.menu menuitem:first-child,
-.menu menuitem:active,
-.menu menuitem:checked {
-  background-color: @accent_color;
-  color: #192120;
-  font-weight: 600;
-  border-radius: 12px;
-}
-
-menu menuitem:not(:first-child):hover,
-.menu menuitem:not(:first-child):hover {
-  background-color: #1e2625;
+menu menuitem:hover,
+.menu menuitem:hover,
+menu menuitem:selected,
+.menu menuitem:selected {
+  background-color: @popover_fg_hover_color;
   color: @window_fg_color;
   border-radius: 4px;
 }
 
-/* =============================================================================
-   Rollers / Steppers (SpinButton matching StyledSpinBox.qml)
-   ============================================================================= */
-
-spinbutton {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
+menu menuitem:active,
+.menu menuitem:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+  border-radius: 4px;
 }
 
-/* Horizontal spinbutton / stepper: unified pill with clean segment separation */
-spinbutton:not(.vertical) {
-  min-height: 36px;
-  background: transparent;
-  padding: 0;
-  border: none;
-  box-shadow: none;
+menu menuitem accelerator,
+.menu menuitem accelerator {
+  color: @on_surface_variant;
+  font-size: 11px;
+  margin-left: 12px;
 }
 
-spinbutton:not(.vertical) > button,
-spinbutton:not(.vertical) button {
-  min-width: 36px;
+menu menuitem:hover accelerator,
+.menu menuitem:hover accelerator,
+menu menuitem:selected accelerator,
+.menu menuitem:selected accelerator {
+  color: inherit;
+}
+
+/* Text entries & Search entries */
+entry:not(.search) {
+  border-radius: 8px;
   min-height: 36px;
-  background-color: @surface_container_highest;
+  padding: 6px 12px;
+  background-color: transparent;
+  color: @window_fg_color;
+  border: 1px solid @outline;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+entry:not(.search):focus {
+  border: 2px solid @accent_color;
+  padding: 5px 11px;
+  color: @window_fg_color;
+  outline: none;
+}
+
+entry:not(.search).error {
+  border: 2px solid @destructive_color;
+  padding: 5px 11px;
+  color: @destructive_color;
+}
+
+entry:not(.search):disabled {
+  opacity: 0.38;
+  border: 1px solid @outline_variant;
+}
+
+entry selection {
+  background-color: @accent_color;
+  color: @accent_fg_color;
+}
+
+searchentry,
+entry.search {
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 6px 14px;
+  background-color: @surface_container;
   color: @window_fg_color;
   border: none;
   box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+searchentry:focus,
+entry.search:focus {
+  background-color: @surface_container_high;
+  box-shadow: inset 0 0 0 1px @outline_variant;
+}
+
+searchentry > image.left,
+searchentry image:first-child,
+entry.search > image.left {
+  color: @on_surface_variant;
+  margin-right: 6px;
+}
+
+searchentry button.clear,
+searchentry button.flat,
+entry.search button.clear,
+entry.search button.flat {
+  border-radius: 999px;
+  background-color: transparent;
+  color: @on_surface_variant;
+  border: none;
+  box-shadow: none;
+  min-width: 24px;
+  min-height: 24px;
   padding: 0;
   margin: 0;
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-spinbutton:not(.vertical) > button:hover,
-spinbutton:not(.vertical) button:hover {
-  background-color: @accent_hover_color;
-  color: @accent_color;
-}
-
-spinbutton:not(.vertical) > button:active,
-spinbutton:not(.vertical) button:active {
-  background-color: @accent_active_color;
-  color: @accent_color;
-}
-
-/* Clear Libadwaita default button borders and margins */
-spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque),
-spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque) {
-  border: none;
-  border-width: 0;
-  box-shadow: none;
-  margin: 0;
-}
-
-/* First button in horizontal (decrement): rounded left pill cap (18px), 4px right edge */
-spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
-spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
-spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
-spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
-spinbutton:not(.vertical) > button.image-button:first-child,
-spinbutton:not(.vertical) > button:first-child {
-  border-radius: 18px 4px 4px 18px;
-  margin: 0 2px 0 0;
-}
-
-/* Last button in horizontal (increment): 4px left edge, rounded right pill cap (18px) */
-spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
-spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
-spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
-spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
-spinbutton:not(.vertical) > button.image-button:last-child,
-spinbutton:not(.vertical) > button:last-child {
-  border-radius: 4px 18px 18px 4px;
-  margin: 0 0 0 2px;
-}
-
-spinbutton:not(.vertical) > button image,
-spinbutton:not(.vertical) button image {
-  color: inherit;
-}
-
-spinbutton:not(.vertical) > text,
-spinbutton:not(.vertical) entry,
-spinbutton:not(.vertical) text {
-  background-color: @surface_container_highest;
+searchentry button.clear:hover,
+searchentry button.flat:hover,
+entry.search button.clear:hover,
+entry.search button.flat:hover {
+  background-color: @popover_fg_hover_color;
   color: @window_fg_color;
-  min-width: 44px;
-  min-height: 36px;
+}
+
+searchentry button.clear:active,
+searchentry button.flat:active,
+entry.search button.clear:active,
+entry.search button.flat:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+}
+
+/* Spinbuttons / Steppers */
+spinbutton:not(.vertical) {
+  background-color: @surface_container_high;
+  color: @window_fg_color;
+  border-radius: 999px;
   border: none;
   box-shadow: none;
-  padding: 0 4px;
-  margin: 0;
-  border-radius: 4px;
+  padding: 2px 4px;
+  min-height: 36px;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-spinbutton:not(.vertical) > text:first-child,
-spinbutton:not(.vertical) entry:first-child {
-  border-radius: 18px 4px 4px 18px;
-  margin: 0 2px 0 0;
+spinbutton:not(.vertical) entry {
+  background: transparent;
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  min-width: 48px;
+  padding: 0 6px;
 }
 
-/* Vertical spinbutton with clean segment separation */
+spinbutton:not(.vertical) button {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  border-radius: 999px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  margin: 2px 2px;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+spinbutton:not(.vertical) button:hover {
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
+}
+
+spinbutton:not(.vertical) button:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+}
+
 spinbutton.vertical {
   min-width: 36px;
-  background: transparent;
-  padding: 0;
-  border: none;
-  box-shadow: none;
+  padding: 4px 0;
 }
 
-spinbutton.vertical > button,
-spinbutton.vertical button {
-  min-width: 36px;
-  min-height: 32px;
-  background-color: @surface_container_highest;
-  color: @window_fg_color;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
+/* Click effects on buttons */
+button {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque),
-spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque) {
-  border: none;
-  border-width: 0;
-  box-shadow: none;
-  margin: 0;
+button:active {
+  background-color: @popover_fg_active_color;
 }
 
-/* First button in vertical (top): rounded top pill (18px), 4px bottom edge */
-spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
-spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
-spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
-spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
-spinbutton.vertical > button.image-button:first-child,
-spinbutton.vertical > button:first-child {
-  border-radius: 18px 18px 4px 4px;
-  margin: 0 0 2px 0;
+button.suggested-action:active,
+button.destructive-action:active {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
 }
 
-/* Last button in vertical (bottom): 4px top edge, rounded bottom pill (18px) */
-spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
-spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
-spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
-spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
-spinbutton.vertical > button.image-button:last-child,
-spinbutton.vertical > button:last-child {
-  border-radius: 4px 4px 18px 18px;
-  margin: 2px 0 0 0;
-}
-
-spinbutton.vertical > button:hover,
-spinbutton.vertical button:hover {
-  background-color: @accent_hover_color;
-  color: @accent_color;
-}
-
-spinbutton.vertical > button:active,
-spinbutton.vertical button:active {
-  background-color: @accent_active_color;
-  color: @accent_color;
-}
-
-spinbutton.vertical > button image,
-spinbutton.vertical button image {
-  color: inherit;
-}
-
-spinbutton.vertical > text,
-spinbutton.vertical entry,
-spinbutton.vertical text {
-  background-color: @surface_container_highest;
-  color: @window_fg_color;
-  min-width: 36px;
-  min-height: 32px;
-  border: none;
-  box-shadow: none;
-  padding: 0 4px;
-  margin: 0;
-  border-radius: 4px;
-}
-
-/* =============================================================================
-   Hyprmod Style Row Indicators & Components
-   ============================================================================= */
+/* Hyprmod indicators */
 
 /* Managed indicator: option is saved in config file */
 row.option-managed,

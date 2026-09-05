@@ -29,7 +29,7 @@
     @define-color headerbar_fg_color #{{ onSurface.hex }};
     @define-color card_bg_color #{{ surfaceContainer.hex }};
     @define-color card_fg_color #{{ onSurface.hex }};
-    @define-color sidebar_bg_color #{{ background.hex }};
+    @define-color sidebar_bg_color #{{ surfaceContainer.hex }};
     @define-color sidebar_fg_color #{{ onSurface.hex }};
     @define-color sidebar_row_active_bg_color #{{ secondaryContainer.hex }};
     @define-color sidebar_row_active_fg_color #{{ onSecondaryContainer.hex }};
@@ -38,9 +38,9 @@
     @define-color secondary_sidebar_fg_color #{{ onSurfaceVariant.hex }};
     @define-color sidebar_border_color @sidebar_bg_color;
     @define-color sidebar_backdrop_color @sidebar_bg_color;
-    @define-color view_bg_color #{{ surfaceContainerLowest.hex }};
+    @define-color view_bg_color #{{ surface.hex }};
     @define-color view_fg_color #{{ onSurface.hex }};
-    @define-color overview_bg_color #{{ surfaceContainerLowest.hex }};
+    @define-color overview_bg_color #{{ surface.hex }};
     @define-color overview_fg_color #{{ onSurface.hex }};
     /* Popups */
     @define-color popover_bg_color #{{ surfaceContainerHighest.hex }};
@@ -58,10 +58,14 @@
     @define-color inverse_surface #{{ inverseSurface.hex }};
     @define-color surface_container_highest #{{ surfaceContainerHighest.hex }};
     @define-color surface_container_high #{{ surfaceContainerHigh.hex }};
+    @define-color surface_container #{{ surfaceContainer.hex }};
+    @define-color surface_container_low #{{ surfaceContainerLow.hex }};
+    @define-color surface_container_lowest #{{ surfaceContainerLowest.hex }};
     @define-color on_surface_variant #{{ onSurfaceVariant.hex }};
     @define-color surface_variant #{{ surfaceVariant.hex }};
 
     @define-color outline #{{ outline.hex }};
+    @define-color outline_variant #{{ outlineVariant.hex }};
 
     /* Material state layers */
     @define-color inverse_on_surface_hover rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.08);
@@ -101,7 +105,7 @@
     @define-color headerbar_fg_color #{{ onSurface.hex }};
     @define-color card_bg_color #{{ surfaceContainer.hex }};
     @define-color card_fg_color #{{ onSurface.hex }};
-    @define-color sidebar_bg_color #{{ background.hex }};
+    @define-color sidebar_bg_color #{{ surfaceContainer.hex }};
     @define-color sidebar_fg_color #{{ onSurface.hex }};
     @define-color sidebar_row_active_bg_color #{{ secondaryContainer.hex }};
     @define-color sidebar_row_active_fg_color #{{ onSecondaryContainer.hex }};
@@ -110,9 +114,9 @@
     @define-color secondary_sidebar_fg_color #{{ onSurfaceVariant.hex }};
     @define-color sidebar_border_color @sidebar_bg_color;
     @define-color sidebar_backdrop_color @sidebar_bg_color;
-    @define-color view_bg_color #{{ surfaceContainerLowest.hex }};
+    @define-color view_bg_color #{{ surface.hex }};
     @define-color view_fg_color #{{ onSurface.hex }};
-    @define-color overview_bg_color #{{ surfaceContainerLowest.hex }};
+    @define-color overview_bg_color #{{ surface.hex }};
     @define-color overview_fg_color #{{ onSurface.hex }};
     /* Popups */
     @define-color popover_bg_color #{{ surfaceContainerHighest.hex }};
@@ -130,10 +134,14 @@
     @define-color inverse_surface #{{ inverseSurface.hex }};
     @define-color surface_container_highest #{{ surfaceContainerHighest.hex }};
     @define-color surface_container_high #{{ surfaceContainerHigh.hex }};
+    @define-color surface_container #{{ surfaceContainer.hex }};
+    @define-color surface_container_low #{{ surfaceContainerLow.hex }};
+    @define-color surface_container_lowest #{{ surfaceContainerLowest.hex }};
     @define-color on_surface_variant #{{ onSurfaceVariant.hex }};
     @define-color surface_variant #{{ surfaceVariant.hex }};
 
     @define-color outline #{{ outline.hex }};
+    @define-color outline_variant #{{ outlineVariant.hex }};
 
     /* Material state layers */
     @define-color inverse_on_surface_hover rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.08);
@@ -367,19 +375,140 @@ splitbutton.destructive-action > menubutton > button {
     background: @accent_vibrant_hover_color;
 }
 
+headerbar,
+.top-bar headerbar,
+toolbarview > .top-bar {
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+}
+
 headerbar button {
   border-radius: 999px;
 }
 
-headerbar >windowhandle box stack > box:nth-child(2) {
-	background: @accent_active_color;
-	border-radius: 8px;
+/* Text entries & Search entries */
+entry:not(.search) {
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  background-color: transparent;
+  color: @window_fg_color;
+  border: 1px solid @outline;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+entry:not(.search) > text {
+  color: @window_fg_color;
+  background-color: transparent;
+  padding: 8px 0;
+}
+
+entry:not(.search):focus,
+entry:not(.search):focus-within {
+  border: 2px solid @accent_color;
+  padding: 0 11px;
+  color: @window_fg_color;
+  outline: none;
+}
+
+entry:not(.search).error {
+  border: 2px solid @destructive_color;
+  padding: 0 11px;
+  color: @destructive_color;
+}
+
+entry:not(.search):disabled {
+  opacity: 0.38;
+  border: 1px solid @outline_variant;
+}
+
+entry selection {
+  background-color: @accent_color;
+  color: @accent_fg_color;
+}
+
+searchentry,
+entry.search {
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 0 14px;
+  background-color: @surface_container;
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+searchentry:focus,
+searchentry:focus-within,
+entry.search:focus,
+entry.search:focus-within {
+  background-color: @surface_container_high;
+  box-shadow: inset 0 0 0 1px @outline_variant;
+}
+
+searchentry > text,
+entry.search > text {
+  background-color: transparent;
+  color: @window_fg_color;
+  padding: 6px 0;
+}
+
+searchentry > image.left,
+searchentry image:first-child,
+entry.search > image.left {
+  color: @on_surface_variant;
+  margin-right: 6px;
+}
+
+entry button.flat,
+entry > image,
+entry button:not(:hover),
+searchentry button:not(:hover),
+entry.search button:not(:hover) {
+  background: transparent;
+  box-shadow: none;
+}
+
+searchentry button,
+entry.search button {
+  border-radius: 999px;
+  background-color: transparent;
+  color: @on_surface_variant;
+  border: none;
+  box-shadow: none;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+entry button:hover,
+searchentry button:hover,
+entry.search button:hover {
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
+}
+
+entry button:active,
+searchentry button:active,
+entry.search button:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
 }
 
 .nautilus-list-view,
 .nautilus-grid-view {
-  background: @secondary_sidebar_bg_color;
   border-radius: 16px;
+}
+
+.navigation-sidebar,
+split-view > .sidebar,
+overlay-split-view > .sidebar,
+navigation-split-view > .sidebar {
+  background-color: @sidebar_bg_color;
 }
 
 .navigation-sidebar row * {
@@ -513,9 +642,7 @@ button.back:active {
   background-color: @accent_active_color;
 }
 
-/* =============================================================================
-   Sliders (Material 3 Expressive Scale matching StyledSlider.qml)
-   ============================================================================= */
+/* Sliders */
 
 scale {
   min-height: 36px;
@@ -526,22 +653,22 @@ scale {
 scale.horizontal > trough,
 scale:not(.vertical) > trough {
   min-height: 16px;
-  border-radius: 4px;
+  border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 2px, transparent 2.5px);
+  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.horizontal > trough > highlight,
 scale:not(.vertical) > trough > highlight {
   min-height: 16px;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   background-color: @accent_color;
   border: none;
   box-shadow: none;
@@ -585,18 +712,21 @@ scale:not(.vertical) > trough > slider:active {
 /* Vertical scale */
 scale.vertical > trough {
   min-width: 16px;
-  border-radius: 4px;
+  border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 2px, transparent 2.5px);
+  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.vertical > trough > highlight {
   min-width: 16px;
-  border-radius: 4px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
   background-color: @accent_color;
   border: none;
   box-shadow: none;
@@ -647,9 +777,48 @@ scale:disabled > trough > slider {
   box-shadow: 0 0 0 3px @window_bg_color;
 }
 
-/* =============================================================================
-   Toggles (Switch, CheckButton, RadioButton matching StyledSwitch / StyledRadioButton)
-   ============================================================================= */
+/* Progress bars */
+
+progressbar {
+  min-height: 4px;
+  padding: 0;
+}
+
+progressbar:not(.vertical) > trough,
+progressbar.horizontal > trough {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at calc(100% - 4px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar:not(.vertical) > trough > progress,
+progressbar.horizontal > trough > progress {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-right: 4px;
+}
+
+progressbar.vertical > trough {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at 50% 4px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar.vertical > trough > progress {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-bottom: 4px;
+}
+
+/* Toggles */
 
 /* Switch */
 switch {
@@ -896,7 +1065,7 @@ popover listview.view row,
 popover listview.view row:first-child,
 popover listview.view row:last-child {
   background: transparent;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 popover contents,
@@ -906,10 +1075,12 @@ popover arrow {
 
 popover listview.view row:hover {
   background: @popover_fg_hover_color;
+  border-radius: 4px;
 }
 
 popover listview.view row:active {
   background: @popover_fg_active_color;
+  border-radius: 4px;
 }
 
 modelbutton {
@@ -940,9 +1111,7 @@ tooltip {
   background: transparent;
 }
 
-/* =============================================================================
-   Drop Downs (DropDown, ComboBox, Popover Menu matching SelectRow / Menu.qml)
-   ============================================================================= */
+/* Dropdowns */
 
 dropdown {
   background: transparent;
@@ -1021,7 +1190,7 @@ dropdown > button:active > box > arrow {
   -gtk-icon-transform: rotate(180deg);
 }
 
-/* Popover & Menus (matching quickshell Menu.qml & media_1788458933825.png) */
+/* Popovers and menus */
 popover,
 popover.menu,
 dropdown > popover {
@@ -1052,7 +1221,7 @@ dropdown > popover contents {
   border-radius: 16px;
   padding: 4px;
   min-width: 200px;
-  box-shadow: none;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* Ensure internal boxes have zero extra padding/margin so card padding is strictly 4px */
@@ -1067,11 +1236,6 @@ dropdown > popover contents listview {
   border: none;
 }
 
-/* Completely remove check and radio widgets */
-popover.menu check,
-popover.menu radio,
-popover check,
-popover radio,
 dropdown > popover listview row image {
   -gtk-icon-source: none;
   min-width: 0;
@@ -1082,12 +1246,36 @@ dropdown > popover listview row image {
   opacity: 0;
 }
 
+popover.menu .linked > button:first-child,
+.linked.horizontal > button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: 0;
+}
+
+popover.menu .linked > button:last-child,
+.linked.horizontal > button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: 0;
+}
+
+popover.menu .linked > button:not(:first-child):not(:last-child),
+.linked.horizontal > button:not(:first-child):not(:last-child) {
+  border-radius: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 /* Menu items: compact height and clean padding */
 popover.menu modelbutton,
 popover.menu modelbutton.flat,
 popover modelbutton,
+modelbutton,
 dropdown > popover listview > row,
-dropdown > popover listview row {
+dropdown > popover listview row,
+row.combo popover listview > row,
+row.combo popover listview row {
   border-radius: 4px;
   padding: 4px 10px;
   min-height: 26px;
@@ -1100,75 +1288,102 @@ dropdown > popover listview row {
 
 popover.menu modelbutton label,
 popover modelbutton label,
-dropdown > popover listview row label {
+modelbutton label,
+dropdown > popover listview row label,
+row.combo popover listview row label {
   padding: 0;
   margin: 0;
+  color: inherit;
 }
 
-popover.menu modelbutton:last-child,
-dropdown > popover listview > row:last-child,
-dropdown > popover listview row:last-child {
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-/* Selected option: rounded pill (12px), bright accent background, dark text */
-popover.menu modelbutton.selected,
-popover.menu modelbutton:selected,
-popover.menu modelbutton:checked,
-popover.menu modelbutton:first-child,
+/* Selected option in dropdowns and select lists */
 dropdown > popover listview row:selected,
-dropdown > popover listview row:first-child,
 row.combo popover listview row:selected,
-popover.menu listview.view row:selected,
-popover.menu listview row:selected {
+dropdown > popover listview row.selected,
+row.combo popover listview row.selected {
   background-color: @tertiary_container;
   color: @on_tertiary_container;
   font-weight: 600;
   border-radius: 12px;
 }
 
-popover.menu modelbutton.selected label,
-popover.menu modelbutton:selected label,
-popover.menu modelbutton:checked label,
-popover.menu modelbutton:first-child label,
 dropdown > popover listview row:selected label,
-dropdown > popover listview row:first-child label,
 row.combo popover listview row:selected label,
-popover.menu listview.view row:selected label,
-popover.menu listview row:selected label {
+dropdown > popover listview row.selected label,
+row.combo popover listview row.selected label {
   color: @on_tertiary_container;
 }
 
-/* Selected option retains tertiary container background and pill rounding on hover */
-popover.menu modelbutton.selected:hover,
-popover.menu modelbutton:selected:hover,
-popover.menu modelbutton:checked:hover,
-popover.menu modelbutton:first-child:hover,
 dropdown > popover listview row:selected:hover,
-dropdown > popover listview row:first-child:hover,
 row.combo popover listview row:selected:hover,
-popover.menu listview.view row:selected:hover,
-popover.menu listview row:selected:hover {
+dropdown > popover listview row.selected:hover,
+row.combo popover listview row.selected:hover {
   background-color: @tertiary_container;
   color: @on_tertiary_container;
   border-radius: 12px;
 }
 
-/* Hover highlight: sharper (4px) than selection (12px), surface tint #1e2625 with light text */
-popover.menu modelbutton:not(:first-child):not(.selected):not(:checked):hover,
-popover.menu modelbutton:not(:first-child):not(.selected):not(:checked):hover label,
-popover modelbutton:not(:first-child):not(.selected):not(:checked):hover,
-dropdown > popover listview row:not(:first-child):not(:selected):hover,
-dropdown > popover listview row:not(:first-child):not(:selected):hover label {
-  background-color: #1e2625;
+/* Hover highlight: sharper corners (4px) and subtle hover tint */
+popover.menu modelbutton:hover,
+popover.menu modelbutton:selected,
+popover.menu modelbutton:focus,
+popover modelbutton:hover,
+popover modelbutton:selected,
+popover modelbutton:focus,
+modelbutton:hover,
+modelbutton:selected,
+modelbutton:focus,
+dropdown > popover listview row:not(:selected):hover,
+dropdown > popover listview row:hover:not(:selected),
+row.combo popover listview row:not(:selected):hover,
+row.combo popover listview row:hover:not(:selected) {
+  background-color: @popover_fg_hover_color;
   color: @window_fg_color;
   border-radius: 4px;
 }
 
-/* =============================================================================
-   Rollers / Steppers (SpinButton matching StyledSpinBox.qml)
-   ============================================================================= */
+popover.menu modelbutton:hover label,
+popover.menu modelbutton:selected label,
+popover.menu modelbutton:focus label,
+popover modelbutton:hover label,
+popover modelbutton:selected label,
+popover modelbutton:focus label,
+modelbutton:hover label,
+modelbutton:selected label,
+modelbutton:focus label,
+dropdown > popover listview row:not(:selected):hover label,
+dropdown > popover listview row:hover:not(:selected) label,
+row.combo popover listview row:not(:selected):hover label,
+row.combo popover listview row:hover:not(:selected) label {
+  color: @window_fg_color;
+}
+
+/* Active / pressed state */
+popover.menu modelbutton:active,
+popover modelbutton:active,
+modelbutton:active,
+dropdown > popover listview row:active,
+row.combo popover listview row:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+  border-radius: 4px;
+}
+
+accelerator {
+  color: @on_surface_variant;
+  font-size: 11px;
+  margin-left: 12px;
+}
+
+popover.menu modelbutton:hover accelerator,
+popover.menu modelbutton:selected accelerator,
+modelbutton:hover accelerator,
+modelbutton:selected accelerator,
+dropdown > popover listview row:selected accelerator {
+  color: inherit;
+}
+
+/* Spinbuttons */
 
 spinbutton {
   background: transparent;
@@ -1201,14 +1416,14 @@ spinbutton:not(.vertical) button {
 
 spinbutton:not(.vertical) > button:hover,
 spinbutton:not(.vertical) button:hover {
-  background-color: @accent_hover_color;
-  color: @accent_color;
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
 }
 
 spinbutton:not(.vertical) > button:active,
 spinbutton:not(.vertical) button:active {
-  background-color: @accent_active_color;
-  color: @accent_color;
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
 }
 
 /* Clear Libadwaita default button borders and margins */
@@ -1350,9 +1565,7 @@ spinbutton.vertical text {
   border-radius: 4px;
 }
 
-/* =============================================================================
-   Hyprmod Style Row Indicators & Components
-   ============================================================================= */
+/* Hyprmod indicators */
 
 /* Managed indicator: option is saved in config file */
 row.option-managed,
@@ -1415,9 +1628,7 @@ row.profile-active {
   font-weight: 600;
 }
 
-/* =============================================================================
-   Adw.ComboRow (SelectRow with SplitButton suffix & Caelestia menu)
-   ============================================================================= */
+/* ComboRow */
 
 row.combo > box.header > .suffixes {
   border-spacing: 2px;
@@ -1559,50 +1770,19 @@ popover.menu listview row image {
   opacity: 0;
 }
 
-/* Menu rows in ComboRow */
-row.combo popover listview > row,
-row.combo popover listview row,
-popover.menu listview.view row {
-  border-radius: 4px;
-  padding: 4px 10px;
-  min-height: 26px;
-  color: @window_fg_color;
-  font-weight: 500;
-  margin: 1px 0;
-  background-color: transparent;
-  transition: all 120ms cubic-bezier(0.2, 0, 0, 1);
+
+/* Click effects on buttons */
+button {
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-row.combo popover listview row:selected,
-popover.menu listview.view row:selected {
-  background-color: @tertiary_container;
-  color: @on_tertiary_container;
-  font-weight: 600;
-  border-radius: 12px;
+button:active {
+  background-color: @popover_fg_active_color;
 }
 
-row.combo popover listview row:selected label,
-popover.menu listview.view row:selected label {
-  color: @on_tertiary_container;
-}
-
-row.combo popover listview row:selected:hover,
-popover.menu listview.view row:selected:hover {
-  background-color: @tertiary_container;
-  color: @on_tertiary_container;
-  border-radius: 12px;
-}
-
-row.combo popover listview row:not(:selected):hover,
-popover.menu listview.view row:not(:selected):hover {
-  background-color: #1e2625;
-  color: @window_fg_color;
-  border-radius: 4px;
-}
-
-row.combo popover listview row:not(:selected):hover label,
-popover.menu listview.view row:not(:selected):hover label {
-  color: @window_fg_color;
+button.suggested-action:active,
+button.destructive-action:active {
+  filter: brightness(0.88);
 }
 
 @import "thunar.css";
