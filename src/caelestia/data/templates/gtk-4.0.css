@@ -1,0 +1,1848 @@
+@media (prefers-color-scheme: light) {
+    /* Accents */
+    @define-color accent_color #{{ primary.hex }};
+    @define-color accent_hover_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.08);
+    @define-color accent_vibrant_hover_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.18);
+    @define-color accent_active_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.1);
+    @define-color accent_vibrant_active_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.26);
+    @define-color accent_fg_color #{{ onPrimary.hex }};
+    @define-color accent_bg_color #{{ primary.hex }};
+    @define-color destructive_bg_color #{{ errorContainer.hex }};
+    @define-color destructive_fg_color #{{ onErrorContainer.hex }};
+    @define-color destructive_color #{{ error.hex }};
+    @define-color success_bg_color #B5CCBA;
+    @define-color success_fg_color #213528;
+    @define-color success_color #374B3E;
+    @define-color warning_bg_color #e0a34b;
+    @define-color warning_fg_color #291800;
+    @define-color warning_color #c27d00;
+    @define-color tertiary_container #{{ tertiaryContainer.hex }};
+    @define-color on_tertiary_container #{{ onTertiaryContainer.hex }};
+    @define-color tonal_hover_bg_color mix(@sidebar_row_active_bg_color, @sidebar_row_active_fg_color, 0.15);
+    @define-color tonal_active_bg_color mix(@sidebar_row_active_bg_color, @sidebar_row_active_fg_color, 0.25);
+    @define-color tonal_hover_fg_color @sidebar_row_active_fg_color;
+    /* Base surfaces */
+    @define-color window_bg_color #{{ background.hex }};
+    @define-color window_fg_color #{{ onBackground.hex }};
+    @define-color headerbar_bg_color #{{ surfaceContainer.hex }};
+    @define-color headerbar_backdrop_color #{{ surfaceContainer.hex }};
+    @define-color headerbar_fg_color #{{ onSurface.hex }};
+    @define-color card_bg_color #{{ surfaceContainer.hex }};
+    @define-color card_fg_color #{{ onSurface.hex }};
+    @define-color sidebar_bg_color #{{ surfaceContainer.hex }};
+    @define-color sidebar_fg_color #{{ onSurface.hex }};
+    @define-color sidebar_row_active_bg_color #{{ secondaryContainer.hex }};
+    @define-color sidebar_row_active_fg_color #{{ onSecondaryContainer.hex }};
+    @define-color secondary_sidebar_bg_color #{{ surfaceContainerLow.hex }};
+    @define-color secondary_sidebar_backdrop_color #{{ surfaceContainerLow.hex }};
+    @define-color secondary_sidebar_fg_color #{{ onSurfaceVariant.hex }};
+    @define-color sidebar_border_color @sidebar_bg_color;
+    @define-color sidebar_backdrop_color @sidebar_bg_color;
+    @define-color view_bg_color #{{ surface.hex }};
+    @define-color view_fg_color #{{ onSurface.hex }};
+    @define-color overview_bg_color #{{ surface.hex }};
+    @define-color overview_fg_color #{{ onSurface.hex }};
+    /* Popups */
+    @define-color popover_bg_color #{{ surfaceContainerHighest.hex }};
+    @define-color popover_fg_color #{{ onSurface.hex }};
+    @define-color popover_fg_hover_color rgba({{ onSurface.red }}, {{ onSurface.green }}, {{ onSurface.blue }}, 0.08);
+    @define-color popover_fg_active_color rgba({{ onSurface.red }}, {{ onSurface.green }}, {{ onSurface.blue }}, 0.18);
+    @define-color dialog_bg_color #{{ surfaceContainerHigh.hex }};
+    @define-color dialog_fg_color #{{ onSurface.hex }};
+    @define-color thumbnail_bg_color #{{ surfaceContainerHigh.hex }};
+    @define-color thumbnail_fg_color #{{ onSurface.hex }};
+
+    /* Material */
+    @define-color inverse_on_surface #{{ inverseOnSurface.hex }};
+    @define-color inverse_primary #{{ inversePrimary.hex }};
+    @define-color inverse_surface #{{ inverseSurface.hex }};
+    @define-color surface_container_highest #{{ surfaceContainerHighest.hex }};
+    @define-color surface_container_high #{{ surfaceContainerHigh.hex }};
+    @define-color surface_container #{{ surfaceContainer.hex }};
+    @define-color surface_container_low #{{ surfaceContainerLow.hex }};
+    @define-color surface_container_lowest #{{ surfaceContainerLowest.hex }};
+    @define-color on_surface_variant #{{ onSurfaceVariant.hex }};
+    @define-color surface_variant #{{ surfaceVariant.hex }};
+
+    @define-color outline #{{ outline.hex }};
+    @define-color outline_variant #{{ outlineVariant.hex }};
+
+    /* Material state layers */
+    @define-color inverse_on_surface_hover rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.08);
+    @define-color inverse_on_surface_active rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.18);
+    @define-color inverse_primary_hover rgba({{ inversePrimary.red }}, {{ inversePrimary.green }}, {{ inversePrimary.blue }}, 0.08);
+    @define-color inverse_primary_active rgba({{ inversePrimary.red }}, {{ inversePrimary.green }}, {{ inversePrimary.blue }}, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+    /* Accents */
+    @define-color accent_color #{{ primary.hex }};
+    @define-color accent_hover_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.08);
+    @define-color accent_vibrant_hover_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.18);
+    @define-color accent_active_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.1);
+    @define-color accent_vibrant_active_color rgba({{ primary.red }}, {{ primary.green }}, {{ primary.blue }}, 0.2);
+    @define-color accent_fg_color #{{ onPrimary.hex }};
+    @define-color accent_bg_color #{{ primary.hex }};
+    @define-color destructive_bg_color #{{ errorContainer.hex }};
+    @define-color destructive_fg_color #{{ onErrorContainer.hex }};
+    @define-color destructive_color #{{ error.hex }};
+    @define-color success_bg_color #374B3E;
+    @define-color success_fg_color #D1E9D6;
+    @define-color success_color #B5CCBA;
+    @define-color warning_bg_color #e0a34b;
+    @define-color warning_fg_color #291800;
+    @define-color warning_color #f5bb64;
+    @define-color tertiary_container #{{ tertiaryContainer.hex }};
+    @define-color on_tertiary_container #{{ onTertiaryContainer.hex }};
+    @define-color tonal_hover_bg_color mix(@sidebar_row_active_bg_color, @sidebar_row_active_fg_color, 0.20);
+    @define-color tonal_active_bg_color mix(@sidebar_row_active_bg_color, @sidebar_row_active_fg_color, 0.35);
+    @define-color tonal_hover_fg_color #ffffff;
+    /* Base surfaces */
+    @define-color window_bg_color #{{ background.hex }};
+    @define-color window_fg_color #{{ onBackground.hex }};
+    @define-color headerbar_bg_color #{{ surfaceContainer.hex }};
+    @define-color headerbar_backdrop_color #{{ surfaceContainer.hex }};
+    @define-color headerbar_fg_color #{{ onSurface.hex }};
+    @define-color card_bg_color #{{ surfaceContainer.hex }};
+    @define-color card_fg_color #{{ onSurface.hex }};
+    @define-color sidebar_bg_color #{{ surfaceContainer.hex }};
+    @define-color sidebar_fg_color #{{ onSurface.hex }};
+    @define-color sidebar_row_active_bg_color #{{ secondaryContainer.hex }};
+    @define-color sidebar_row_active_fg_color #{{ onSecondaryContainer.hex }};
+    @define-color secondary_sidebar_bg_color #{{ surfaceContainerLow.hex }};
+    @define-color secondary_sidebar_backdrop_color #{{ surfaceContainerLow.hex }};
+    @define-color secondary_sidebar_fg_color #{{ onSurfaceVariant.hex }};
+    @define-color sidebar_border_color @sidebar_bg_color;
+    @define-color sidebar_backdrop_color @sidebar_bg_color;
+    @define-color view_bg_color #{{ surface.hex }};
+    @define-color view_fg_color #{{ onSurface.hex }};
+    @define-color overview_bg_color #{{ surface.hex }};
+    @define-color overview_fg_color #{{ onSurface.hex }};
+    /* Popups */
+    @define-color popover_bg_color #{{ surfaceContainerHighest.hex }};
+    @define-color popover_fg_color #{{ onSurface.hex }};
+    @define-color popover_fg_hover_color rgba({{ onSurface.red }}, {{ onSurface.green }}, {{ onSurface.blue }}, 0.08);
+    @define-color popover_fg_active_color rgba({{ onSurface.red }}, {{ onSurface.green }}, {{ onSurface.blue }}, 0.18);
+    @define-color dialog_bg_color #{{ surfaceContainerHigh.hex }};
+    @define-color dialog_fg_color #{{ onSurface.hex }};
+    @define-color thumbnail_bg_color #{{ surfaceContainerHigh.hex }};
+    @define-color thumbnail_fg_color #{{ onSurface.hex }};
+
+    /* Material */
+    @define-color inverse_on_surface #{{ inverseOnSurface.hex }};
+    @define-color inverse_primary #{{ inversePrimary.hex }};
+    @define-color inverse_surface #{{ inverseSurface.hex }};
+    @define-color surface_container_highest #{{ surfaceContainerHighest.hex }};
+    @define-color surface_container_high #{{ surfaceContainerHigh.hex }};
+    @define-color surface_container #{{ surfaceContainer.hex }};
+    @define-color surface_container_low #{{ surfaceContainerLow.hex }};
+    @define-color surface_container_lowest #{{ surfaceContainerLowest.hex }};
+    @define-color on_surface_variant #{{ onSurfaceVariant.hex }};
+    @define-color surface_variant #{{ surfaceVariant.hex }};
+
+    @define-color outline #{{ outline.hex }};
+    @define-color outline_variant #{{ outlineVariant.hex }};
+
+    /* Material state layers */
+    @define-color inverse_on_surface_hover rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.08);
+    @define-color inverse_on_surface_active rgba({{ inverseOnSurface.red }}, {{ inverseOnSurface.green }}, {{ inverseOnSurface.blue }}, 0.18);
+    @define-color inverse_primary_hover rgba({{ inversePrimary.red }}, {{ inversePrimary.green }}, {{ inversePrimary.blue }}, 0.08);
+    @define-color inverse_primary_active rgba({{ inversePrimary.red }}, {{ inversePrimary.green }}, {{ inversePrimary.blue }}, 0.18);
+}
+
+* {
+  caret-color: @accent_color;
+}
+
+window {
+  background: @window_bg_color;
+}
+
+.text-button {
+  border-radius: 999px;
+}
+
+.text-button,
+.text-button * {
+  font-weight: 500;
+}
+
+splitbutton {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+splitbutton menubutton {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+splitbutton > button:dir(ltr),
+splitbutton > button {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border: none;
+  box-shadow: none;
+  margin: 0 2px 0 0;
+  padding: 0 14px;
+  min-height: 32px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+splitbutton > button:hover,
+splitbutton button:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+splitbutton > button:active,
+splitbutton button:active {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+splitbutton separator {
+  min-width: 0;
+  min-height: 0;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}
+
+splitbutton > menubutton > button:dir(ltr),
+splitbutton > menubutton > button,
+splitbutton menubutton button {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  min-width: 32px;
+  min-height: 32px;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+splitbutton > menubutton > button arrow {
+  min-width: 14px;
+  min-height: 14px;
+  -gtk-icon-size: 14px;
+  transform-origin: center center;
+  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1),
+              -gtk-icon-transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+splitbutton > menubutton > button:hover,
+splitbutton menubutton button:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+splitbutton > menubutton > button:active,
+splitbutton > menubutton > button:checked,
+splitbutton menubutton button:checked {
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border-radius: 16px;
+  margin: 0;
+}
+
+splitbutton > menubutton > button:checked > arrow,
+splitbutton > menubutton > button:checked arrow,
+splitbutton > menubutton > button:active arrow,
+splitbutton menubutton button:checked arrow,
+splitbutton menubutton button:active arrow {
+  -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
+  transform: rotate(180deg);
+  -gtk-icon-transform: rotate(180deg);
+}
+
+/* Suggested & Destructive SplitButtons (like Hyprmod Save banner) */
+splitbutton.suggested-action > button {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+}
+
+splitbutton.suggested-action > button:hover {
+  background-color: @accent_vibrant_hover_color;
+  color: @accent_fg_color;
+}
+
+splitbutton.suggested-action > menubutton > button {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+}
+
+splitbutton.suggested-action > menubutton > button:hover {
+  background-color: @accent_vibrant_hover_color;
+  color: @accent_fg_color;
+}
+
+splitbutton.suggested-action > menubutton > button:checked,
+splitbutton.suggested-action > menubutton > button:active {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+  border-radius: 16px;
+}
+
+splitbutton.destructive-action > button {
+  background-color: @destructive_color;
+  color: @destructive_fg_color;
+}
+
+splitbutton.destructive-action > menubutton > button {
+  background-color: @destructive_color;
+  color: @destructive_fg_color;
+}
+
+.popup-menu-item {
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+#NautilusPathBar #NautilusPathButton *,
+.nautilus-pathbar .nautilus-path-button * {
+    color: @sidebar_row_active_fg_color;
+    font-weight: 400;
+}
+
+#NautilusPathBar #NautilusPathButton,
+.nautilus-pathbar .nautilus-path-button {
+    background: @accent_active_color;
+    border-radius: 4px;
+    margin: 0;
+    margin-right: 2px;
+}
+
+#NautilusPathBar #NautilusPathButton:hover,
+.nautilus-pathbar .nautilus-path-button:hover {
+    background: @accent_vibrant_hover_color;
+}
+
+#NautilusPathBar #NautilusPathButton:active,
+.nautilus-pathbar .nautilus-path-button:active {
+    background: @accent_vibrant_active_color;
+}
+
+#NautilusPathButton,
+.nautilus-pathbar {
+    background: transparent;
+}
+
+#NautilusPathBar box box:first-child #NautilusPathButton,
+.nautilus-pathbar box box:first-child .nautilus-path-button {
+    border-radius: 24px 4px 4px 24px;
+}
+
+#NautilusPathBar box box:last-child #NautilusPathButton,
+.nautilus-pathbar box box:last-child .nautilus-path-button {
+    border-radius: 4px 24px 24px 4px;
+}
+
+#NautilusPathBar #NautilusPathButton.current-dir.current-dir,
+.nautilus-pathbar .nautilus-path-button.current-dir.current-dir {
+    border-radius: 999px;
+}
+
+#NautilusPathBar .dim-label,
+.nautilus-pathbar .dim-label {
+    font-size: 0;
+}
+
+#NautilusPathBar button .dim-label,
+.nautilus-pathbar button .dim-label {
+    font-size: 14px;
+    opacity: 100%;
+}
+
+#NautilusPathBar button,
+.nautilus-pathbar button {
+    border-radius: 8px;
+}
+#NautilusPathBar button:checked,
+.nautilus-pathbar button:checked {
+    background: @accent_vibrant_hover_color;
+}
+
+headerbar,
+.top-bar headerbar,
+toolbarview > .top-bar {
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+}
+
+headerbar button {
+  border-radius: 999px;
+}
+
+/* Text entries & Search entries */
+entry:not(.search) {
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  background-color: transparent;
+  color: @window_fg_color;
+  border: 1px solid @outline;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+entry:not(.search) > text {
+  color: @window_fg_color;
+  background-color: transparent;
+  padding: 8px 0;
+}
+
+entry:not(.search):focus,
+entry:not(.search):focus-within {
+  border: 2px solid @accent_color;
+  padding: 0 11px;
+  color: @window_fg_color;
+  outline: none;
+}
+
+entry:not(.search).error {
+  border: 2px solid @destructive_color;
+  padding: 0 11px;
+  color: @destructive_color;
+}
+
+entry:not(.search):disabled {
+  opacity: 0.38;
+  border: 1px solid @outline_variant;
+}
+
+entry selection {
+  background-color: @accent_color;
+  color: @accent_fg_color;
+}
+
+searchentry,
+entry.search {
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 0 14px;
+  background-color: @surface_container;
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+searchentry:focus,
+searchentry:focus-within,
+entry.search:focus,
+entry.search:focus-within {
+  background-color: @surface_container_high;
+  box-shadow: inset 0 0 0 1px @outline_variant;
+}
+
+searchentry > text,
+entry.search > text {
+  background-color: transparent;
+  color: @window_fg_color;
+  padding: 6px 0;
+}
+
+searchentry > image.left,
+searchentry image:first-child,
+entry.search > image.left {
+  color: @on_surface_variant;
+  margin-right: 6px;
+}
+
+entry button.flat,
+entry > image,
+entry button:not(:hover),
+searchentry button:not(:hover),
+entry.search button:not(:hover) {
+  background: transparent;
+  box-shadow: none;
+}
+
+searchentry button,
+entry.search button {
+  border-radius: 999px;
+  background-color: transparent;
+  color: @on_surface_variant;
+  border: none;
+  box-shadow: none;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+entry button:hover,
+searchentry button:hover,
+entry.search button:hover {
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
+}
+
+entry button:active,
+searchentry button:active,
+entry.search button:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+}
+
+.nautilus-list-view,
+.nautilus-grid-view {
+  border-radius: 16px;
+}
+
+.navigation-sidebar,
+split-view > .sidebar,
+overlay-split-view > .sidebar,
+navigation-split-view > .sidebar {
+  background-color: @sidebar_bg_color;
+}
+
+.navigation-sidebar row * {
+  color: @sidebar_fg_color;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.navigation-sidebar row {
+  border-radius: 999px;
+  padding: 2px;
+}
+
+.navigation-sidebar row:hover {
+  background: @accent_hover_color;
+}
+
+.navigation-sidebar row:active {
+  background: @accent_active_color;
+}
+
+.navigation-sidebar row:selected {
+  background: @sidebar_row_active_bg_color;
+}
+
+.navigation-sidebar row:selected * {
+  color: @sidebar_row_active_fg_color;
+}
+
+banner widget {
+  border-radius: 16px 0 0 16px;
+  margin-bottom: 8px;
+  background-color: @secondary_sidebar_bg_color;
+}
+
+.boxed-list {
+  box-shadow: none;
+  background-color: @window_bg_color;
+}
+
+.boxed-list row {
+  background: @card_bg_color;
+  border-radius: 4px;
+  border: none;
+  margin-bottom: 2px;
+}
+
+.boxed-list row.activatable:hover {
+  background-color: @thumbnail_bg_color;
+}
+
+.boxed-list row.activatable:active {
+  background-color: @popover_bg_color;
+}
+
+.horizontal>listview>row {
+  background-color: transparent;
+}
+
+.boxed-list row:disabled {
+  background-color: @card_bg_color;
+}
+
+.text-button.toggle {
+  border-radius: 4px;
+  background-color: @surface_container_highest;
+  margin-left: 2px;
+}
+
+.text-button.toggle:hover {
+  background-color: @surface_variant;
+}
+
+.text-button.toggle:active {
+  background-color: @surface_container_highest;
+}
+
+.text-button.toggle * {
+  color: @on_surface_variant;
+  font-weight: 400;
+}
+
+.boxed-list row:first-child {
+  border-radius: 16px 16px 4px 4px;
+}
+
+.boxed-list row:last-child {
+  border-radius: 4px 4px 16px 16px;
+  margin-bottom: 0;
+}
+
+.text-button.toggle:first-child {
+  border-radius: 16px 4px 4px 16px;
+}
+
+.text-button.toggle:last-child {
+  border-radius: 4px 16px 16px 4px;
+}
+
+.boxed-list row:first-child:last-child,
+.text-button.toggle:first-child:last-child {
+  border-radius: 16px;
+}
+
+.text-button.toggle:checked {
+  background-color: @accent_bg_color;
+  border-radius: 999px;
+}
+
+.text-button.toggle:checked * {
+  color: @accent_fg_color;
+  font-weight: 500;
+}
+
+button.back {
+  border-radius: 999px;
+  background-color: @accent_hover_color;
+  padding-left: 4px;
+  padding-right: 6px;
+}
+
+button.back * {
+  font-size: 12px;
+}
+
+button.back:hover {
+  background-color: @accent_hover_color;
+}
+
+button.back:active {
+  background-color: @accent_active_color;
+}
+
+/* Sliders */
+
+scale {
+  min-height: 36px;
+  padding: 8px 0;
+}
+
+/* Horizontal scale */
+scale.horizontal > trough,
+scale:not(.vertical) > trough {
+  min-height: 16px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  padding: 0;
+  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+scale.horizontal > trough > highlight,
+scale:not(.vertical) > trough > highlight {
+  min-height: 16px;
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background-color: @accent_color;
+  border: none;
+  box-shadow: none;
+  margin-right: 6px;
+}
+
+scale.horizontal > trough > slider,
+scale:not(.vertical) > trough > slider {
+  min-width: 4px;
+  min-height: 32px;
+  margin: -8px 0;
+  border-radius: 999px;
+  background-color: @accent_color;
+  box-shadow: 0 0 0 3px @window_bg_color;
+  border: none;
+  outline: none;
+  transition: min-height 150ms cubic-bezier(0.2, 0, 0, 1),
+              margin 150ms cubic-bezier(0.2, 0, 0, 1),
+              transform 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+scale.horizontal > trough > slider:hover,
+scale:not(.vertical) > trough > slider:hover {
+  min-width: 4px;
+  min-height: 32px;
+  background-color: @accent_color;
+}
+
+scale.horizontal:active > trough > slider,
+scale:not(.vertical):active > trough > slider,
+scale.horizontal > trough:active > slider,
+scale:not(.vertical) > trough:active > slider,
+scale.horizontal > trough > slider:active,
+scale:not(.vertical) > trough > slider:active {
+  min-width: 4px;
+  min-height: 40px;
+  margin: -12px 0;
+  transform: scaleY(1.25);
+}
+
+/* Vertical scale */
+scale.vertical > trough {
+  min-width: 16px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  padding: 0;
+  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+scale.vertical > trough > highlight {
+  min-width: 16px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 6px;
+}
+
+scale.vertical > trough > slider {
+  min-width: 32px;
+  min-height: 4px;
+  margin: 0 -8px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  box-shadow: 0 0 0 3px @window_bg_color;
+  border: none;
+  outline: none;
+  transition: min-width 150ms cubic-bezier(0.2, 0, 0, 1),
+              margin 150ms cubic-bezier(0.2, 0, 0, 1),
+              transform 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+scale.vertical > trough > slider:hover {
+  min-width: 32px;
+  min-height: 4px;
+  background-color: @accent_color;
+}
+
+scale.vertical:active > trough > slider,
+scale.vertical > trough:active > slider,
+scale.vertical > trough > slider:active {
+  min-height: 4px;
+  min-width: 40px;
+  margin: 0 -12px;
+  transform: scaleX(1.25);
+}
+
+/* Disabled scale */
+scale:disabled > trough {
+  background-color: alpha(@on_surface_variant, 0.12);
+  background-image: none;
+}
+
+scale:disabled > trough > highlight {
+  background-color: alpha(@on_surface_variant, 0.38);
+}
+
+scale:disabled > trough > slider {
+  background-color: alpha(@on_surface_variant, 0.38);
+  box-shadow: 0 0 0 3px @window_bg_color;
+}
+
+/* Progress bars */
+
+progressbar {
+  min-height: 4px;
+  padding: 0;
+}
+
+progressbar:not(.vertical) > trough,
+progressbar.horizontal > trough {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at calc(100% - 4px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar:not(.vertical) > trough > progress,
+progressbar.horizontal > trough > progress {
+  min-height: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-right: 4px;
+}
+
+progressbar.vertical > trough {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  background-image: radial-gradient(circle at 50% 4px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+}
+
+progressbar.vertical > trough > progress {
+  min-width: 4px;
+  border-radius: 999px;
+  background-color: @accent_color;
+  border: none;
+  margin-bottom: 4px;
+}
+
+/* Toggles */
+
+/* Switch */
+switch {
+  min-width: 46px;
+  min-height: 24px;
+  border-radius: 999px;
+  background-color: @surface_container_highest;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  padding: 3px;
+  transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+switch:hover {
+  background-color: @surface_variant;
+}
+
+switch:checked {
+  background-color: @accent_color;
+  border-color: @accent_color;
+}
+
+switch:checked:hover {
+  background-color: @accent_color;
+  filter: brightness(1.06);
+}
+
+switch slider {
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 999px;
+  background-color: @outline;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M4.5 4.5 L13.5 13.5 M4.5 13.5 L13.5 4.5' stroke='%23{{ surfaceContainerHighest.hex }}' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 13px 13px;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  margin: 0;
+  transition: all 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+switch:hover slider {
+  background-color: @on_surface_variant;
+}
+
+switch:checked slider {
+  min-width: 18px;
+  min-height: 18px;
+  background-color: @accent_fg_color;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M4 9 L7.5 12.5 L14 4.5' stroke='%23{{ primary.hex }}' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 13px 13px;
+  margin: 0;
+}
+
+switch:checked:hover slider {
+  background-color: @accent_fg_color;
+}
+
+switch:active slider {
+  min-width: 24px;
+}
+
+switch:disabled {
+  background-color: alpha(@on_surface_variant, 0.12);
+  border: none;
+}
+
+switch:disabled slider {
+  background-color: alpha(@on_surface_variant, 0.38);
+  background-image: none;
+}
+
+switch:disabled:checked {
+  background-color: alpha(@accent_color, 0.38);
+}
+
+switch:disabled:checked slider {
+  background-color: @window_bg_color;
+  background-image: none;
+}
+
+/* Check buttons */
+checkbutton {
+  border-spacing: 8px;
+}
+
+checkbutton check {
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 4px;
+  border: 2px solid @outline;
+  background-color: transparent;
+  color: transparent;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+checkbutton check:hover {
+  border-color: @accent_color;
+}
+
+checkbutton check:checked,
+checkbutton check:indeterminate {
+  background-color: @accent_color;
+  border-color: @accent_color;
+  color: @accent_fg_color;
+}
+
+checkbutton check:checked:hover,
+checkbutton check:indeterminate:hover {
+  filter: brightness(1.08);
+}
+
+checkbutton check:disabled {
+  border-color: alpha(@on_surface_variant, 0.38);
+}
+
+checkbutton check:checked:disabled {
+  background-color: alpha(@accent_color, 0.38);
+  border-color: transparent;
+  color: @window_bg_color;
+}
+
+/* Radio buttons */
+checkbutton radio {
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 999px;
+  border: 2px solid @outline;
+  background-color: transparent;
+  color: transparent;
+  box-shadow: none;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+checkbutton radio:hover {
+  border-color: @accent_color;
+}
+
+checkbutton radio:checked {
+  border-color: @accent_color;
+  color: @accent_color;
+  background-color: transparent;
+}
+
+checkbutton radio:disabled {
+  border-color: alpha(@on_surface_variant, 0.38);
+}
+
+checkbutton radio:checked:disabled {
+  border-color: alpha(@accent_color, 0.38);
+  color: alpha(@accent_color, 0.38);
+}
+
+/* toast */
+
+toast {
+  border-radius: 999px;
+  padding: 6px 6px 6px 10px;
+  background-color: @inverse_surface;
+  color: @inverse_on_surface;
+}
+
+toast .heading {
+  font-weight: 400;
+}
+
+toast button {
+  background-color: transparent;
+  color: @inverse_primary;
+}
+
+toast button:hover {
+  background-color: @inverse_primary_hover;
+}
+
+toast button:active {
+  background-color: @inverse_primary_active;
+}
+
+toast button:last-child {
+  color: @inverse_on_surface;
+}
+
+toast button:last-child:hover {
+  background-color: @inverse_on_surface_hover;
+}
+
+toast button:last-child:active {
+  background-color: @inverse_on_surface_active;
+}
+
+.collapse-spacing.vertical {
+  padding-bottom: 0;
+}
+
+tabbox {
+  padding: 0;
+}
+
+tabbox tabboxchild tab,
+tabbox tabboxchild {
+  background: transparent;
+  padding: 0 8px 3px;
+  border-radius: 999px;
+}
+
+tabbox tabboxchild tab {
+  padding: 3px 8px;
+}
+
+tab:hover {
+  background: @accent_hover_color;
+}
+
+tab:active,
+tab:selected {
+  background: @accent_active_color;
+}
+
+tab .tab-title {
+  padding: 0 12px;
+  color: @secondary_sidebar_fg_color;
+}
+
+tab .tab-title label {
+  border: none;
+  font-weight: 500;
+}
+
+tab:selected .tab-title label {
+  padding: 6px 0;
+  color: @accent_color;
+}
+
+/* popup menu */
+
+popover listview.view row,
+popover listview.view row:first-child,
+popover listview.view row:last-child {
+  background: transparent;
+  border-radius: 4px;
+}
+
+popover contents,
+popover arrow {
+  background: @secondary_sidebar_bg_color;
+}
+
+popover listview.view row:hover {
+  background: @popover_fg_hover_color;
+  border-radius: 4px;
+}
+
+popover listview.view row:active {
+  background: @popover_fg_active_color;
+  border-radius: 4px;
+}
+
+modelbutton {
+  padding: 2px 10px;
+}
+
+modelbutton * {
+  color: @popover_fg_color;
+}
+
+modelbutton:hover {
+  background-color: @popover_fg_hover_color;
+}
+
+tooltip {
+  background-color: @inverse_surface;
+  color: @inverse_on_surface;
+  font-size: 11px;
+  padding: 5px 9px;
+}
+
+/* search */
+
+.entry-completion.entry-completion.entry-completion contents {
+	padding: 0;
+}
+.image-button.flat arrow {
+  background: transparent;
+}
+
+/* Dropdowns */
+
+dropdown {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+dropdown > button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  min-height: 32px;
+}
+
+dropdown > button > box {
+  border-spacing: 0;
+  padding: 0;
+  margin: 0;
+  min-height: 32px;
+}
+
+dropdown > button > box > stack {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 0 14px;
+  margin: 0 2px 0 0;
+  min-height: 32px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+dropdown > button > box > stack > row.activatable {
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+dropdown > button > box > arrow {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 9px;
+  margin: 0;
+  min-width: 14px;
+  min-height: 14px;
+  -gtk-icon-size: 14px;
+  transform-origin: center center;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1),
+              transform 200ms cubic-bezier(0.2, 0, 0, 1),
+              -gtk-icon-transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+dropdown > button:hover > box > stack,
+dropdown > button:hover > box > arrow {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+dropdown > button:active > box > stack,
+dropdown > button:active > box > arrow {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+dropdown > button:checked > box > arrow,
+dropdown > button:active > box > arrow {
+  border-radius: 16px;
+  margin: 0;
+  -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
+  transform: rotate(180deg);
+  -gtk-icon-transform: rotate(180deg);
+}
+
+combobox {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+combobox > box > button,
+combobox button.combo,
+combobox button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  min-height: 32px;
+}
+
+combobox cellview {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 14px;
+  margin: 0 2px 0 0;
+  min-height: 20px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox arrow,
+combobox button arrow {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 10px;
+  min-width: 14px;
+  min-height: 14px;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox button:hover cellview,
+combobox button:hover arrow {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+combobox button:active cellview,
+combobox button:active arrow {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+/* Popovers and menus */
+popover,
+popover.menu,
+dropdown > popover {
+  background: transparent;
+  padding: 0;
+}
+
+popover > arrow,
+popover.menu > arrow,
+.popover > arrow {
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+popover > contents,
+popover contents,
+popover.menu > contents,
+popover.menu contents,
+dropdown > popover > contents,
+dropdown > popover contents {
+  background-color: @secondary_sidebar_bg_color;
+  color: @window_fg_color;
+  border: none;
+  border-radius: 16px;
+  padding: 4px;
+  min-width: 200px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure internal boxes have zero extra padding/margin so card padding is strictly 4px */
+popover.menu contents scrolledwindow,
+popover.menu contents viewport,
+popover.menu contents stack,
+popover.menu contents box,
+dropdown > popover contents scrolledwindow,
+dropdown > popover contents listview {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+dropdown > popover listview row image {
+  -gtk-icon-source: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  opacity: 0;
+}
+
+popover.menu .linked > button:first-child,
+.linked.horizontal > button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: 0;
+}
+
+popover.menu .linked > button:last-child,
+.linked.horizontal > button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: 0;
+}
+
+popover.menu .linked > button:not(:first-child):not(:last-child),
+.linked.horizontal > button:not(:first-child):not(:last-child) {
+  border-radius: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Menu items: compact height and clean padding */
+popover.menu modelbutton,
+popover.menu modelbutton.flat,
+popover modelbutton,
+modelbutton,
+dropdown > popover listview > row,
+dropdown > popover listview row,
+row.combo popover listview > row,
+row.combo popover listview row {
+  border-radius: 4px;
+  padding: 4px 10px;
+  min-height: 26px;
+  color: @window_fg_color;
+  font-weight: 500;
+  margin: 1px 0;
+  background-color: transparent;
+  transition: all 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+popover.menu modelbutton label,
+popover modelbutton label,
+modelbutton label,
+dropdown > popover listview row label,
+row.combo popover listview row label {
+  padding: 0;
+  margin: 0;
+  color: inherit;
+}
+
+/* Selected option in dropdowns and select lists */
+dropdown > popover listview row:selected,
+row.combo popover listview row:selected,
+dropdown > popover listview row.selected,
+row.combo popover listview row.selected {
+  background-color: @tertiary_container;
+  color: @on_tertiary_container;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+dropdown > popover listview row:selected label,
+row.combo popover listview row:selected label,
+dropdown > popover listview row.selected label,
+row.combo popover listview row.selected label {
+  color: @on_tertiary_container;
+}
+
+dropdown > popover listview row:selected:hover,
+row.combo popover listview row:selected:hover,
+dropdown > popover listview row.selected:hover,
+row.combo popover listview row.selected:hover {
+  background-color: @tertiary_container;
+  color: @on_tertiary_container;
+  border-radius: 12px;
+}
+
+/* Hover highlight: sharper corners (4px) and subtle hover tint */
+popover.menu modelbutton:hover,
+popover.menu modelbutton:selected,
+popover.menu modelbutton:focus,
+popover modelbutton:hover,
+popover modelbutton:selected,
+popover modelbutton:focus,
+modelbutton:hover,
+modelbutton:selected,
+modelbutton:focus,
+dropdown > popover listview row:not(:selected):hover,
+dropdown > popover listview row:hover:not(:selected),
+row.combo popover listview row:not(:selected):hover,
+row.combo popover listview row:hover:not(:selected) {
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
+  border-radius: 4px;
+}
+
+popover.menu modelbutton:hover label,
+popover.menu modelbutton:selected label,
+popover.menu modelbutton:focus label,
+popover modelbutton:hover label,
+popover modelbutton:selected label,
+popover modelbutton:focus label,
+modelbutton:hover label,
+modelbutton:selected label,
+modelbutton:focus label,
+dropdown > popover listview row:not(:selected):hover label,
+dropdown > popover listview row:hover:not(:selected) label,
+row.combo popover listview row:not(:selected):hover label,
+row.combo popover listview row:hover:not(:selected) label {
+  color: @window_fg_color;
+}
+
+/* Active / pressed state */
+popover.menu modelbutton:active,
+popover modelbutton:active,
+modelbutton:active,
+dropdown > popover listview row:active,
+row.combo popover listview row:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+  border-radius: 4px;
+}
+
+accelerator {
+  color: @on_surface_variant;
+  font-size: 11px;
+  margin-left: 12px;
+}
+
+popover.menu modelbutton:hover accelerator,
+popover.menu modelbutton:selected accelerator,
+modelbutton:hover accelerator,
+modelbutton:selected accelerator,
+dropdown > popover listview row:selected accelerator {
+  color: inherit;
+}
+
+/* Spinbuttons */
+
+spinbutton {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Horizontal spinbutton / stepper: unified pill with clean segment separation */
+spinbutton:not(.vertical) {
+  min-height: 36px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+spinbutton:not(.vertical) > button,
+spinbutton:not(.vertical) button {
+  min-width: 36px;
+  min-height: 36px;
+  background-color: @surface_container_highest;
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+spinbutton:not(.vertical) > button:hover,
+spinbutton:not(.vertical) button:hover {
+  background-color: @popover_fg_hover_color;
+  color: @window_fg_color;
+}
+
+spinbutton:not(.vertical) > button:active,
+spinbutton:not(.vertical) button:active {
+  background-color: @popover_fg_active_color;
+  color: @window_fg_color;
+}
+
+/* Clear Libadwaita default button borders and margins */
+spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque),
+spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque) {
+  border: none;
+  border-width: 0;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* First button in horizontal (decrement): rounded left pill cap (18px), 4px right edge */
+spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
+spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
+spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
+spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
+spinbutton:not(.vertical) > button.image-button:first-child,
+spinbutton:not(.vertical) > button:first-child {
+  border-radius: 18px 4px 4px 18px;
+  margin: 0 2px 0 0;
+}
+
+/* Middle button if not first and not last (4px) */
+spinbutton:not(.vertical) > button:not(:first-child):not(:last-child) {
+  border-radius: 4px;
+  margin: 0 2px 0 0;
+}
+
+/* Last button in horizontal (increment): 4px left edge, rounded right pill cap (18px) */
+spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
+spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
+spinbutton:not(.vertical) > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
+spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
+spinbutton:not(.vertical) > button.image-button:last-child,
+spinbutton:not(.vertical) > button:last-child {
+  border-radius: 4px 18px 18px 4px;
+  margin: 0 0 0 2px;
+}
+
+spinbutton:not(.vertical) > button image,
+spinbutton:not(.vertical) button image {
+  color: inherit;
+}
+
+spinbutton:not(.vertical) > text,
+spinbutton:not(.vertical) entry,
+spinbutton:not(.vertical) text {
+  background-color: @surface_container_highest;
+  color: @window_fg_color;
+  min-width: 44px;
+  min-height: 36px;
+  border: none;
+  box-shadow: none;
+  padding: 0 14px;
+  margin: 0;
+  border-radius: 4px;
+}
+
+spinbutton:not(.vertical) > text:first-child,
+spinbutton:not(.vertical) entry:first-child {
+  border-radius: 18px 4px 4px 18px;
+  margin: 0 2px 0 0;
+}
+
+/* Vertical spinbutton with clean segment separation */
+spinbutton.vertical {
+  min-width: 36px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+spinbutton.vertical > button,
+spinbutton.vertical button {
+  min-width: 36px;
+  min-height: 32px;
+  background-color: @surface_container_highest;
+  color: @window_fg_color;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque),
+spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque) {
+  border: none;
+  border-width: 0;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* First button in vertical (top): rounded top pill (18px), 4px bottom edge */
+spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
+spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):first-child,
+spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
+spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):first-child,
+spinbutton.vertical > button.image-button:first-child,
+spinbutton.vertical > button:first-child {
+  border-radius: 18px 18px 4px 4px;
+  margin: 0 0 2px 0;
+}
+
+/* Last button in vertical (bottom): 4px top edge, rounded bottom pill (18px) */
+spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
+spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):dir(ltr):last-child,
+spinbutton.vertical > button.image-button.up:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
+spinbutton.vertical > button.image-button.down:not(.flat):not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):last-child,
+spinbutton.vertical > button.image-button:last-child,
+spinbutton.vertical > button:last-child {
+  border-radius: 4px 4px 18px 18px;
+  margin: 2px 0 0 0;
+}
+
+spinbutton.vertical > button:hover,
+spinbutton.vertical button:hover {
+  background-color: @accent_hover_color;
+  color: @accent_color;
+}
+
+spinbutton.vertical > button:active,
+spinbutton.vertical button:active {
+  background-color: @accent_active_color;
+  color: @accent_color;
+}
+
+spinbutton.vertical > button image,
+spinbutton.vertical button image {
+  color: inherit;
+}
+
+spinbutton.vertical > text,
+spinbutton.vertical entry,
+spinbutton.vertical text {
+  background-color: @surface_container_highest;
+  color: @window_fg_color;
+  min-width: 36px;
+  min-height: 32px;
+  border: none;
+  box-shadow: none;
+  padding: 0 4px;
+  margin: 0;
+  border-radius: 4px;
+}
+
+/* Hyprmod indicators */
+
+/* Managed indicator: option is saved in config file */
+row.option-managed,
+.option-managed {
+  border-left: 3px solid @accent_bg_color;
+}
+
+/* Dirty indicator: changed but not yet saved */
+row.option-dirty,
+.option-dirty {
+  border-left: 3px solid @warning_bg_color;
+}
+
+/* Default value: slightly muted subtitle */
+.option-default .subtitle {
+  opacity: 0.55;
+}
+
+/* Reset button / action buttons strip */
+.reset-button {
+  opacity: 0.85;
+  transition: opacity 150ms ease-in-out;
+}
+
+row:hover .reset-button,
+.reset-button:hover,
+.reset-button:focus,
+.reset-button:focus-within {
+  opacity: 1;
+}
+
+/* Active profile card — accent border + subtle tint */
+.profile-active,
+row.profile-active {
+  border-left: 3px solid @accent_bg_color;
+  background-color: alpha(@accent_bg_color, 0.06);
+}
+
+/* Active badge pill */
+.profile-badge-active {
+  background-color: alpha(@accent_bg_color, 0.25);
+  color: @accent_color;
+  border-radius: 9999px;
+  padding: 2px 10px;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ButtonRow styling */
+.boxed-list row.button.suggested-action label,
+.boxed-list row.button.suggested-action image {
+  color: @accent_color;
+  font-weight: 600;
+}
+
+.boxed-list row.button.destructive-action label,
+.boxed-list row.button.destructive-action image {
+  color: @destructive_color;
+  font-weight: 600;
+}
+
+/* ComboRow */
+
+row.combo > box.header > .suffixes {
+  border-spacing: 2px;
+}
+
+row.combo > box.header > .suffixes > box {
+  margin: 0;
+  padding: 0;
+}
+
+/* Single unified pill for text area (no inner double pill) */
+row.combo listview.inline {
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border-radius: 16px 4px 4px 16px;
+  margin: 0;
+  padding: 0;
+  min-height: 32px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+row.combo listview.inline row,
+row.combo listview.inline row box {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+row.combo listview.inline row {
+  margin: 0;
+  padding: 0;
+  min-height: 32px;
+  border-radius: 0;
+}
+
+row.combo listview.inline row box {
+  padding: 0 16px;
+  margin: 0;
+}
+
+row.combo listview.inline row label {
+  color: @sidebar_row_active_fg_color;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  transition: color 150ms ease;
+}
+
+/* Hover: clean bright highlight on the hovered control */
+row.combo listview.inline:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+row.combo listview.inline:hover row label {
+  color: @tonal_hover_fg_color;
+}
+
+row.combo listview.inline:active {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+/* Morphing arrow button with smooth CSS rotation transition */
+row.combo image.dropdown-arrow {
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border-radius: 4px 16px 16px 4px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0;
+  -gtk-icon-size: 14px;
+  transform-origin: center center;
+  transition: transform 250ms cubic-bezier(0.2, 0, 0, 1),
+              border-radius 250ms cubic-bezier(0.2, 0, 0, 1),
+              background-color 150ms ease,
+              color 150ms ease;
+}
+
+row.combo.has-open-popup image.dropdown-arrow {
+  border-radius: 16px;
+  transform: rotate(180deg);
+}
+
+row.combo image.dropdown-arrow:hover {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+row.combo image.dropdown-arrow:active {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+/* Popover for Adw.ComboRow */
+row.combo popover {
+  background: transparent;
+  padding: 0;
+}
+
+row.combo popover > arrow {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+row.combo popover > contents,
+row.combo popover contents {
+  background-color: @secondary_sidebar_bg_color;
+  color: @window_fg_color;
+  border: none;
+  border-radius: 16px;
+  padding: 4px;
+  min-width: 200px;
+  box-shadow: none;
+}
+
+row.combo popover contents scrolledwindow,
+row.combo popover contents listview {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+/* Hide checkmarks in ComboRow & all popover listviews */
+row.combo popover listview image,
+row.combo popover listview row image,
+popover.menu listview.view row image,
+popover.menu listview row image {
+  -gtk-icon-source: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  opacity: 0;
+}
+
+
+/* Click effects on buttons */
+button {
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+button:active {
+  background-color: @popover_fg_active_color;
+}
+
+button.suggested-action:active,
+button.destructive-action:active {
+  filter: brightness(0.88);
+}
+
+@import "thunar.css";
