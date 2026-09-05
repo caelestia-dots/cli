@@ -1190,6 +1190,60 @@ dropdown > button:active > box > arrow {
   -gtk-icon-transform: rotate(180deg);
 }
 
+combobox {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+combobox > box > button,
+combobox button.combo,
+combobox button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  min-height: 32px;
+}
+
+combobox cellview {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 14px;
+  margin: 0 2px 0 0;
+  min-height: 20px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox arrow,
+combobox button arrow {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 10px;
+  min-width: 14px;
+  min-height: 14px;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox button:hover cellview,
+combobox button:hover arrow {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+combobox button:active cellview,
+combobox button:active arrow {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
 /* Popovers and menus */
 popover,
 popover.menu,
@@ -1443,6 +1497,12 @@ spinbutton:not(.vertical) > button.image-button.down:not(.flat):not(.raised):not
 spinbutton:not(.vertical) > button.image-button:first-child,
 spinbutton:not(.vertical) > button:first-child {
   border-radius: 18px 4px 4px 18px;
+  margin: 0 2px 0 0;
+}
+
+/* Middle button if not first and not last (4px) */
+spinbutton:not(.vertical) > button:not(:first-child):not(:last-child) {
+  border-radius: 4px;
   margin: 0 2px 0 0;
 }
 

@@ -419,9 +419,7 @@ radio:checked:disabled {
   background-image: radial-gradient(circle, alpha(@accent_color, 0.38) 0px, alpha(@accent_color, 0.38) 4px, transparent 4.5px);
 }
 
-/* Dropdowns */
-
-/* ComboBox & Dropdown trigger buttons */
+/* Dropdowns / ComboBox matching split button rows */
 combobox {
   background: transparent;
   border: none;
@@ -432,51 +430,80 @@ combobox {
 
 combobox button.combo,
 combobox button {
-  border-radius: 999px;
-  background-color: @sidebar_row_active_bg_color;
-  color: @sidebar_row_active_fg_color;
-  padding: 6px 16px;
+  background: transparent;
   border: none;
   box-shadow: none;
-  min-height: 36px;
-  font-weight: 500;
-  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+  padding: 0;
+  margin: 0;
+  min-height: 32px;
 }
 
-combobox button.combo:hover,
-combobox button:hover {
-  background-color: @tonal_hover_bg_color;
-  color: @sidebar_row_active_fg_color;
-}
-
-combobox button.combo:active,
-combobox button:active,
-combobox button.combo:checked,
-combobox button:checked {
-  background-color: @tonal_active_bg_color;
-  color: @sidebar_row_active_fg_color;
-}
-
-combobox button.combo label,
-combobox button label {
-  background: transparent;
-  color: inherit;
-  font-weight: 500;
+combobox button.combo > box {
   padding: 0;
   margin: 0;
 }
 
-combobox arrow,
-combobox button arrow {
-  background: transparent;
-  color: inherit;
-  min-width: 16px;
-  min-height: 16px;
-  padding: 0;
-  margin-left: 8px;
+combobox cellview {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 14px;
+  margin: 0 2px 0 0;
+  min-height: 20px;
+  font-weight: 500;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.linked > button:first-child {
+combobox arrow,
+combobox button arrow {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 10px;
+  min-width: 14px;
+  min-height: 14px;
+  margin: 0;
+  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox button.combo:hover cellview,
+combobox button.combo:hover arrow,
+combobox button:hover cellview,
+combobox button:hover arrow {
+  background-color: @tonal_hover_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+combobox button.combo:active cellview,
+combobox button.combo:active arrow,
+combobox button:active cellview,
+combobox button:active arrow {
+  background-color: @tonal_active_bg_color;
+  color: @tonal_hover_fg_color;
+}
+
+combobox.entry > entry {
+  border-radius: 16px 4px 4px 16px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  border: none;
+  box-shadow: none;
+  padding: 6px 14px;
+  margin: 0 2px 0 0;
+  min-height: 20px;
+}
+
+combobox.entry > button {
+  border-radius: 4px 16px 16px 4px;
+  background-color: @sidebar_row_active_bg_color;
+  color: @sidebar_row_active_fg_color;
+  padding: 6px 10px;
+  min-width: 14px;
+  min-height: 14px;
+  margin: 0;
+}
+
+.linked > button:first-child:not(.combo) {
   border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
@@ -488,7 +515,7 @@ combobox button arrow {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.linked > button:last-child {
+.linked > button:last-child:not(.combo) {
   border-radius: 4px 18px 18px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
@@ -501,15 +528,15 @@ combobox button arrow {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.linked > button:first-child:hover,
-.linked > button:last-child:hover {
+.linked > button:first-child:not(.combo):hover,
+.linked > button:last-child:not(.combo):hover {
   background-color: @tonal_hover_bg_color;
   color: @sidebar_row_active_fg_color;
 }
 
-.linked > button:first-child:active,
-.linked > button:last-child:active,
-.linked > button:last-child:checked {
+.linked > button:first-child:not(.combo):active,
+.linked > button:last-child:not(.combo):active,
+.linked > button:last-child:not(.combo):checked {
   background-color: @tonal_active_bg_color;
   color: @sidebar_row_active_fg_color;
 }
@@ -682,48 +709,92 @@ entry.search button.flat:active {
   color: @window_fg_color;
 }
 
-/* Spinbuttons / Steppers */
-spinbutton:not(.vertical) {
-  background-color: @surface_container_high;
-  color: @window_fg_color;
-  border-radius: 999px;
-  border: none;
-  box-shadow: none;
-  padding: 2px 4px;
-  min-height: 36px;
-  transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-spinbutton:not(.vertical) entry {
+/* Spinbuttons / Steppers matching M3 stepper rows */
+spinbutton {
   background: transparent;
-  color: @window_fg_color;
   border: none;
   box-shadow: none;
-  min-width: 48px;
-  padding: 0 6px;
+  padding: 0;
 }
 
+spinbutton:not(.vertical) {
+  min-height: 36px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+spinbutton:not(.vertical) > button,
 spinbutton:not(.vertical) button {
-  background-color: rgba(255, 255, 255, 0.06);
+  min-width: 36px;
+  min-height: 36px;
+  background-color: @surface_container_highest;
   color: @window_fg_color;
   border: none;
   box-shadow: none;
-  border-radius: 999px;
-  min-width: 28px;
-  min-height: 28px;
   padding: 0;
-  margin: 2px 2px;
+  margin: 0;
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
+spinbutton:not(.vertical) > button:hover,
 spinbutton:not(.vertical) button:hover {
   background-color: @popover_fg_hover_color;
   color: @window_fg_color;
 }
 
+spinbutton:not(.vertical) > button:active,
 spinbutton:not(.vertical) button:active {
   background-color: @popover_fg_active_color;
   color: @window_fg_color;
+}
+
+/* First button if button is first-child (decrement when reordered): rounded left pill cap (18px), 4px right edge */
+spinbutton:not(.vertical) > button:first-child,
+spinbutton:not(.vertical) button:first-child {
+  border-radius: 18px 4px 4px 18px;
+  margin: 0 2px 0 0;
+}
+
+/* Middle button if not first and not last (4px) */
+spinbutton:not(.vertical) > button:not(:first-child):not(:last-child),
+spinbutton:not(.vertical) button:not(:first-child):not(:last-child) {
+  border-radius: 4px;
+  margin: 0 2px 0 0;
+}
+
+/* Last button in horizontal (increment): 4px left edge, rounded right pill cap (18px) */
+spinbutton:not(.vertical) > button:last-child,
+spinbutton:not(.vertical) button:last-child {
+  border-radius: 4px 18px 18px 4px;
+  margin: 0;
+}
+
+spinbutton:not(.vertical) > button image,
+spinbutton:not(.vertical) button image {
+  color: inherit;
+}
+
+spinbutton:not(.vertical) > text,
+spinbutton:not(.vertical) entry,
+spinbutton:not(.vertical) text {
+  background-color: @surface_container_highest;
+  color: @window_fg_color;
+  min-width: 44px;
+  min-height: 36px;
+  border: none;
+  box-shadow: none;
+  padding: 0 8px;
+  margin: 0;
+  border-radius: 4px;
+}
+
+/* Entry when first-child (e.g. standard GTK3): rounded left pill cap (18px), 4px right edge */
+spinbutton:not(.vertical) > text:first-child,
+spinbutton:not(.vertical) entry:first-child {
+  border-radius: 18px 4px 4px 18px;
+  margin: 0 2px 0 0;
 }
 
 spinbutton.vertical {
