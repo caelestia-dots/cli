@@ -435,7 +435,7 @@ combobox button {
   box-shadow: none;
   padding: 0;
   margin: 0;
-  min-height: 32px;
+  min-height: 36px;
 }
 
 combobox button.combo > box {
@@ -443,23 +443,25 @@ combobox button.combo > box {
   margin: 0;
 }
 
-combobox cellview {
-  border-radius: 16px 4px 4px 16px;
+combobox button.combo cellview,
+combobox button cellview {
+  border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
-  padding: 6px 14px;
+  padding: 2px 14px;
   margin: 0 2px 0 0;
   min-height: 20px;
   font-weight: 500;
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-combobox arrow,
-combobox button arrow {
-  border-radius: 4px 16px 16px 4px;
+combobox button.combo arrow,
+combobox button arrow,
+combobox arrow {
+  border-radius: 4px 18px 18px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
-  padding: 6px 10px;
+  padding: 2px 10px;
   min-width: 14px;
   min-height: 14px;
   margin: 0;
@@ -483,21 +485,21 @@ combobox button:active arrow {
 }
 
 combobox.entry > entry {
-  border-radius: 16px 4px 4px 16px;
+  border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
   border: none;
   box-shadow: none;
-  padding: 6px 14px;
+  padding: 2px 14px;
   margin: 0 2px 0 0;
   min-height: 20px;
 }
 
 combobox.entry > button {
-  border-radius: 4px 16px 16px 4px;
+  border-radius: 4px 18px 18px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
-  padding: 6px 10px;
+  padding: 2px 10px;
   min-width: 14px;
   min-height: 14px;
   margin: 0;
@@ -556,16 +558,26 @@ menu > arrow {
   min-height: 0;
 }
 
+window.popup,
+window.popup decoration,
+.csd.popup decoration,
+window.popup.csd decoration {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
 popover contents,
-.menu.popup,
-menu {
+.menu,
+menu,
+.context-menu {
   background-color: @secondary_sidebar_bg_color;
   color: @window_fg_color;
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 4px;
-  min-width: 200px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 menu box,
@@ -614,6 +626,20 @@ menu menuitem:hover accelerator,
 .menu menuitem:hover accelerator,
 menu menuitem:selected accelerator,
 .menu menuitem:selected accelerator {
+  color: inherit;
+}
+
+menu cellview,
+.menu cellview,
+menu menuitem cellview,
+.menu menuitem cellview {
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
   color: inherit;
 }
 
@@ -750,21 +776,24 @@ spinbutton:not(.vertical) button:active {
   color: @window_fg_color;
 }
 
-/* First button if button is first-child (decrement when reordered): rounded left pill cap (18px), 4px right edge */
+spinbutton:not(.vertical) > button.down,
+spinbutton:not(.vertical) button.down {
+  border-radius: 4px;
+  margin: 0 2px 0 0;
+}
+
+spinbutton:not(.vertical) > button.up,
+spinbutton:not(.vertical) button.up {
+  border-radius: 4px 18px 18px 4px;
+  margin: 0;
+}
+
 spinbutton:not(.vertical) > button:first-child,
 spinbutton:not(.vertical) button:first-child {
   border-radius: 18px 4px 4px 18px;
   margin: 0 2px 0 0;
 }
 
-/* Middle button if not first and not last (4px) */
-spinbutton:not(.vertical) > button:not(:first-child):not(:last-child),
-spinbutton:not(.vertical) button:not(:first-child):not(:last-child) {
-  border-radius: 4px;
-  margin: 0 2px 0 0;
-}
-
-/* Last button in horizontal (increment): 4px left edge, rounded right pill cap (18px) */
 spinbutton:not(.vertical) > button:last-child,
 spinbutton:not(.vertical) button:last-child {
   border-radius: 4px 18px 18px 4px;
@@ -785,16 +814,9 @@ spinbutton:not(.vertical) text {
   min-height: 36px;
   border: none;
   box-shadow: none;
-  padding: 0 8px;
-  margin: 0;
-  border-radius: 4px;
-}
-
-/* Entry when first-child (e.g. standard GTK3): rounded left pill cap (18px), 4px right edge */
-spinbutton:not(.vertical) > text:first-child,
-spinbutton:not(.vertical) entry:first-child {
-  border-radius: 18px 4px 4px 18px;
+  padding: 0 14px;
   margin: 0 2px 0 0;
+  border-radius: 18px 4px 4px 18px;
 }
 
 spinbutton.vertical {
