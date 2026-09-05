@@ -103,6 +103,7 @@ complete -c caelestia -n "$seen scheme && $seen set" -s 'v' -l 'variant' -d 'Set
 # Screenshot
 complete -c caelestia -n "$seen screenshot" -s 'r' -l 'region' -d 'Capture region'
 complete -c caelestia -n "$seen screenshot" -s 'f' -l 'freeze' -d 'Freeze while selecting region'
+complete -c caelestia -n "$seen screenshot" -s 'c' -l 'copy' -d 'Copy screenshot to clipboard instead of opening it'
 
 # Record
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
@@ -110,7 +111,8 @@ complete -c caelestia -n "$seen record" -s 's' -l 'sound' -d 'Capture sound'
 complete -c caelestia -n "$seen record" -s 'c' -l 'clipboard' -d 'Copy recording path to clipboard'
 
 # Clipboard
-complete -c caelestia -n "$seen clipboard" -s 'd' -l 'delete' -d 'Delete from cliboard history'
+complete -c caelestia -n "$seen clipboard" -s 'd' -l 'delete' -d 'Delete from clipboard history'
+complete -c caelestia -n "$seen clipboard" -s 'c' -l 'clear' -d 'Clear clipboard history'
 
 # Wallpaper
 complete -c caelestia -n "$seen wallpaper" -s 'p' -l 'print' -d 'Print the scheme for a wallpaper' -rF
