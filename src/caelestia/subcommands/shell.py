@@ -24,34 +24,37 @@ class Command:
             self.print_log()
         elif self.args.kill:
             # Kill the shell
-            self.shell("kill")
+            self.stop_instances()
+        elif self.args.restart:
+            # Restart the shell. Wait for the old instances to exit first,
+            # otherwise `-n` will silently skip the relaunch
+            self.stop_instances()
+            self.start_shell()
         elif self.args.message:
             # Send a message
             self.message(*self.args.message)
         else:
-            # Kill any running instances and wait for them to exit, otherwise `-n`
-            # will silently skip the relaunch
-            if self.args.restart:
-                self.stop_instances()
-
             # Start the shell
-            args = ["qs", "-c", "caelestia", "-n"]
-            if self.args.log_rules:
-                args.extend(["--log-rules", self.args.log_rules])
-            if self.args.daemon:
-                args.append("-d")
-                subprocess.run(args)
-            else:
-                shell = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
-
-                # Ensure stdout is not None for the type checker
-                if shell.stdout:
-                    for line in shell.stdout:
-                        if self.filter_log(line):
-                            print(line, end="")
+            self.start_shell()
 
     def shell(self, *args: str) -> str:
         return subprocess.check_output(["qs", "-c", "caelestia", *args], text=True)
+
+    def start_shell(self) -> None:
+        args = ["qs", "-c", "caelestia", "-n"]
+        if self.args.log_rules:
+            args.extend(["--log-rules", self.args.log_rules])
+        if self.args.daemon:
+            args.append("-d")
+            subprocess.run(args)
+        else:
+            shell = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
+
+            # Ensure stdout is not None for the type checker
+            if shell.stdout:
+                for line in shell.stdout:
+                    if self.filter_log(line):
+                        print(line, end="")
 
     def list_instances(self) -> list[dict]:
         proc = subprocess.run(["qs", "-c", "caelestia", "list", "-j"], check=False, capture_output=True, text=True)
@@ -70,7 +73,7 @@ class Command:
             fatal(f"failed to parse shell instance list: {out}")
 
     def instance_pids(self) -> list[int]:
-        return [instance["pid"] for instance in self.list_instances() if "pid" in instance]
+        return [instance["pid"] for instance in self.list_instances()]
 
     def wait_for_exit(self, timeout: float) -> bool:
         end = time.monotonic() + timeout
@@ -95,7 +98,7 @@ class Command:
         if self.wait_for_exit(5):
             return
 
-        # Some instances are stuck; force kill them so the restart still happens
+        # Some instances are stuck; force kill them to ensure they are stopped
         warn("shell did not exit gracefully, killing")
         for pid in self.instance_pids():
             try:
