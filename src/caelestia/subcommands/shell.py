@@ -29,7 +29,7 @@ class Command:
             # Send a message
             self.message(*self.args.message)
         else:
-            # Kill any running instance and wait for it to exit, otherwise `-n`
+            # Kill any running instances and wait for them to exit, otherwise `-n`
             # will silently skip the relaunch
             if self.args.restart:
                 self.stop_instances()
@@ -69,6 +69,9 @@ class Command:
         except json.JSONDecodeError:
             fatal(f"failed to parse shell instance list: {out}")
 
+    def instance_pids(self) -> list[int]:
+        return [instance["pid"] for instance in self.list_instances() if "pid" in instance]
+
     def wait_for_exit(self, timeout: float) -> bool:
         end = time.monotonic() + timeout
         while time.monotonic() < end:
@@ -78,23 +81,26 @@ class Command:
         return False
 
     def stop_instances(self) -> None:
-        instances = self.list_instances()
-        if not instances:
+        pids = self.instance_pids()
+        if not pids:
             return
 
-        subprocess.run(["qs", "-c", "caelestia", "kill"], check=False, stdout=subprocess.DEVNULL)
+        # Without `--pid`, `qs kill` only kills one instance, so ask each one to
+        # exit. A kill that fails is not fatal here: the force kill below is the
+        # fallback for any instance that does not go away.
+        for pid in pids:
+            subprocess.run(["qs", "-c", "caelestia", "kill", "--pid", str(pid)], check=False, stdout=subprocess.DEVNULL)
 
-        # Teardown is not instant, so wait for the instance to actually disappear
+        # Teardown is not instant, so wait for the instances to actually disappear
         if self.wait_for_exit(5):
             return
 
-        # The instance is stuck; force kill it so the restart still happens
+        # Some instances are stuck; force kill them so the restart still happens
         warn("shell did not exit gracefully, killing")
-        instances = self.list_instances()
-        for instance in instances:
+        for pid in self.instance_pids():
             try:
-                os.kill(instance["pid"], signal.SIGKILL)
-            except (KeyError, ProcessLookupError):
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
                 pass
 
         if not self.wait_for_exit(2):
