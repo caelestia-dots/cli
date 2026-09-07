@@ -105,8 +105,12 @@ complete -c caelestia -n "$seen screenshot" -s 'r' -l 'region' -d 'Capture regio
 complete -c caelestia -n "$seen screenshot" -s 'f' -l 'freeze' -d 'Freeze while selecting region'
 
 # Record
+complete -c caelestia -n "$seen record" -s 'm' -l 'mode' -d 'What to record' -r -a 'fullscreen region window'
+complete -c caelestia -n "$seen record" -s 'a' -l 'audio' -d 'What to record audio from' -r -a 'none system mic combined'
 complete -c caelestia -n "$seen record" -s 'r' -l 'region' -d 'Capture region'
 complete -c caelestia -n "$seen record" -s 's' -l 'sound' -d 'Capture sound'
+complete -c caelestia -n "$seen record" -s 'p' -l 'pause' -d 'Pause/resume the recording'
+complete -c caelestia -n "$seen record" -l 'stop' -d 'Stop the recording instead of toggling'
 complete -c caelestia -n "$seen record" -s 'c' -l 'clipboard' -d 'Copy recording path to clipboard'
 
 # Clipboard
