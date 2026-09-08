@@ -650,26 +650,26 @@ button.back:active {
 /* Sliders */
 
 scale {
-  min-height: 24px;
-  padding: 0;
+  min-height: 36px;
+  padding: 8px 0;
 }
 
 /* Horizontal scale */
 scale.horizontal > trough,
 scale:not(.vertical) > trough {
-  min-height: 12px;
+  min-height: 16px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at calc(100% - 6px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.horizontal > trough > highlight,
 scale:not(.vertical) > trough > highlight {
-  min-height: 12px;
+  min-height: 16px;
   border-top-left-radius: 999px;
   border-bottom-left-radius: 999px;
   border-top-right-radius: 2px;
@@ -677,14 +677,14 @@ scale:not(.vertical) > trough > highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 scale.horizontal > trough > slider,
 scale:not(.vertical) > trough > slider {
   min-width: 4px;
-  min-height: 24px;
-  margin: -6px 0;
+  min-height: 32px;
+  margin: -8px 0;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -698,7 +698,7 @@ scale:not(.vertical) > trough > slider {
 scale.horizontal > trough > slider:hover,
 scale:not(.vertical) > trough > slider:hover {
   min-width: 4px;
-  min-height: 24px;
+  min-height: 32px;
   background-color: @accent_color;
 }
 
@@ -709,25 +709,25 @@ scale:not(.vertical) > trough:active > slider,
 scale.horizontal > trough > slider:active,
 scale:not(.vertical) > trough > slider:active {
   min-width: 4px;
-  min-height: 28px;
-  margin: -8px 0;
+  min-height: 40px;
+  margin: -12px 0;
   transform: scaleY(1.25);
 }
 
 /* Vertical scale */
 scale.vertical > trough {
-  min-width: 12px;
+  min-width: 16px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at 50% 6px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.vertical > trough > highlight {
-  min-width: 12px;
+  min-width: 16px;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   border-bottom-left-radius: 999px;
@@ -735,13 +735,13 @@ scale.vertical > trough > highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 scale.vertical > trough > slider {
-  min-width: 24px;
+  min-width: 32px;
   min-height: 4px;
-  margin: 0 -6px;
+  margin: 0 -8px;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -753,7 +753,7 @@ scale.vertical > trough > slider {
 }
 
 scale.vertical > trough > slider:hover {
-  min-width: 24px;
+  min-width: 32px;
   min-height: 4px;
   background-color: @accent_color;
 }
@@ -762,8 +762,8 @@ scale.vertical:active > trough > slider,
 scale.vertical > trough:active > slider,
 scale.vertical > trough > slider:active {
   min-height: 4px;
-  min-width: 28px;
-  margin: 0 -8px;
+  min-width: 40px;
+  margin: 0 -12px;
   transform: scaleX(1.25);
 }
 
@@ -857,10 +857,10 @@ switch slider {
   min-height: 18px;
   border-radius: 999px;
   background-color: @outline;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M4.5 4.5 L13.5 13.5 M4.5 13.5 L13.5 4.5' stroke='%23{{ surfaceContainerHighest.hex }}' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M3 3 L15 15 M3 15 L15 3' stroke='%23{{ surfaceContainerHighest.hex }}' stroke-width='2.6' stroke-linecap='round' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 13px 13px;
+  background-size: 14px 14px;
   border: none;
   box-shadow: none;
   outline: none;
@@ -888,7 +888,7 @@ switch:checked:hover slider {
 }
 
 switch:active slider {
-  min-width: 24px;
+  opacity: 0.85;
 }
 
 switch:disabled {

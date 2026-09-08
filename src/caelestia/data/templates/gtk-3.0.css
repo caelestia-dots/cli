@@ -83,26 +83,26 @@ window {
 /* Sliders */
 
 scale {
-  min-height: 24px;
-  padding: 0;
+  min-height: 36px;
+  padding: 8px 0;
 }
 
 /* Horizontal scale */
 scale.horizontal trough,
 scale:not(.vertical) trough {
-  min-height: 12px;
+  min-height: 16px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at calc(100% - 6px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.horizontal highlight,
 scale:not(.vertical) highlight {
-  min-height: 12px;
+  min-height: 16px;
   border-top-left-radius: 999px;
   border-bottom-left-radius: 999px;
   border-top-right-radius: 2px;
@@ -110,14 +110,14 @@ scale:not(.vertical) highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 scale.horizontal slider,
 scale:not(.vertical) slider {
   min-width: 4px;
-  min-height: 24px;
-  margin: -6px 0;
+  min-height: 32px;
+  margin: -8px 0;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -130,31 +130,31 @@ scale:not(.vertical) slider {
 scale.horizontal slider:hover,
 scale:not(.vertical) slider:hover {
   min-width: 4px;
-  min-height: 24px;
+  min-height: 32px;
   background-color: @accent_color;
 }
 
 scale.horizontal:active slider,
 scale:not(.vertical):active slider {
   min-width: 4px;
-  min-height: 28px;
-  margin: -8px 0;
+  min-height: 40px;
+  margin: -12px 0;
 }
 
 /* Vertical scale */
 scale.vertical trough {
-  min-width: 12px;
+  min-width: 16px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at 50% 6px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.vertical highlight {
-  min-width: 12px;
+  min-width: 16px;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   border-bottom-left-radius: 999px;
@@ -162,13 +162,13 @@ scale.vertical highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 scale.vertical slider {
-  min-width: 24px;
+  min-width: 32px;
   min-height: 4px;
-  margin: 0 -6px;
+  margin: 0 -8px;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -179,15 +179,15 @@ scale.vertical slider {
 }
 
 scale.vertical slider:hover {
-  min-width: 24px;
+  min-width: 32px;
   min-height: 4px;
   background-color: @accent_color;
 }
 
 scale.vertical:active slider {
   min-height: 4px;
-  min-width: 28px;
-  margin: 0 -8px;
+  min-width: 40px;
+  margin: 0 -12px;
 }
 
 /* Disabled scale */
@@ -279,10 +279,10 @@ switch slider {
   min-height: 18px;
   border-radius: 999px;
   background-color: @outline;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M4.5 4.5 L13.5 13.5 M4.5 13.5 L13.5 4.5' stroke='%23{{ surfaceContainerHighest.hex }}' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M3 3 L15 15 M3 15 L15 3' stroke='%23{{ surfaceContainerHighest.hex }}' stroke-width='2.6' stroke-linecap='round' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 13px 13px;
+  background-size: 14px 14px;
   border: none;
   box-shadow: none;
   outline: none;
@@ -310,7 +310,7 @@ switch:checked:hover slider {
 }
 
 switch:active slider {
-  min-width: 24px;
+  opacity: 0.85;
 }
 
 switch:disabled {
@@ -932,7 +932,7 @@ row.profile-active {
   letter-spacing: 0.03em;
 }
 
-/* Nemo toolbar and statusbar buttons */
+/* Nemo toolbar and statusbar buttons and scales */
 .nemo-window .toolbar button,
 .nemo-window NemoStatusBar button,
 NemoStatusBar button {
@@ -940,6 +940,27 @@ NemoStatusBar button {
   min-width: 24px;
   padding: 4px 6px;
   margin: 1px 2px;
+}
+
+.nemo-window .toolbar scale,
+.nemo-window NemoStatusBar scale,
+NemoStatusBar scale {
+  min-height: 16px;
+  padding: 2px 0;
+}
+
+.nemo-window .toolbar scale trough,
+.nemo-window NemoStatusBar scale trough,
+NemoStatusBar scale trough {
+  min-height: 8px;
+}
+
+.nemo-window .toolbar scale slider,
+.nemo-window NemoStatusBar scale slider,
+NemoStatusBar scale slider {
+  min-width: 4px;
+  min-height: 20px;
+  margin: -6px 0;
 }
 
 @import "thunar.css";
