@@ -354,12 +354,19 @@ check:hover {
 }
 
 checkbutton check:checked,
+check:checked {
+  background-color: @accent_color;
+  border-color: @accent_color;
+  color: @accent_fg_color;
+  -gtk-icon-source: -gtk-icontheme("object-select-symbolic");
+}
+
 checkbutton check:indeterminate,
-check:checked,
 check:indeterminate {
   background-color: @accent_color;
   border-color: @accent_color;
   color: @accent_fg_color;
+  -gtk-icon-source: -gtk-icontheme("dash-symbolic");
 }
 
 checkbutton check:checked:hover,
@@ -484,6 +491,22 @@ combobox button:active arrow {
   color: @tonal_hover_fg_color;
 }
 
+combobox button.combo:focus,
+combobox button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+combobox button.combo:focus cellview,
+combobox button:focus cellview {
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
+combobox button.combo:focus arrow,
+combobox button:focus arrow {
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
 combobox.entry > entry {
   border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
@@ -505,7 +528,7 @@ combobox.entry > button {
   margin: 0;
 }
 
-.linked > button:first-child:not(.combo) {
+.split-button > button:first-child:not(.combo) {
   border-radius: 18px 4px 4px 18px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
@@ -517,7 +540,7 @@ combobox.entry > button {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.linked > button:last-child:not(.combo) {
+.split-button > button:last-child:not(.combo) {
   border-radius: 4px 18px 18px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
@@ -530,22 +553,28 @@ combobox.entry > button {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.linked > button:first-child:not(.combo):hover,
-.linked > button:last-child:not(.combo):hover {
+.split-button > button:first-child:not(.combo):hover,
+.split-button > button:last-child:not(.combo):hover {
   background-color: @tonal_hover_bg_color;
   color: @sidebar_row_active_fg_color;
 }
 
-.linked > button:first-child:not(.combo):active,
-.linked > button:last-child:not(.combo):active,
-.linked > button:last-child:not(.combo):checked {
+.split-button > button:first-child:not(.combo):active,
+.split-button > button:last-child:not(.combo):active,
+.split-button > button:last-child:not(.combo):checked {
   background-color: @tonal_active_bg_color;
   color: @sidebar_row_active_fg_color;
 }
 
-.linked > button:last-child arrow {
+.split-button > button:last-child arrow {
   min-width: 16px;
   min-height: 16px;
+}
+
+.split-button > button:first-child:focus,
+.split-button > button:last-child:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px @accent_color;
 }
 
 /* Popovers and menus */
@@ -599,20 +628,35 @@ menu menuitem,
   transition: all 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
+menu menuitem:first-child,
+.menu menuitem:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+menu menuitem:last-child,
+.menu menuitem:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+menu menuitem:first-child:last-child,
+.menu menuitem:first-child:last-child {
+  border-radius: 8px;
+}
+
 menu menuitem:hover,
 .menu menuitem:hover,
 menu menuitem:selected,
 .menu menuitem:selected {
   background-color: @popover_fg_hover_color;
   color: @window_fg_color;
-  border-radius: 4px;
 }
 
 menu menuitem:active,
 .menu menuitem:active {
   background-color: @popover_fg_active_color;
   color: @window_fg_color;
-  border-radius: 4px;
 }
 
 menu menuitem accelerator,
@@ -646,8 +690,8 @@ menu menuitem cellview,
 /* Text entries & Search entries */
 entry:not(.search) {
   border-radius: 8px;
-  min-height: 36px;
-  padding: 6px 12px;
+  min-height: 24px;
+  padding: 4px 10px;
   background-color: transparent;
   color: @window_fg_color;
   border: 1px solid @outline;
@@ -657,14 +701,14 @@ entry:not(.search) {
 
 entry:not(.search):focus {
   border: 2px solid @accent_color;
-  padding: 5px 11px;
+  padding: 3px 9px;
   color: @window_fg_color;
   outline: none;
 }
 
 entry:not(.search).error {
   border: 2px solid @destructive_color;
-  padding: 5px 11px;
+  padding: 3px 9px;
   color: @destructive_color;
 }
 

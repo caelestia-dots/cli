@@ -199,16 +199,20 @@ splitbutton > button {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-splitbutton > button:hover,
-splitbutton button:hover {
+splitbutton > button:hover {
   background-color: @tonal_hover_bg_color;
   color: @tonal_hover_fg_color;
 }
 
-splitbutton > button:active,
-splitbutton button:active {
+splitbutton > button:active {
   background-color: @tonal_active_bg_color;
   color: @tonal_hover_fg_color;
+}
+
+splitbutton > button:focus,
+splitbutton > button:focus:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px @accent_color;
 }
 
 splitbutton separator {
@@ -220,8 +224,7 @@ splitbutton separator {
 }
 
 splitbutton > menubutton > button:dir(ltr),
-splitbutton > menubutton > button,
-splitbutton menubutton button {
+splitbutton > menubutton > button {
   border-radius: 4px 16px 16px 4px;
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
@@ -234,6 +237,12 @@ splitbutton menubutton button {
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
+splitbutton > menubutton > button:focus,
+splitbutton > menubutton > button:focus:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
 splitbutton > menubutton > button arrow {
   min-width: 14px;
   min-height: 14px;
@@ -243,26 +252,22 @@ splitbutton > menubutton > button arrow {
               -gtk-icon-transform 200ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-splitbutton > menubutton > button:hover,
-splitbutton menubutton button:hover {
+splitbutton > menubutton > button:hover {
   background-color: @tonal_hover_bg_color;
   color: @tonal_hover_fg_color;
 }
 
 splitbutton > menubutton > button:active,
-splitbutton > menubutton > button:checked,
-splitbutton menubutton button:checked {
+splitbutton > menubutton > button:checked {
   background-color: @sidebar_row_active_bg_color;
   color: @sidebar_row_active_fg_color;
-  border-radius: 16px;
+  border-radius: 4px 16px 16px 4px;
   margin: 0;
 }
 
 splitbutton > menubutton > button:checked > arrow,
 splitbutton > menubutton > button:checked arrow,
-splitbutton > menubutton > button:active arrow,
-splitbutton menubutton button:checked arrow,
-splitbutton menubutton button:active arrow {
+splitbutton > menubutton > button:active arrow {
   -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
   transform: rotate(180deg);
   -gtk-icon-transform: rotate(180deg);
@@ -389,8 +394,8 @@ headerbar button {
 /* Text entries & Search entries */
 entry:not(.search) {
   border-radius: 8px;
-  min-height: 36px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 10px;
   background-color: transparent;
   color: @window_fg_color;
   border: 1px solid @outline;
@@ -401,20 +406,20 @@ entry:not(.search) {
 entry:not(.search) > text {
   color: @window_fg_color;
   background-color: transparent;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 entry:not(.search):focus,
 entry:not(.search):focus-within {
   border: 2px solid @accent_color;
-  padding: 0 11px;
+  padding: 0 9px;
   color: @window_fg_color;
   outline: none;
 }
 
 entry:not(.search).error {
   border: 2px solid @destructive_color;
-  padding: 0 11px;
+  padding: 0 9px;
   color: @destructive_color;
 }
 
@@ -925,7 +930,19 @@ checkbutton check:hover {
   border-color: @accent_color;
 }
 
-checkbutton check:checked,
+checkbutton:focus:focus-visible check,
+checkbutton:focus check {
+  outline: 2px solid @accent_color;
+  outline-offset: 2px;
+}
+
+checkbutton check:checked {
+  background-color: @accent_color;
+  border-color: @accent_color;
+  color: @accent_fg_color;
+  -gtk-icon-source: -gtk-icontheme("object-select-symbolic");
+}
+
 checkbutton check:indeterminate {
   background-color: @accent_color;
   border-color: @accent_color;
@@ -1061,11 +1078,23 @@ tab:selected .tab-title label {
 
 /* popup menu */
 
-popover listview.view row,
-popover listview.view row:first-child,
-popover listview.view row:last-child {
+popover listview.view row {
   background: transparent;
   border-radius: 4px;
+}
+
+popover listview.view row:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+popover listview.view row:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+popover listview.view row:first-child:last-child {
+  border-radius: 8px;
 }
 
 popover contents,
@@ -1075,12 +1104,10 @@ popover arrow {
 
 popover listview.view row:hover {
   background: @popover_fg_hover_color;
-  border-radius: 4px;
 }
 
 popover listview.view row:active {
   background: @popover_fg_active_color;
-  border-radius: 4px;
 }
 
 modelbutton {
@@ -1181,9 +1208,24 @@ dropdown > button:active > box > arrow {
   color: @tonal_hover_fg_color;
 }
 
+dropdown > button:focus,
+dropdown > button:focus:focus-visible {
+  outline: none;
+}
+
+dropdown > button:focus > box > stack,
+dropdown > button:focus:focus-visible > box > stack {
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
+dropdown > button:focus > box > arrow,
+dropdown > button:focus:focus-visible > box > arrow {
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
 dropdown > button:checked > box > arrow,
 dropdown > button:active > box > arrow {
-  border-radius: 16px;
+  border-radius: 4px 16px 16px 4px;
   margin: 0;
   -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
   transform: rotate(180deg);
@@ -1209,6 +1251,13 @@ combobox button {
   min-height: 32px;
 }
 
+combobox button:focus,
+combobox button:focus:focus-visible,
+combobox > box > button:focus,
+combobox > box > button:focus:focus-visible {
+  outline: none;
+}
+
 combobox cellview {
   border-radius: 16px 4px 4px 16px;
   background-color: @sidebar_row_active_bg_color;
@@ -1230,6 +1279,18 @@ combobox button arrow {
   min-height: 14px;
   margin: 0;
   transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+combobox button:focus cellview,
+combobox button:focus:focus-visible cellview,
+combobox > box > button:focus cellview {
+  box-shadow: inset 0 0 0 2px @accent_color;
+}
+
+combobox button:focus arrow,
+combobox button:focus:focus-visible arrow,
+combobox > box > button:focus arrow {
+  box-shadow: inset 0 0 0 2px @accent_color;
 }
 
 combobox button:hover cellview,
@@ -1272,7 +1333,7 @@ dropdown > popover contents {
   background-color: @secondary_sidebar_bg_color;
   color: @window_fg_color;
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 4px;
   min-width: 200px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
@@ -1340,6 +1401,35 @@ row.combo popover listview row {
   transition: all 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
+popover.menu modelbutton:first-child,
+popover modelbutton:first-child,
+dropdown > popover listview > row:first-child,
+dropdown > popover listview row:first-child,
+row.combo popover listview > row:first-child,
+row.combo popover listview row:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+popover.menu modelbutton:last-child,
+popover modelbutton:last-child,
+dropdown > popover listview > row:last-child,
+dropdown > popover listview row:last-child,
+row.combo popover listview > row:last-child,
+row.combo popover listview row:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+popover.menu modelbutton:first-child:last-child,
+popover modelbutton:first-child:last-child,
+dropdown > popover listview > row:first-child:last-child,
+dropdown > popover listview row:first-child:last-child,
+row.combo popover listview > row:first-child:last-child,
+row.combo popover listview row:first-child:last-child {
+  border-radius: 8px;
+}
+
 popover.menu modelbutton label,
 popover modelbutton label,
 modelbutton label,
@@ -1393,7 +1483,6 @@ row.combo popover listview row:not(:selected):hover,
 row.combo popover listview row:hover:not(:selected) {
   background-color: @popover_fg_hover_color;
   color: @window_fg_color;
-  border-radius: 4px;
 }
 
 popover.menu modelbutton:hover label,
@@ -1420,7 +1509,6 @@ dropdown > popover listview row:active,
 row.combo popover listview row:active {
   background-color: @popover_fg_active_color;
   color: @window_fg_color;
-  border-radius: 4px;
 }
 
 accelerator {
