@@ -83,26 +83,26 @@ window {
 /* Sliders */
 
 scale {
-  min-height: 36px;
-  padding: 8px 0;
+  min-height: 24px;
+  padding: 0;
 }
 
 /* Horizontal scale */
 scale.horizontal trough,
 scale:not(.vertical) trough {
-  min-height: 16px;
+  min-height: 12px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at calc(100% - 8px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at calc(100% - 6px) 50%, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.horizontal highlight,
 scale:not(.vertical) highlight {
-  min-height: 16px;
+  min-height: 12px;
   border-top-left-radius: 999px;
   border-bottom-left-radius: 999px;
   border-top-right-radius: 2px;
@@ -110,14 +110,14 @@ scale:not(.vertical) highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 
 scale.horizontal slider,
 scale:not(.vertical) slider {
   min-width: 4px;
-  min-height: 32px;
-  margin: -8px 0;
+  min-height: 24px;
+  margin: -6px 0;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -130,31 +130,31 @@ scale:not(.vertical) slider {
 scale.horizontal slider:hover,
 scale:not(.vertical) slider:hover {
   min-width: 4px;
-  min-height: 32px;
+  min-height: 24px;
   background-color: @accent_color;
 }
 
 scale.horizontal:active slider,
 scale:not(.vertical):active slider {
   min-width: 4px;
-  min-height: 40px;
-  margin: -12px 0;
+  min-height: 28px;
+  margin: -8px 0;
 }
 
 /* Vertical scale */
 scale.vertical trough {
-  min-width: 16px;
+  min-width: 12px;
   border-radius: 999px;
   background-color: @surface_container_highest;
   border: none;
   box-shadow: none;
   outline: none;
   padding: 0;
-  background-image: radial-gradient(circle at 50% 8px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
+  background-image: radial-gradient(circle at 50% 6px, @accent_color 0px, @accent_color 1.5px, transparent 2px);
 }
 
 scale.vertical highlight {
-  min-width: 16px;
+  min-width: 12px;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   border-bottom-left-radius: 999px;
@@ -162,13 +162,13 @@ scale.vertical highlight {
   background-color: @accent_color;
   border: none;
   box-shadow: none;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 scale.vertical slider {
-  min-width: 32px;
+  min-width: 24px;
   min-height: 4px;
-  margin: 0 -8px;
+  margin: 0 -6px;
   border-radius: 999px;
   background-color: @accent_color;
   box-shadow: 0 0 0 3px @window_bg_color;
@@ -179,15 +179,15 @@ scale.vertical slider {
 }
 
 scale.vertical slider:hover {
-  min-width: 32px;
+  min-width: 24px;
   min-height: 4px;
   background-color: @accent_color;
 }
 
 scale.vertical:active slider {
   min-height: 4px;
-  min-width: 40px;
-  margin: 0 -12px;
+  min-width: 28px;
+  margin: 0 -8px;
 }
 
 /* Disabled scale */
@@ -930,6 +930,16 @@ row.profile-active {
   font-size: 0.75em;
   font-weight: 700;
   letter-spacing: 0.03em;
+}
+
+/* Nemo toolbar and statusbar buttons */
+.nemo-window .toolbar button,
+.nemo-window NemoStatusBar button,
+NemoStatusBar button {
+  min-height: 24px;
+  min-width: 24px;
+  padding: 4px 6px;
+  margin: 1px 2px;
 }
 
 @import "thunar.css";
