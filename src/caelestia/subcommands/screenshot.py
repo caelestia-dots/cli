@@ -21,11 +21,16 @@ class Command:
 
     def region(self) -> None:
         if self.args.region == "slurp":
-            subprocess.run(
-                ["qs", "-c", "caelestia", "ipc", "call", "picker", "openFreeze" if self.args.freeze else "open"]
-            )
+            func = "open" + ("Freeze" if self.args.freeze else "") + ("Clip" if self.args.copy else "")
+            subprocess.run(["qs", "-c", "caelestia", "ipc", "call", "picker", func])
         else:
             sc_data = subprocess.check_output(["grim", "-l", "0", "-g", self.args.region.strip(), "-"])
+
+            if self.args.copy:
+                subprocess.run(["wl-copy"], input=sc_data)
+                notify("Screenshot taken", "Screenshot copied to clipboard")
+                return
+
             swappy = subprocess.Popen(["swappy", "-f", "-"], stdin=subprocess.PIPE, start_new_session=True)
 
             # Ensure stdin is not None for the type checker
