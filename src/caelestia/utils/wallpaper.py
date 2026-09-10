@@ -1,8 +1,10 @@
 import json
 import os
 import random
+import shutil
 import subprocess
 from argparse import Namespace
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import cast
 
@@ -16,6 +18,7 @@ from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.paths import (
     compute_hash,
     get_config,
+    videowallpapers_dir,
     wallpaper_link_path,
     wallpaper_path_path,
     wallpaper_thumbnail_path,
@@ -24,9 +27,15 @@ from caelestia.utils.paths import (
 from caelestia.utils.scheme import Scheme, get_scheme
 from caelestia.utils.theme import apply_colours
 
+VIDEO_EXTENSIONS = [".mp4", ".webm", ".mkv", ".avi", ".mov", ".gif"]
+
 
 def is_valid_image(path: Path) -> bool:
     return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+
+
+def is_valid_video(path: Path) -> bool:
+    return path.is_file() and path.suffix in VIDEO_EXTENSIONS
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
@@ -47,7 +56,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     if not directory.is_dir():
         return []
 
-    walls = [f for f in directory.rglob("*") if is_valid_image(f)]
+    walls = [f for f in directory.rglob("*") if is_valid_image(f) or is_valid_video(f)]
 
     if args.no_filter:
         return walls
@@ -55,7 +64,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     monitors = cast(list[dict[str, int]], message("monitors"))
     filter_size = min(m["width"] for m in monitors), min(m["height"] for m in monitors)
 
-    return [f for f in walls if check_wall(f, filter_size, args.threshold)]
+    return [f for f in walls if is_valid_video(f) or check_wall(f, filter_size, args.threshold)]
 
 
 def get_thumb(wall: Path, cache: Path) -> Path:
@@ -98,14 +107,36 @@ def get_smart_opts(wall: Path, cache: Path) -> dict:
     return opts
 
 
-def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
-    wall = Path(wall)
+def video_thumb_path(wall: Path) -> Path:
+    return wall.parent / ".thumbs" / f"{wall.stem}.jpg"
+
+
+def generate_video_thumb(video: Path, dest: Path) -> None:
+    if shutil.which("ffmpegthumbnailer") is None:
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "8"],
+        capture_output=True,
+        check=False,
+    )
+
+
+def colour_source(wall: Path) -> Path:
+    if is_valid_video(wall):
+        thumb_path = video_thumb_path(wall)
+        if not thumb_path.exists():
+            generate_video_thumb(wall, thumb_path)
+        return thumb_path
+    if wall.suffix.lower() == ".gif":
+        return convert_gif(wall)
+    return wall
+
+
+def get_colours_for_wall(wall: Path | str, no_smart: bool) -> dict:
+    wall = colour_source(Path(wall))
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
-
-    if wall.suffix.lower() == ".gif":
-        wall = convert_gif(wall)
-
     name = "dynamic"
 
     if not no_smart:
@@ -148,14 +179,12 @@ def convert_gif(wall: Path) -> Path:
 
 
 def set_wallpaper(wall: Path, no_smart: bool) -> None:
-    # Make path absolute
     wall = Path(wall).resolve()
 
-    if not is_valid_image(wall):
-        raise ValueError(f'"{wall}" is not a valid image')
+    if not is_valid_image(wall) and not is_valid_video(wall):
+        raise ValueError(f'"{wall}" is not a valid image or video')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    wall_cache = colour_source(wall)
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
@@ -204,8 +233,41 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
         )
 
 
+def generate_video_thumb(video: Path, dest: Path) -> None:
+    if shutil.which("ffmpegthumbnailer") is None:
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        ["ffmpegthumbnailer", "-i", str(video), "-o", str(dest), "-s", "512", "-q", "8"],
+        capture_output=True,
+        check=False,
+    )
+
+
+def update_video_thumbs() -> None:
+    if not videowallpapers_dir.is_dir():
+        return
+    missing = []
+    for f in videowallpapers_dir.iterdir():
+        if not is_valid_video(f):
+            continue
+        dest = f.parent / ".thumbs" / f"{f.stem}.jpg"
+        if not dest.exists():
+            missing.append((f, dest))
+    if not missing:
+        return
+    with ThreadPoolExecutor() as pool:
+        for f, dest in missing:
+            pool.submit(generate_video_thumb, f, dest)
+
+
 def set_random(args: Namespace) -> None:
     wallpapers = get_wallpapers(args)
+
+    if videowallpapers_dir.is_dir():
+        for f in videowallpapers_dir.iterdir():
+            if is_valid_video(f):
+                wallpapers.append(f)
 
     if not wallpapers:
         raise ValueError("No valid wallpapers found")

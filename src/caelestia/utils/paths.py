@@ -34,6 +34,7 @@ scheme_data_dir: Path = cli_data_dir / "schemes"
 scheme_cache_dir: Path = c_cache_dir / "schemes"
 
 wallpapers_dir: Path = Path(os.getenv("CAELESTIA_WALLPAPERS_DIR", pictures_dir / "Wallpapers"))
+videowallpapers_dir: Path = Path(os.getenv("CAELESTIA_VIDEO_WALLPAPERS_DIR", videos_dir / "Wallpapers"))
 wallpaper_path_path: Path = c_state_dir / "wallpaper/path.txt"
 wallpaper_link_path: Path = c_state_dir / "wallpaper/current"
 wallpaper_thumbnail_path: Path = c_state_dir / "wallpaper/thumbnail.jpg"
