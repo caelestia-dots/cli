@@ -27,6 +27,7 @@ complete -c caelestia -n $not_seen -a 'update' -d 'Update the Caelestia dotfiles
 set -l commands mpris drawers wallpaper notifs
 set -l not_seen "$seen shell && not $seen $commands"
 complete -c caelestia -n $not_seen -s 'd' -l 'daemon' -d 'Start the shell detached'
+complete -c caelestia -n $not_seen -s 'r' -l 'restart' -d 'Kill and restart the shell'
 complete -c caelestia -n $not_seen -s 's' -l 'show' -d 'Print all IPC commands'
 complete -c caelestia -n $not_seen -s 'l' -l 'log' -d 'Print the shell log'
 complete -c caelestia -n $not_seen -l 'log-rules' -d 'Log rules to apply'
