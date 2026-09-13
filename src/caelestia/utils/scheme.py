@@ -12,6 +12,7 @@ class Scheme:
     _flavour: str
     _mode: str
     _variant: str
+    _source_colour: str | None
     _colours: dict[str, str]
     notify: bool
 
@@ -21,12 +22,15 @@ class Scheme:
             self._flavour = "mocha"
             self._mode = "dark"
             self._variant = "tonalspot"
+            self._source_colour = None
             self._colours = read_colours_from_file(self.get_colours_path())
         else:
             self._name = scheme_json["name"]
             self._flavour = scheme_json["flavour"]
             self._mode = scheme_json["mode"]
             self._variant = scheme_json["variant"]
+            source_colour = scheme_json.get("sourceColour")
+            self._source_colour = self.normalise_colour(source_colour) if source_colour else None
             self._colours = scheme_json["colours"]
         self.notify = False
 
@@ -50,6 +54,8 @@ class Scheme:
             raise ValueError(f"Invalid scheme name: {name}")
 
         self._name = name
+        if name != "dynamic":
+            self._source_colour = None
         self._check_flavour()
         self._check_mode()
         self._update_colours()
@@ -117,6 +123,38 @@ class Scheme:
     def colours(self) -> dict[str, str]:
         return self._colours
 
+    @property
+    def source_colour(self) -> str | None:
+        return self._source_colour
+
+    @staticmethod
+    def normalise_colour(colour: str) -> str:
+        value = colour.strip().removeprefix("#")
+        if len(value) == 3:
+            value = "".join(c * 2 for c in value)
+        if len(value) != 6 or any(c not in "0123456789abcdefABCDEF" for c in value):
+            raise ValueError(f'Invalid colour: "{colour}". Expected a 6-digit hexadecimal colour.')
+        return value.lower()
+
+    def set_source_colour(self, colour: str) -> None:
+        try:
+            self._source_colour = self.normalise_colour(colour)
+        except ValueError as exc:
+            if self.notify:
+                notify("-u", "critical", "Unable to set colour", str(exc))
+            raise
+
+        self._name = "dynamic"
+        self._check_flavour()
+        self._check_mode()
+        self.update_colours()
+
+    def clear_source_colour(self) -> None:
+        if self._source_colour is None:
+            return
+        self._source_colour = None
+        self.update_colours()
+
     def get_colours_path(self) -> Path:
         return (scheme_data_dir / self.name / self.flavour / self.mode).with_suffix(".txt")
 
@@ -129,11 +167,13 @@ class Scheme:
                 "flavour": self.flavour,
                 "mode": self.mode,
                 "variant": self.variant,
+                "sourceColour": self.source_colour,
                 "colours": self.colours,
             },
         )
 
     def set_random(self) -> None:
+        self._source_colour = None
         self._name = random.choice(get_scheme_names())
         self._flavour = random.choice(get_scheme_flavours(self.name))
         self._mode = random.choice(get_scheme_modes(self.name, self.flavour))
@@ -158,7 +198,12 @@ class Scheme:
             from caelestia.utils.material import get_colours_for_image
 
             try:
-                self._colours = get_colours_for_image()
+                if self.source_colour:
+                    from caelestia.utils.material.generator import gen_scheme, hex_to_hct
+
+                    self._colours = gen_scheme(self, hex_to_hct(self.source_colour))
+                else:
+                    self._colours = get_colours_for_image()
             except FileNotFoundError:
                 if self.notify:
                     notify(
