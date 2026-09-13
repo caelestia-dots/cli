@@ -14,6 +14,7 @@ The main control script for the Caelestia dotfiles.
 - `glib2` - closing notifications
 - [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
 - [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
+- [`quickshell`](https://git.outfoxxed.me/outfoxxed/quickshell) - the Material 3 clipboard picker
 
 </details>
 
@@ -161,6 +162,11 @@ subcommands:
     install      install the Caelestia dotfiles
     update       update the Caelestia dotfiles
 ```
+
+When Quickshell is installed, `caelestia clipboard` opens a Material 3 picker with image
+previews, search, pinning, deletion, keyboard navigation and click-outside dismissal. The
+existing fuzzel picker remains available as a fallback when Quickshell is unavailable; use
+`caelestia clipboard --delete` to open its delete mode directly.
 
 ### User templates
 

@@ -1,0 +1,229 @@
+#!/usr/bin/env bash
+
+set -u
+
+# The picker is a small standalone Quickshell config. Toggling its process
+# here keeps the desktop shell alive while the picker is open.
+picker_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+picker_pattern="([q]uickshell|[q]s).*${picker_dir}"
+if pids="$(pgrep -u "$(id -u)" -f "$picker_pattern" 2>/dev/null)"; then
+    [[ -n "$pids" ]] && kill $pids 2>/dev/null || true
+    exit 0
+fi
+
+quickshell_bin="${CAELESTIA_QUICKSHELL:-}"
+if [[ -z "$quickshell_bin" ]]; then
+    quickshell_bin="$(command -v quickshell || command -v qs || true)"
+fi
+if [[ -z "$quickshell_bin" ]]; then
+    exit 127
+fi
+
+thumbnail_dir="${XDG_CACHE_HOME:-$HOME/.cache}/cliphist/thumbnails"
+mkdir -p "$thumbnail_dir"
+picker_state="${XDG_CACHE_HOME:-$HOME/.cache}/caelestia-clipboard-picker"
+mkdir -p "$picker_state"
+
+# Pins live under XDG_STATE_HOME so they survive cache cleanup and picker
+# restarts. Each line is one cliphist entry id.
+pin_state="${XDG_STATE_HOME:-$HOME/.local/state}/caelestia-clipboard-picker"
+mkdir -p "$pin_state"
+pins="$pin_state/pinned"
+touch "$pins"
+
+manifest="$picker_state/entries.$$"
+manifest_next="$picker_state/entries.next.$$"
+result="$picker_state/result.$$"
+refresh="$picker_state/refresh.$$"
+pinned_manifest="$picker_state/pinned.$$"
+normal_manifest="$picker_state/normal.$$"
+tmp=""
+refresh_generation=0
+trap 'rm -f -- "$manifest" "$manifest_next" "$result" "$refresh" "$pinned_manifest" "$normal_manifest" "$tmp"' EXIT
+
+toggle_pin() {
+    local id="$1"
+    local next="$pins.tmp.$$"
+
+    if grep -Fxq -- "$id" "$pins"; then
+        grep -Fxv -- "$id" "$pins" >"$next" || true
+    else
+        cp -- "$pins" "$next"
+        printf '%s\n' "$id" >>"$next"
+    fi
+    mv -f -- "$next" "$pins"
+}
+
+remove_pin() {
+    local id="$1"
+    local next="$pins.tmp.$$"
+
+    grep -Fxv -- "$id" "$pins" >"$next" || true
+    mv -f -- "$next" "$pins"
+}
+
+picker_is_running() {
+    pgrep -u "$(id -u)" -f "$picker_pattern" >/dev/null 2>&1
+}
+
+wait_picker_exit() {
+    for _ in {1..100}; do
+        picker_is_running || return 0
+        sleep 0.05
+    done
+}
+
+build_manifest() {
+    entries="$(cliphist list)"
+    : >"$pinned_manifest"
+    : >"$normal_manifest"
+
+    # Load pin ids once per refresh. Spawning grep once for every history row
+    # made a 700+ item clipboard noticeably slow to open.
+    declare -A pinned_ids=()
+    while IFS= read -r pin_id; do
+        [[ -n "$pin_id" ]] && pinned_ids["$pin_id"]=1
+    done <"$pins"
+
+    # Decode image entries once into the existing cliphist cache, then pass a
+    # newline-delimited manifest to the QML picker. Text payloads stay exactly
+    # as cliphist presents them; image rows deliberately carry no metadata.
+    if [[ -n "$entries" ]]; then
+        while IFS=$'\t' read -r id preview; do
+            [[ -n "$id" ]] || continue
+
+            pin_flag=0
+            [[ -n "${pinned_ids[$id]:-}" ]] && pin_flag=1
+            target_manifest="$normal_manifest"
+            [[ "$pin_flag" == 1 ]] && target_manifest="$pinned_manifest"
+
+            if [[ "$preview" == *"[[ binary data "* ]] &&
+                [[ "$preview" =~ (png|svg|jpe?g|bmp|webp|tiff|gif)[[:space:]][0-9]+x[0-9]+ ]]; then
+                extension="${BASH_REMATCH[1],,}"
+                image_file="$thumbnail_dir/$id.$extension"
+
+                if [[ ! -s "$image_file" ]]; then
+                    temporary_file="$(mktemp "$thumbnail_dir/.${id}.XXXXXX")"
+                    if printf '%s' "$id" | cliphist decode >"$temporary_file"; then
+                        mv -f -- "$temporary_file" "$image_file"
+                    else
+                        rm -f -- "$temporary_file"
+                    fi
+                fi
+
+                if [[ -s "$image_file" ]]; then
+                    printf '%s\timage\t%s\t%s\t%s\n' \
+                        "$id" "$image_file" "$preview" "$pin_flag" >>"$target_manifest"
+                    continue
+                fi
+            fi
+
+            printf '%s\ttext\t%s\t%s\n' "$id" "$preview" "$pin_flag" >>"$target_manifest"
+        done <<< "$entries"
+    fi
+
+    # Build a complete snapshot first, then atomically replace the manifest.
+    # A separate refresh marker tells QML exactly when the replacement is
+    # ready, avoiding a transient empty/partial file while the list animates.
+    cat "$pinned_manifest" "$normal_manifest" >"$manifest_next"
+    mv -f -- "$manifest_next" "$manifest"
+    refresh_generation=$((refresh_generation + 1))
+    printf '%s\n' "$refresh_generation" >"$refresh"
+    [[ -n "$entries" ]]
+}
+
+scheme_path="${CAELESTIA_CLIPBOARD_SCHEME:-$HOME/.local/state/caelestia/scheme.json}"
+if ! build_manifest; then
+    exit 0
+fi
+
+CAELESTIA_CLIPBOARD_MANIFEST="$manifest" \
+CAELESTIA_CLIPBOARD_RESULT="$result" \
+CAELESTIA_CLIPBOARD_REFRESH="$refresh" \
+CAELESTIA_CLIPBOARD_SCHEME="$scheme_path" \
+    "$quickshell_bin" --path "$picker_dir" --daemonize >/dev/null 2>&1
+
+# Quickshell is daemonized because a non-interactive Hyprland command closes
+# the foreground event loop after mapping a standalone layer-shell window.
+picker_running=false
+action=""
+selected_id=""
+for _ in {1..100}; do
+    if picker_is_running; then
+        picker_running=true
+        break
+    fi
+    sleep 0.05
+done
+
+if [[ "$picker_running" != true ]]; then
+    # Let the Python command fall back to fuzzel when Quickshell could not
+    # load the picker configuration.
+    exit 127
+fi
+
+# Keep one picker process alive. Pin/delete actions are acknowledged by
+# clearing result, refreshing the manifest in place, and letting FileView
+# update the ListModel; paste/close remain terminal actions.
+while picker_is_running; do
+    if [[ ! -s "$result" ]]; then
+        sleep 0.03
+        continue
+    fi
+
+    action=""
+    selected_id=""
+    IFS=$'\t' read -r action selected_id <"$result"
+    : >"$result"
+
+    case "$action" in
+        paste|close)
+            wait_picker_exit
+            break
+            ;;
+        pin)
+            [[ -n "$selected_id" ]] && toggle_pin "$selected_id"
+            build_manifest || true
+            ;;
+        delete)
+            if [[ -n "$selected_id" ]]; then
+                # cliphist delete consumes the original list line (not the
+                # decoded payload). Recover it by its stable numeric id.
+                selected_line="$(printf '%s\n' "$entries" | awk -F $'\t' -v wanted="$selected_id" '$1 == wanted { print; exit }')"
+                if [[ -n "$selected_line" ]]; then
+                    printf '%s\n' "$selected_line" | cliphist delete >/dev/null 2>&1 || true
+                fi
+                remove_pin "$selected_id"
+                find "$thumbnail_dir" -maxdepth 1 -type f -name "${selected_id}.*" -delete
+            fi
+            build_manifest || true
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+[[ "$action" == "paste" && -n "$selected_id" ]] || exit 0
+
+# Decode to a file so binary clipboard entries (for example images) are not
+# corrupted by shell command substitution.
+tmp="$(mktemp)"
+printf '%s' "$selected_id" | cliphist decode >"$tmp" || exit 1
+wl-copy <"$tmp" || exit 1
+
+# fuzzel normally restores the previous focus when it exits. Start ydotoold
+# on demand, then send Ctrl+V to that restored window.
+socket="${YDOTOOL_SOCKET:-/run/user/$(id -u)/.ydotool_socket}"
+if [[ ! -S "$socket" ]]; then
+    systemctl --user start --no-block ydotool.service >/dev/null 2>&1 || true
+    for _ in {1..40}; do
+        [[ -S "$socket" ]] && break
+        sleep 0.05
+    done
+fi
+
+if [[ -S "$socket" ]]; then
+    sleep 0.15
+    YDOTOOL_SOCKET="$socket" ydotool key 29:1 47:1 47:0 29:0 >/dev/null 2>&1 || true
+fi
