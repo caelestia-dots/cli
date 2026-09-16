@@ -27,9 +27,22 @@ class Set:
         if self.args.random:
             scheme.set_random()
             apply_colours(scheme.colours, scheme.mode)
-        elif self.args.name or self.args.flavour or self.args.mode or self.args.variant:
+        elif (
+            self.args.name
+            or self.args.flavour
+            or self.args.mode
+            or self.args.variant
+            or self.args.colour is not None
+            or self.args.auto_colour
+        ):
             if self.args.name:
                 scheme.name = self.args.name
+                if self.args.name == "dynamic" and self.args.colour is None and not self.args.auto_colour:
+                    scheme.clear_source_colour()
+            if self.args.colour is not None:
+                scheme.set_source_colour(self.args.colour)
+            elif self.args.auto_colour:
+                scheme.clear_source_colour()
             if self.args.flavour:
                 scheme.flavour = self.args.flavour
             if self.args.mode:
@@ -38,7 +51,10 @@ class Set:
                 scheme.variant = self.args.variant
             apply_colours(scheme.colours, scheme.mode)
         else:
-            print("No args given. Use --name, --flavour, --mode, --variant or --random to set a scheme")
+            print(
+                "No args given. Use --name, --flavour, --mode, --variant, "
+                "--colour, --auto-colour or --random to set a scheme"
+            )
 
 
 class Get:
@@ -50,7 +66,7 @@ class Get:
     def run(self) -> None:
         scheme = get_scheme()
 
-        if self.args.name or self.args.flavour or self.args.mode or self.args.variant:
+        if self.args.name or self.args.flavour or self.args.mode or self.args.variant or self.args.colour:
             if self.args.name:
                 print(scheme.name)
             if self.args.flavour:
@@ -59,6 +75,8 @@ class Get:
                 print(scheme.mode)
             if self.args.variant:
                 print(scheme.variant)
+            if self.args.colour:
+                print(scheme.source_colour or "auto")
         else:
             print(scheme)
 
