@@ -12,6 +12,32 @@ from caelestia.utils.paths import get_config, recording_notif_path, recording_pa
 
 RECORDER = "gpu-screen-recorder"
 
+# Handles the "Recording stopped" notification actions in a tiny detached shell
+# process, so `caelestia record` can exit as soon as the recording is saved.
+# $1 = saved recording path
+STOPPED_NOTIF_HANDLER = r"""
+action=$(notify-send -a caelestia-cli \
+    --action=watch=Watch --action=open=Open --action=delete=Delete \
+    "Recording stopped" "Recording saved in $1")
+
+case "$action" in
+    watch)
+        xdg-open "$1" &
+        ;;
+    open)
+        if ! dbus-send --session --dest=org.freedesktop.FileManager1 \
+            --type=method_call /org/freedesktop/FileManager1 \
+            org.freedesktop.FileManager1.ShowItems \
+            "array:string:file://$1" "string:"; then
+            xdg-open "$(dirname -- "$1")" &
+        fi
+        ;;
+    delete)
+        rm -f -- "$1"
+        ;;
+esac
+"""
+
 
 class Command:
     args: Namespace
@@ -39,7 +65,11 @@ class Command:
         monitors = hypr.message("monitors")
         if self.args.region:
             if self.args.region == "slurp":
-                region = subprocess.check_output(["slurp", "-f", "%wx%h+%x+%y"], text=True, stdin=subprocess.DEVNULL)
+                region = subprocess.check_output(
+                    ["slurp", "-f", "%wx%h+%x+%y"],
+                    text=True,
+                    stdin=subprocess.DEVNULL,
+                )
             else:
                 region = self.args.region.strip()
             args += ["region", "-region", region]
@@ -59,7 +89,11 @@ class Command:
         else:
             focused_monitor = next(monitor for monitor in monitors if monitor["focused"])
             if focused_monitor:
-                args += [focused_monitor["name"], "-f", str(round(focused_monitor["refreshRate"]))]
+                args += [
+                    focused_monitor["name"],
+                    "-f",
+                    str(round(focused_monitor["refreshRate"])),
+                ]
 
         if self.args.sound:
             args += ["-a", "default_output"]
@@ -72,7 +106,8 @@ class Command:
             raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
-        proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], stderr=subprocess.DEVNULL, start_new_session=True)
+        # The recorder outlives this command, so it must not inherit our stdio
+        proc = subprocess.Popen( [RECORDER, *args, "-o", str(recording_path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
         notif = notify("-p", "Recording started", "Recording...")
         recording_notif_path.write_text(notif)
@@ -109,32 +144,14 @@ class Command:
 
         if self.args.clipboard:
             file_uri = Path(new_path).resolve().as_uri() + "\n"
-            subprocess.run(["wl-copy", "--type", "text/uri-list"], input=file_uri.encode())
-
-        action = notify(
-            "--action=watch=Watch",
-            "--action=open=Open",
-            "--action=delete=Delete",
-            "Recording stopped",
-            f"Recording saved in {new_path}",
-        )
-
-        if action == "watch":
-            subprocess.Popen(["xdg-open", new_path], start_new_session=True)
-        elif action == "open":
-            p = subprocess.run(
-                [
-                    "dbus-send",
-                    "--session",
-                    "--dest=org.freedesktop.FileManager1",
-                    "--type=method_call",
-                    "/org/freedesktop/FileManager1",
-                    "org.freedesktop.FileManager1.ShowItems",
-                    f"array:string:file://{new_path}",
-                    "string:",
-                ]
+            # wl-copy forks a background server that outlives this command
+            subprocess.run(
+                ["wl-copy", "--type", "text/uri-list"],
+                input=file_uri.encode(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
-            if p.returncode != 0:
-                subprocess.Popen(["xdg-open", new_path.parent], start_new_session=True)
-        elif action == "delete":
-            new_path.unlink()
+
+        # The action notification's lifetime is the user's interaction with it,
+        # not this command's, so hand it off to a detached lightweight handler
+        subprocess.Popen( ["sh", "-c", STOPPED_NOTIF_HANDLER, "sh", str(new_path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
