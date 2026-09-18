@@ -72,7 +72,7 @@ class Command:
             raise ValueError(f"Config option 'record.extraArgs' should be an array: {e}")
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
-        proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], start_new_session=True)
+        proc = subprocess.Popen([RECORDER, *args, "-o", str(recording_path)], stderr=subprocess.DEVNULL, start_new_session=True)
 
         notif = notify("-p", "Recording started", "Recording...")
         recording_notif_path.write_text(notif)
