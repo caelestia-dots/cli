@@ -63,7 +63,13 @@ class Score:
             if primary:
                 break
 
-        return DislikeAnalyzer.fix_if_disliked(primary) if primary else Score.score(colors_to_population, False)
+        if primary:
+            return DislikeAnalyzer.fix_if_disliked(primary)
+
+        if scored_hct:
+            return scored_hct[0]["hct"]
+
+        return DislikeAnalyzer.fix_if_disliked(None)
 
 
 def score(image: str) -> Hct:
