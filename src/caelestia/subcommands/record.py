@@ -39,7 +39,7 @@ class Command:
         monitors = hypr.message("monitors")
         if self.args.region:
             if self.args.region == "slurp":
-                region = subprocess.check_output(["slurp", "-f", "%wx%h+%x+%y"], text=True)
+                region = subprocess.check_output(["slurp", "-f", "%wx%h+%x+%y"], text=True, stdin=subprocess.DEVNULL)
             else:
                 region = self.args.region.strip()
             args += ["region", "-region", region]
