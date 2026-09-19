@@ -159,13 +159,7 @@ class Command:
 
         if self.args.clipboard:
             file_uri = Path(new_path).resolve().as_uri() + "\n"
-            # wl-copy forks a background server that outlives this command
-            subprocess.run(
-                ["wl-copy", "--type", "text/uri-list"],
-                input=file_uri.encode(),
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            subprocess.run(["wl-copy", "--type", "text/uri-list"], input=file_uri.encode())
 
         recording = new_path.resolve()
 
