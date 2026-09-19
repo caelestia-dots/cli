@@ -14,26 +14,35 @@ RECORDER = "gpu-screen-recorder"
 
 # Handles the "Recording stopped" notification actions in a tiny detached shell
 # process, so `caelestia record` can exit as soon as the recording is saved.
-# $1 = saved recording path
-STOPPED_NOTIF_HANDLER = r"""
+_STOPPED_NOTIF_HANDLER = r"""
+path=$1
+uri=$2
+directory=$3
+
 action=$(notify-send -a caelestia-cli \
-    --action=watch=Watch --action=open=Open --action=delete=Delete \
-    "Recording stopped" "Recording saved in $1")
+    --action=watch=Watch \
+    --action=open=Open \
+    --action=delete=Delete \
+    "Recording stopped" \
+    "Recording saved in $path") || exit 0
 
 case "$action" in
     watch)
-        xdg-open "$1" &
+        exec xdg-open "$path"
         ;;
     open)
-        if ! dbus-send --session --dest=org.freedesktop.FileManager1 \
-            --type=method_call /org/freedesktop/FileManager1 \
+        if ! dbus-send --session \
+            --dest=org.freedesktop.FileManager1 \
+            --type=method_call \
+            /org/freedesktop/FileManager1 \
             org.freedesktop.FileManager1.ShowItems \
-            "array:string:file://$1" "string:"; then
-            xdg-open "$(dirname -- "$1")" &
+            "array:string:$uri" \
+            "string:"; then
+            exec xdg-open "$directory"
         fi
         ;;
     delete)
-        rm -f -- "$1"
+        rm -f -- "$path"
         ;;
 esac
 """
