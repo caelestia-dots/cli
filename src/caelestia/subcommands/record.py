@@ -158,6 +158,23 @@ class Command:
                 stderr=subprocess.DEVNULL,
             )
 
+        recording = new_path.resolve()
+
         # The action notification's lifetime is the user's interaction with it,
         # not this command's, so hand it off to a detached lightweight handler
-        subprocess.Popen( ["sh", "-c", STOPPED_NOTIF_HANDLER, "sh", str(new_path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        subprocess.Popen(
+            [
+                "sh",
+                "-c",
+                _STOPPED_NOTIF_HANDLER,
+                "sh",
+                str(recording),
+                recording.as_uri(),
+                str(recording.parent),
+            ],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+            cwd="/",
+        )
