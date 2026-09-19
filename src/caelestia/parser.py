@@ -125,6 +125,13 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
         action="store_true",
         help="do not automatically change the scheme mode based on wallpaper colour",
     )
+    wallpaper_parser.add_argument(
+        "--extract-thumbs",
+        nargs="?",
+        const=wallpapers_dir,
+        metavar="DIR",
+        help="generate cached thumbnails for video wallpapers in a directory",
+    )
 
     # Create parser for resizer opts
     resizer_parser = command_parser.add_parser("resizer", help="window resizer daemon")

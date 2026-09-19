@@ -14,6 +14,7 @@ The main control script for the Caelestia dotfiles.
 - `glib2` - closing notifications
 - [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
 - [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
+- [`ffmpeg`](https://ffmpeg.org/) - animated wallpaper thumbnails and metadata
 
 </details>
 
@@ -76,7 +77,7 @@ Install all [dependencies](#dependencies), then install
 e.g. via an AUR helper (yay)
 
 ```sh
-yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
+yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder glib2 cliphist fuzzel ffmpeg python-build python-installer python-hatch python-hatch-vcs
 ```
 
 Now, clone the repo, `cd` into it, build the wheel via `python -m build --wheel`
@@ -134,6 +135,13 @@ sudo chmod 440 /etc/sudoers.d/caelestia-chromium
 ## Usage
 
 All subcommands/options can be explored via the help flag.
+
+The wallpaper command accepts static images, GIFs, and MP4, WebM, or MKV video wallpapers. Generate
+launcher previews for every video in a directory with:
+
+```sh
+caelestia wallpaper --extract-thumbs ~/Pictures/Wallpapers
+```
 
 ```
 $ caelestia -h

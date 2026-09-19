@@ -14,6 +14,7 @@ from caelestia.utils.colourfulness import get_variant
 from caelestia.utils.hypr import message
 from caelestia.utils.material import get_colours_for_image
 from caelestia.utils.paths import (
+    c_cache_dir,
     compute_hash,
     get_config,
     wallpaper_link_path,
@@ -24,15 +25,117 @@ from caelestia.utils.paths import (
 from caelestia.utils.scheme import Scheme, get_scheme
 from caelestia.utils.theme import apply_colours
 
+VIDEO_EXTENSIONS = frozenset({".mp4", ".webm", ".mkv"})
+
 
 def is_valid_image(path: Path) -> bool:
     return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
 
 
+def is_video(path: Path) -> bool:
+    return path.is_file() and path.suffix.lower() in VIDEO_EXTENSIONS
+
+
+def is_valid_wallpaper(path: Path) -> bool:
+    return is_valid_image(path) or is_video(path)
+
+
+def video_thumbnail_hash(path: Path | str) -> str:
+    """Return the DJB2 path hash used by the shell's QML thumbnail lookup."""
+    encoded_path = str(Path(path).resolve()).encode("utf-16-le")
+    value = 5381
+    for offset in range(0, len(encoded_path), 2):
+        code_unit = int.from_bytes(encoded_path[offset : offset + 2], "little")
+        value = ((value << 5) + value + code_unit) & 0xFFFFFFFF
+    return str(value)
+
+
+def get_video_thumbnail_path(wall: Path | str) -> Path:
+    return c_cache_dir / "videothumbs" / f"{video_thumbnail_hash(wall)}.jpg"
+
+
+def _probe_video(wall: Path) -> tuple[int, int, float]:
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height:format=duration",
+            "-of",
+            "json",
+            str(wall),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    data = json.loads(result.stdout)
+    stream = data["streams"][0]
+    duration = float(data.get("format", {}).get("duration", 0))
+    return int(stream["width"]), int(stream["height"]), duration
+
+
+def extract_video_thumbnail(wall: Path | str) -> Path:
+    wall = Path(wall).resolve()
+    if not is_video(wall):
+        raise ValueError(f'"{wall}" is not a valid video wallpaper')
+
+    thumbnail = get_video_thumbnail_path(wall)
+    if thumbnail.exists() and thumbnail.stat().st_mtime_ns >= wall.stat().st_mtime_ns:
+        return thumbnail
+
+    _, _, duration = _probe_video(wall)
+    seek = min(max(duration * 0.3, 0), max(duration - 0.05, 0))
+    temporary = thumbnail.with_name(f".{thumbnail.name}.{os.getpid()}.tmp.jpg")
+    thumbnail.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-y",
+                "-ss",
+                str(seek),
+                "-i",
+                str(wall),
+                "-frames:v",
+                "1",
+                "-vf",
+                "scale=256:144:force_original_aspect_ratio=increase,crop=256:144",
+                "-q:v",
+                "3",
+                str(temporary),
+            ],
+            check=True,
+        )
+        temporary.replace(thumbnail)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+    return thumbnail
+
+
+def extract_video_thumbnails(directory: Path | str) -> list[Path]:
+    directory = Path(directory).expanduser().resolve()
+    if not directory.is_dir():
+        raise ValueError(f'"{directory}" is not a directory')
+
+    return [extract_video_thumbnail(wall) for wall in directory.rglob("*") if is_video(wall)]
+
+
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
-    with Image.open(wall) as img:
-        width, height = img.size
-        return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+    if is_video(wall):
+        width, height, _ = _probe_video(wall)
+    else:
+        with Image.open(wall) as img:
+            width, height = img.size
+
+    return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
 def get_wallpaper() -> str | None:
@@ -47,7 +150,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     if not directory.is_dir():
         return []
 
-    walls = [f for f in directory.rglob("*") if is_valid_image(f)]
+    walls = [f for f in directory.rglob("*") if is_valid_wallpaper(f)]
 
     if args.no_filter:
         return walls
@@ -105,6 +208,8 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
 
     if wall.suffix.lower() == ".gif":
         wall = convert_gif(wall)
+    elif is_video(wall):
+        wall = extract_video_thumbnail(wall)
 
     name = "dynamic"
 
@@ -151,11 +256,16 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 
-    if not is_valid_image(wall):
-        raise ValueError(f'"{wall}" is not a valid image')
+    if not is_valid_wallpaper(wall):
+        raise ValueError(f'"{wall}" is not a valid wallpaper')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    # Use a still frame for animated wallpaper thumbnails and colour extraction.
+    if wall.suffix.lower() == ".gif":
+        wall_cache = convert_gif(wall)
+    elif is_video(wall):
+        wall_cache = extract_video_thumbnail(wall)
+    else:
+        wall_cache = wall
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
