@@ -107,7 +107,13 @@ class Command:
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         # The recorder outlives this command, so it must not inherit our stdio
-        proc = subprocess.Popen( [RECORDER, *args, "-o", str(recording_path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        proc = subprocess.Popen(
+            [RECORDER, *args, "-o", str(recording_path)],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
 
         notif = notify("-p", "Recording started", "Recording...")
         recording_notif_path.write_text(notif)
