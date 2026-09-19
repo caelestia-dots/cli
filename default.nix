@@ -15,6 +15,7 @@
   gpu-screen-recorder,
   dconf,
   killall,
+  ffmpeg,
   caelestia-shell,
   withShell ? false,
   discordBin ? "discord",
@@ -53,6 +54,7 @@ python3.pkgs.buildPythonApplication {
       gpu-screen-recorder
       dconf
       killall
+      ffmpeg
     ]
     ++ lib.optional withShell caelestia-shell;
 
