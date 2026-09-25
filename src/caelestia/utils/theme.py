@@ -9,7 +9,7 @@ from pathlib import Path
 
 from caelestia.utils.colour import get_dynamic_colours
 from caelestia.utils.hypr import is_lua_config
-from caelestia.utils.io import log_exception
+from caelestia.utils.io import log_exception, warn
 from caelestia.utils.paths import (
     atomic_write,
     c_state_dir,
@@ -344,13 +344,28 @@ def apply_warp(colours: dict[str, str], mode: str) -> None:
 
 @log_exception
 def apply_chromium(colours: dict[str, str]) -> None:
-    surface_hex = colours["surface"]
-    theme_color = f"#{surface_hex}"
     browsers = [
         ("chromium", Path("/etc/chromium/policies/managed")),
         ("brave", Path("/etc/brave/policies/managed")),
         ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed")),
     ]
+    if not any(shutil.which(cmd) for cmd, _ in browsers):
+        return
+
+    # Writing the policy needs root, via a passwordless `sudo -n`. Almost no
+    # one sets that up for this specific case, so check once up front rather
+    # than attempting-and-warning per installed browser on every theme
+    # change -- that's expected, not an error, and shouldn't be noisy.
+    if (
+        subprocess.run(
+            ["sudo", "-n", "true"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False
+        ).returncode
+        != 0
+    ):
+        return
+
+    surface_hex = colours["surface"]
+    theme_color = f"#{surface_hex}"
 
     for cmd, policy_dir in browsers:
         if shutil.which(cmd) is None:
@@ -358,7 +373,7 @@ def apply_chromium(colours: dict[str, str]) -> None:
         if not policy_dir.is_dir():
             subprocess.run(["sudo", "-n", "mkdir", "-p", str(policy_dir)], stderr=subprocess.DEVNULL)
         if not policy_dir.is_dir():
-            print(f"Unable to create {policy_dir} directory")
+            warn(f"unable to create {policy_dir} directory")
             continue
 
         # Use tee instead of atomic_write cause we need sudo
