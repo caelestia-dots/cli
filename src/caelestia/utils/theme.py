@@ -347,12 +347,14 @@ def apply_chromium(colours: dict[str, str]) -> None:
     surface_hex = colours["surface"]
     theme_color = f"#{surface_hex}"
     browsers = [
-        ("chromium", Path("/etc/chromium/policies/managed")),
-        ("brave", Path("/etc/brave/policies/managed")),
-        ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed")),
+        ("chromium", Path("/etc/chromium/policies/managed"), True),
+        ("brave", Path("/etc/brave/policies/managed"), True),
+        # Brave and Brave Origin share a policy directory, so keep Origin last.
+        ("brave-origin", Path("/etc/brave/policies/managed"), False),
+        ("google-chrome-stable", Path("/etc/opt/chrome/policies/managed"), True),
     ]
 
-    for cmd, policy_dir in browsers:
+    for cmd, policy_dir, supports_color_scheme in browsers:
         if shutil.which(cmd) is None:
             continue
         if not policy_dir.is_dir():
@@ -362,9 +364,12 @@ def apply_chromium(colours: dict[str, str]) -> None:
             continue
 
         # Use tee instead of atomic_write cause we need sudo
+        policy = {"BrowserThemeColor": theme_color}
+        if supports_color_scheme:
+            policy["BrowserColorScheme"] = "device"
         subprocess.run(
             ["sudo", "-n", "tee", str(policy_dir / "caelestia.json")],
-            input=json.dumps({"BrowserThemeColor": theme_color, "BrowserColorScheme": "device"}),
+            input=json.dumps(policy),
             text=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
