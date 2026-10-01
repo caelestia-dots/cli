@@ -155,6 +155,7 @@ subcommands:
     screenshot   take a screenshot
     record       start a screen recording
     clipboard    open clipboard history
+    tray         print tray icon details
     emoji        emoji/glyph utilities
     wallpaper    manage the wallpaper
     resizer      window resizer daemon
