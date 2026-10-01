@@ -19,6 +19,8 @@ c_data_dir: Path = data_dir / "caelestia"
 c_state_dir: Path = state_dir / "caelestia"
 c_cache_dir: Path = cache_dir / "caelestia"
 
+shell_config_path: Path = c_config_dir / "shell.json"
+
 user_config_path: Path = c_config_dir / "cli.json"
 cli_data_dir: Path = Path(__file__).parent.parent / "data"
 templates_dir: Path = cli_data_dir / "templates"
@@ -76,8 +78,16 @@ def atomic_dump(path: Path, content: dict[str, Any]) -> None:
 
 
 def get_config() -> dict[str, Any]:
+    return _read_json_config(user_config_path)
+
+
+def get_shell_config() -> dict[str, Any]:
+    return _read_json_config(shell_config_path)
+
+
+def _read_json_config(config_path: Path) -> dict[str, Any]:
     try:
-        return json.loads(user_config_path.read_text())
+        return json.loads(config_path.read_text())
     except json.JSONDecodeError:
         warn("failed to parse config, invalid JSON")
     except FileNotFoundError:

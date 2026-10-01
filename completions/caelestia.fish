@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer install update
+set -l commands shell toggle scheme screenshot record clipboard tray emoji-picker wallpaper resizer install update
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -17,6 +17,7 @@ complete -c caelestia -n $not_seen -a 'scheme' -d 'Manage the colour scheme'
 complete -c caelestia -n $not_seen -a 'screenshot' -d 'Take a screenshot'
 complete -c caelestia -n $not_seen -a 'record' -d 'Start a screen recording'
 complete -c caelestia -n $not_seen -a 'clipboard' -d 'Open clipboard history'
+complete -c caelestia -n $not_seen -a 'tray' -d 'Print tray icon details'
 complete -c caelestia -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
 complete -c caelestia -n $not_seen -a 'resizer' -d 'Window resizer'

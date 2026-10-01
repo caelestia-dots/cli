@@ -29,6 +29,7 @@ jobs:
           result/bin/caelestia screenshot -h
           result/bin/caelestia record -h
           result/bin/caelestia clipboard -h
+          result/bin/caelestia tray -h
           result/bin/caelestia emoji -h
           result/bin/caelestia emoji
           result/bin/caelestia wallpaper -h
