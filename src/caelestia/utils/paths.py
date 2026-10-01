@@ -78,17 +78,16 @@ def atomic_dump(path: Path, content: dict[str, Any]) -> None:
 
 
 def get_config() -> dict[str, Any]:
-    try:
-        return json.loads(user_config_path.read_text())
-    except json.JSONDecodeError:
-        warn("failed to parse config, invalid JSON")
-    except FileNotFoundError:
-        pass
-    return {}
+    return _read_json_config(user_config_path)
+
 
 def get_shell_config() -> dict[str, Any]:
+    return _read_json_config(shell_config_path)
+
+
+def _read_json_config(config_path: Path) -> dict[str, Any]:
     try:
-        return json.loads(shell_config_path.read_text())
+        return json.loads(config_path.read_text())
     except json.JSONDecodeError:
         warn("failed to parse config, invalid JSON")
     except FileNotFoundError:
