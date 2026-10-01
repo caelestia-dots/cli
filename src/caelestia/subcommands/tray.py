@@ -1,6 +1,8 @@
-import dbus
 from argparse import Namespace
-from caelestia.utils.io import log, info
+
+import dbus
+
+from caelestia.utils.io import fatal, info, log, warn
 from caelestia.utils.paths import get_shell_config
 
 
@@ -11,40 +13,58 @@ class Command:
         self.args = args
 
     def run(self) -> None:
-        bus = dbus.SessionBus()
         config = get_shell_config()
-        hidden_icons = []
+        if not isinstance(config, dict):
+            fatal("Shell config must be an object")
+
+        bar_cfg = config.get("bar", {})
+        if not isinstance(bar_cfg, dict):
+            fatal("Shell config option 'bar' must be an object")
+
+        tray_cfg = bar_cfg.get("tray", {})
+        if not isinstance(tray_cfg, dict):
+            fatal("Shell config option 'bar.tray' must be an object")
+
+        hidden_icons = tray_cfg.get("hiddenIcons", [])
+        if not isinstance(hidden_icons, list) or not all(isinstance(item, str) for item in hidden_icons):
+            fatal("Shell config option 'bar.tray.hiddenIcons' must be an array of strings")
 
         try:
-            if (
-                "bar" in config
-                and "tray" in config["bar"]
-                and "hiddenIcons" in config["bar"]["tray"]
-            ):
-                hidden_icons = config["bar"]["tray"]["hiddenIcons"]
-        except TypeError as e:
-            raise ValueError(
-                f"Config option 'bar.tray.hiddenIcons' should be an array: {e}"
-            ) from e
+            bus = dbus.SessionBus()
+        except dbus.DBusException as e:
+            fatal(f"Failed to connect to the session bus: {e}")
 
-        for r in bus.get_object(
-            "org.kde.StatusNotifierWatcher", "/StatusNotifierWatcher"
-        ).Get(
-            "org.kde.StatusNotifierWatcher",
-            "RegisteredStatusNotifierItems",
-            dbus_interface="org.freedesktop.DBus.Properties",
-        ):
-            i = r.index("/")
-            service = r[:i]
-            path = r[i:]
-
-            props = bus.get_object(service, path).GetAll(
-                "org.kde.StatusNotifierItem",
+        try:
+            watcher = bus.get_object("org.kde.StatusNotifierWatcher", "/StatusNotifierWatcher")
+            items = watcher.Get(
+                "org.kde.StatusNotifierWatcher",
+                "RegisteredStatusNotifierItems",
                 dbus_interface="org.freedesktop.DBus.Properties",
             )
+        except dbus.DBusException as e:
+            fatal(f"Failed to query the status notifier watcher: {e}")
 
-            status = "Hidden" if props["Id"] in hidden_icons else "Visible"
+        if not items:
+            info("No tray items registered.")
+            return
 
-            info(f"Application: {props['Title'] or '(Unknown)'}", False)
-            log(f"Icon ID: {props['Id']}")
-            log(f"Status: {status}")
+        for item in items:
+            i = item.index("/")
+            service = item[:i]
+            path = item[i:]
+
+            try:
+                props = bus.get_object(service, path).GetAll(
+                    "org.kde.StatusNotifierItem", dbus_interface="org.freedesktop.DBus.Properties"
+                )
+            except dbus.DBusException as e:
+                warn(f"Failed to query tray item '{item}': {e}")
+                continue
+
+            icon_id = props["Id"]
+            hidden = "Yes" if icon_id in hidden_icons else "No"
+
+            info(f"Application: {props.get('Title') or '(Unknown)'}", False)
+            log(f"Icon ID: {icon_id}", False)
+            log(f"Hidden by config: {hidden}", False)
+            log(f"Item status: {props.get('Status', 'Unknown')}", False)
