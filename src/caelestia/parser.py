@@ -11,6 +11,7 @@ from caelestia.subcommands import (
     screenshot,
     shell,
     toggle,
+    tray,
     update,
     wallpaper,
 )
@@ -95,6 +96,10 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
     clipboard_parser.set_defaults(cls=clipboard.Command)
     clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
+
+    # Create parser for tray icons
+    tray_parser = command_parser.add_parser("tray", help="print tray icon details")
+    tray_parser.set_defaults(cls=tray.Command)
 
     # Create parser for emoji-picker opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
