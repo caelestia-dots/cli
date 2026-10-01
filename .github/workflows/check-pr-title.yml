@@ -29,6 +29,7 @@ jobs:
             scheme
             screenshot
             shell
+            tray
             update
             wallpaper
 
