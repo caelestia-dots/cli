@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji-picker wallpaper resizer install update
+set -l commands shell toggle scheme screenshot record clipboard emoji wallpaper resizer install update
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
