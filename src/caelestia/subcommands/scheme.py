@@ -109,12 +109,14 @@ class List:
                         }
                     )
                     modes = get_scheme_modes(scheme, flavour)
+                    if not modes:
+                        continue
                     if s.mode not in modes:
                         s._mode = modes[0]
                     try:
                         s._update_colours()
                         schemes[scheme][flavour] = s.colours
-                    except ValueError:
+                    except (ValueError, KeyError, OSError):
                         pass
 
             print(json.dumps(schemes))
