@@ -37,6 +37,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     shell_parser.set_defaults(cls=shell.Command)
     shell_parser.add_argument("message", nargs="*", help="a message to send to the shell")
     shell_parser.add_argument("-d", "--daemon", action="store_true", help="start the shell detached")
+    shell_parser.add_argument("-r", "--restart", action="store_true", help="kill and restart the shell")
     shell_parser.add_argument("-s", "--show", action="store_true", help="print all shell IPC commands")
     shell_parser.add_argument("-l", "--log", action="store_true", help="print the shell log")
     shell_parser.add_argument("-k", "--kill", action="store_true", help="kill the shell")
@@ -95,7 +96,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     clipboard_parser.set_defaults(cls=clipboard.Command)
     clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
 
-    # Create parser for emoji-picker opts
+    # Create parser for emoji opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
     emoji_parser.set_defaults(cls=emoji.Command)
     emoji_parser.add_argument("-p", "--picker", action="store_true", help="open the emoji/glyph picker")

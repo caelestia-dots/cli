@@ -167,24 +167,25 @@ class Command:
 
         return new_files, revived_files, deployer.deployed_files
 
-    def sync_packages(self, installer: PackageInstaller, current: list[str], desired: list[str]) -> list[str]:
+    def sync_packages(self, installer: PackageInstaller, current: dict[str, str], desired: list[str]) -> dict[str, str]:
         to_install = [p for p in desired if p not in current]
         to_remove = [p for p in current if p not in desired]
-        installed = list(current)
+        installed = dict(current)
 
         if to_install:
             print()
             info(f"Installing new packages: {', '.join(to_install)}")
-            installer.install(to_install)
-            installed.extend(p for p in to_install if p not in installed)
+            # Record each desired name -> its real installed name so removal later is exact
+            installed.update(zip(to_install, installer.install(to_install)))
 
         if to_remove:
             print()
             info(f"Packages no longer required: {', '.join(to_remove)}")
             selected = prompt_selection(to_remove, "Packages to remove?")
             if selected:
-                installer.remove(selected)
-                installed = [p for p in installed if p not in selected]
+                installer.remove([current[p] for p in selected])
+                for p in selected:
+                    installed.pop(p, None)
 
         return installed
 

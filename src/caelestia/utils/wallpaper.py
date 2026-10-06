@@ -31,7 +31,7 @@ VIDEO_EXTENSIONS = [".mp4", ".webm", ".mkv", ".avi", ".mov", ".gif"]
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+    return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
 
 
 def is_valid_video(path: Path) -> bool:

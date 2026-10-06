@@ -60,7 +60,7 @@ def gen_replace_dynamic(colours: dict[str, str], template: Path, mode: str) -> s
         col, form = data
         if col not in colours_dyn or not hasattr(colours_dyn[col], form):
             return match.group()
-        return getattr(colours_dyn[col], form)
+        return str(getattr(colours_dyn[col], form))
 
     # match atomic {{ . }} pairs
     dotField = r"\{\{((?:(?!\{\{|\}\}).)*)\}\}"
