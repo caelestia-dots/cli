@@ -150,12 +150,18 @@ def apply_hypr(conf: str) -> None:
 
 
 @log_exception
-def apply_discord(scss: str) -> None:
+def apply_discord(scss: str, client: str) -> None:
     with tempfile.TemporaryDirectory("w") as tmp_dir:
         (Path(tmp_dir) / "_colours.scss").write_text(scss)
         conf = subprocess.check_output(["sass", "-I", tmp_dir, templates_dir / "discord.scss"], text=True)
 
-    for client in "Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord":
+    if client not in ("Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord"):
+        client = "All"
+
+    if client == "All":
+        for target_client in ("Equicord", "Vencord", "BetterDiscord", "equibop", "vesktop", "legcord"):
+            atomic_write(config_dir / target_client / "themes/caelestia.theme.css", conf)
+    else:
         atomic_write(config_dir / client / "themes/caelestia.theme.css", conf)
 
 
@@ -427,7 +433,8 @@ def apply_colours(colours: dict[str, str], mode: str) -> None:
             if check("enableHypr"):
                 apply_hypr(gen_lua(colours) if is_lua_config() else gen_conf(colours))
             if check("enableDiscord"):
-                apply_discord(gen_scss(colours))
+                discord_client = cfg.get("discordClient", "All")
+                apply_discord(gen_scss(colours), discord_client)
             if check("enableSpicetify"):
                 apply_spicetify(colours, mode)
             if check("enablePandora"):
