@@ -14,6 +14,7 @@ The main control script for the Caelestia dotfiles.
 - `glib2` - closing notifications
 - [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
 - [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
+- [`ffmpegthumbnailer`](https://github.com/dirkvdb/ffmpegthumbnailer) - video wallpaper thumbnails
 
 </details>
 
