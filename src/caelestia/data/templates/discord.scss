@@ -46,8 +46,7 @@ body {
     /* dms button icon options */
     --custom-dms-icon: custom; /* off: use default discord icon, hide: remove icon entirely, custom: use custom icon */
     --dms-icon-svg-url: url("https://raw.githubusercontent.com/caelestia-dots/shell/refs/heads/main/assets/logo.svg"); /* icon svg url. MUST BE A SVG. */
-    --dms-icon-svg-size: 110%; /* size of the svg (css mask-size) */
-    --dms-icon-svg-size-after: 110%;
+    --dms-icon-svg-size: 100%; /* size of the svg (css mask-size) */
     --dms-icon-color-before: var(--icon-subtle); /* normal icon color */
     --dms-icon-color-after: var(--white); /* icon color when button is hovered/selected */
 
@@ -177,9 +176,15 @@ body {
 }
 
 @container body style(--custom-dms-icon: custom) {
+    .wrapper__6e9f8[data-list-item-id="guildsnav___home"] {
+        > .childWrapper__6e9f8::before {
+            width: 75%;
+            height: 75%;
+        }
 
-    .wrapper__6e9f8[data-list-item-id='guildsnav___home'].selected__6e9f8 > .childWrapper__6e9f8::before {
-        background: var(--dms-icon-color-after);
-        transform: rotate(-360deg) scale(var(--dms-icon-svg-size-after));
+        &.selected__6e9f8 > .childWrapper__6e9f8::before {
+            background: var(--dms-icon-color-after);
+            transform: rotate(-360deg) scale(var(--dms-icon-svg-size));
+        }
     }
 }
