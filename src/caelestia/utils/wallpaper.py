@@ -24,15 +24,49 @@ from caelestia.utils.paths import (
 from caelestia.utils.scheme import Scheme, get_scheme
 from caelestia.utils.theme import apply_colours
 
+IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+VIDEO_EXTENSIONS = [".mp4", ".mkv", ".webm", ".mov", ".avi"]
 
-def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+
+def is_video(path: Path) -> bool:
+    return path.suffix.lower() in VIDEO_EXTENSIONS
+
+
+def is_animated(path: Path) -> bool:
+    return path.suffix.lower() == ".gif" or is_video(path)
+
+
+def is_valid_wallpaper(path: Path) -> bool:
+    return path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS + VIDEO_EXTENSIONS
+
+
+def get_size(wall: Path) -> tuple[int, int]:
+    if is_video(wall):
+        out = subprocess.check_output(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height",
+                "-of",
+                "csv=p=0",
+                wall,
+            ],
+            text=True,
+        )
+        width, height = out.strip().split(",")
+        return int(width), int(height)
+
+    with Image.open(wall) as img:
+        return img.size
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
-    with Image.open(wall) as img:
-        width, height = img.size
-        return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
+    width, height = get_size(wall)
+    return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
 def get_wallpaper() -> str | None:
@@ -47,7 +81,7 @@ def get_wallpapers(args: Namespace) -> list[Path]:
     if not directory.is_dir():
         return []
 
-    walls = [f for f in directory.rglob("*") if is_valid_image(f)]
+    walls = [f for f in directory.rglob("*") if is_valid_wallpaper(f)]
 
     if args.no_filter:
         return walls
@@ -103,8 +137,8 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     scheme = get_scheme()
     cache = wallpapers_cache_dir / compute_hash(wall)
 
-    if wall.suffix.lower() == ".gif":
-        wall = convert_gif(wall)
+    if is_animated(wall):
+        wall = extract_first_frame(wall)
 
     name = "dynamic"
 
@@ -129,20 +163,31 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
     }
 
 
-def convert_gif(wall: Path) -> Path:
+def extract_first_frame(wall: Path) -> Path:
     cache = wallpapers_cache_dir / compute_hash(wall)
     output_path = cache / "first_frame.png"
 
-    if not output_path.exists():
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with Image.open(wall) as img:
-            try:
-                img.seek(0)
-            except EOFError:
-                pass
+    if output_path.exists():
+        return output_path
 
-            img = img.convert("RGB")
-            img.save(output_path, "PNG")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if is_video(wall):
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", wall, "-frames:v", "1", output_path],
+            check=True,
+            stdin=subprocess.DEVNULL,
+        )
+        return output_path
+
+    with Image.open(wall) as img:
+        try:
+            img.seek(0)
+        except EOFError:
+            pass
+
+        img = img.convert("RGB")
+        img.save(output_path, "PNG")
 
     return output_path
 
@@ -151,11 +196,11 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
 
-    if not is_valid_image(wall):
-        raise ValueError(f'"{wall}" is not a valid image')
+    if not is_valid_wallpaper(wall):
+        raise ValueError(f'"{wall}" is not a valid image or video')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    # Use 1st frame of animated wallpapers for thumb only
+    wall_cache = extract_first_frame(wall) if is_animated(wall) else wall
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)
