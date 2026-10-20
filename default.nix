@@ -28,6 +28,7 @@ python3.pkgs.buildPythonApplication {
   pyproject = true;
 
   build-system = with python3.pkgs; [
+    hatch-vcs
     hatchling
   ];
 
@@ -57,8 +58,15 @@ python3.pkgs.buildPythonApplication {
     ]
     ++ lib.optional withShell caelestia-shell;
 
+  SETUPTOOLS_SCM_PRETEND_VERSION = "${rev}";
 
   patchPhase = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'source = "vcs"' 'source = "independent"' \
+      --replace-fail 'version = "${rev}"' || true
+
+    echo "${rev}" > .version
+    
     # Replace qs config call with nix shell pkg bin
     substituteInPlace src/caelestia/subcommands/shell.py \
     	--replace-fail '"qs", "-c", "caelestia"' '"caelestia-shell"'
