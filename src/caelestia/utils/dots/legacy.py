@@ -25,8 +25,10 @@ _confs = [
 
 def _find_legacy_repo(path: Path) -> Path | None:
     try:
-        remote = subprocess.check_output(["git", "-C", path, "remote", "get-url", "origin"], text=True)
-    except subprocess.CalledProcessError:
+        remote = subprocess.check_output(
+            ["git", "-C", path, "remote", "get-url", "origin"], text=True, stderr=subprocess.DEVNULL
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return
 
     # Check remote

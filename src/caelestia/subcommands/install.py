@@ -175,14 +175,16 @@ class Command:
 
     def install_packages(
         self, source: DotsSource, manifest: Manifest
-    ) -> tuple[PackageInstaller, list[str], dict[str, list[str]]]:
+    ) -> tuple[PackageInstaller, dict[str, str], dict[str, list[str]]]:
         installer = PackageInstaller.get(self.args.aur_helper, self.args.noconfirm)
 
-        packages = manifest.enabled_packages()
-        if packages:
+        packages = {}
+        desired = manifest.enabled_packages()
+        if desired:
             print()
             log("Installing packages...")
-            installer.install(packages)
+            # Record each desired name -> its real installed name so removal later is exact
+            packages = dict(zip(desired, installer.install(desired)))
 
         local_packages = {}
         local_dirs = manifest.enabled_local_packages()
@@ -259,8 +261,8 @@ class Command:
         print()
         info("All done! Caelestia has been installed.")
         info("A few things to finish up:")
-        info("  - A reboot is recommended for all changes take effect")
-        info("  - Edit `~/.config/caelestia/hypr-vars.conf` to set default apps, keybinds and much more")
-        info("  - Edit `~/.config/caelestia/hypr-user.conf` to set your monitor layout and other Hyprland configs")
+        info("  - A reboot is recommended for all changes to take effect")
+        info("  - Edit `~/.config/caelestia/hypr-vars.lua` to set default apps, keybinds and much more")
+        info("  - Edit `~/.config/caelestia/hypr-user.lua` to set your monitor layout and other Hyprland configs")
         info("  - Run `caelestia update` later to pull in the latest changes")
-        info("Enjoy! For support (or to just hang out), join our Discord server: https://discord.gg/BGDCFCmMBk")
+        info("Enjoy! For support (or to just hang out), join our Discord server: https://caelestiashell.com/discord")

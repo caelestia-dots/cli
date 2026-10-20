@@ -88,6 +88,11 @@ class DotsSource:
     def manifest_at(self, ref: str) -> Manifest:
         return Manifest.parse(self.text_at(ref, "manifest.toml"))
 
+    def commit_message_at(self, ref: str) -> str:
+        """Return the first line of the commit message at `ref`."""
+
+        return self._git("show", "-s", "--format=%s", ref).strip()
+
     def text_at(self, ref: str, relpath: str) -> str:
         return self._git("show", f"{ref}:{relpath}")
 

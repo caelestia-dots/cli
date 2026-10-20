@@ -4,7 +4,7 @@ The main control script for the Caelestia dotfiles.
 
 <details><summary id="dependencies">External dependencies</summary>
 
-- [`libnotfy`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
+- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
 - [`swappy`](https://github.com/jtheoof/swappy) - screenshot editor
 - [`grim`](https://gitlab.freedesktop.org/emersion/grim) - taking screenshots
 - [`dart-sass`](https://github.com/sass/dart-sass) - discord theming
@@ -14,6 +14,7 @@ The main control script for the Caelestia dotfiles.
 - `glib2` - closing notifications
 - [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
 - [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
+- [`ffmpeg`](https://ffmpeg.org) - video wallpaper detection and colour generation
 
 </details>
 
@@ -76,7 +77,7 @@ Install all [dependencies](#dependencies), then install
 e.g. via an AUR helper (yay)
 
 ```sh
-yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
+yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder ffmpeg glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
 ```
 
 Now, clone the repo, `cd` into it, build the wheel via `python -m build --wheel`
@@ -171,12 +172,15 @@ Custom user templates can be defined in `~/.config/caelestia/templates/`.
 `{{ <color>.<format> }}`
 
 - `<color>` is a theme color role derived from the Material You color system (e.g. `primary`, `secondary`, `background`)
-- `<format>` is the output format: `hex` or `rgb`
+- `<format>` is the output format: `hex`, `rgb`, `hsl`, or a single channel (`red`, `green`, `blue`, `hue`, `saturation`, `lightness`)
 
 #### Examples
 
 - `{{ primary.hex }}` outputs `3f4ba2`
 - `{{ primary.rgb }}` outputs `rgb(193, 132, 207)`
+- `{{ primary.red }}` outputs `193`
+- `{{ primary.hsl }}` outputs `hsl(268,41%,66%)`
+- `{{ primary.hue }}` outputs `268`
 
 Output files are written to `~/.local/state/caelestia/theme/`. You can symlink them to your desired locations.
 
