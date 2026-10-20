@@ -50,7 +50,7 @@ def get_size(wall: Path) -> tuple[int, int]:
                 "-select_streams",
                 "v:0",
                 "-show_entries",
-                "stream=width,height",
+                "stream=width,height:stream_side_data=rotation",
                 "-of",
                 "default=nw=1:nk=1",
                 wall,
@@ -58,8 +58,10 @@ def get_size(wall: Path) -> tuple[int, int]:
             text=True,
             stderr=subprocess.DEVNULL,
         )
-        width, height = out.split()
-        return int(width), int(height)
+        width, height, *rotation = map(int, out.split())
+        if rotation and rotation[0] % 180 != 0:
+            return height, width
+        return width, height
 
     with Image.open(wall) as img:
         return img.size
