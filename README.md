@@ -77,7 +77,7 @@ Install all [dependencies](#dependencies), then install
 e.g. via an AUR helper (yay)
 
 ```sh
-yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
+yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder ffmpeg glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
 ```
 
 Now, clone the repo, `cd` into it, build the wheel via `python -m build --wheel`
