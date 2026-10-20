@@ -58,6 +58,7 @@
 🙂 :) slightly smiling face face happy slightly smile smiling
 🙃 upside-down face face hehe smile upside-down
 🫠 melting face disappear dissolve embarrassed face haha heat hot liquid lol melt melting sarcasm sarcastic
+🫫 cracking face breaking crumbling masking resilience reveal tension transformation
 😉 ;) winking face face flirt heartbreaker sexy slide tease wink winking winks
 😊 :> smiling face with smiling eyes blush eye eyes face glad satisfied smile smiling
 😇 o:) O:) smiling face with halo angel angelic angels blessed face fairy fairytale fantasy halo happy innocent peaceful smile smiling spirit tale
@@ -82,10 +83,10 @@
 🫣 face with peeking eye captivated embarrass eye face hide hiding peek peeking peep scared shy stare
 🤫 shushing face face quiet shh shush shushing
 🤔 :l :L thinking face chin consider face hmm ponder pondering thinking wondering
-🫡 saluting face face good luck ma’am ok respect salute saluting sir troops yes
+🫡 saluting face OK face good luck ma’am respect salute saluting sir troops yes
 🤐 :z :Z zipper-mouth face face keep mouth quiet secret shut zip zipper zipper-mouth
 🤨 face with raised eyebrow disapproval disbelief distrust emoji eyebrow face hmm mild raised skeptic skeptical skepticism surprise what
-😐️ :| neutral face awkward blank deadpan expressionless face fine jealous meh neutral oh shade straight unamused unhappy unimpressed whatever
+😐 :| neutral face awkward blank deadpan expressionless face fine jealous meh neutral oh shade straight unamused unhappy unimpressed whatever
 😑 expressionless face awkward dead expressionless face fine inexpressive jealous meh not oh omg straight uh unhappy unimpressed whatever
 😶 :# face without mouth awkward blank expressionless face mouth mouthless mute quiet secret silence silent speechless
 🫥 dotted line face depressed disappear dotted face hidden hide introvert invisible line meh whatever wtv
@@ -163,7 +164,7 @@
 👹 >0) ogre creature devil face fairy fairytale fantasy mask monster scary tale
 👺 goblin angry creature face fairy fairytale fantasy mask mean monster tale
 👻 ghost boo creature excited face fairy fairytale fantasy halloween haunting monster scary silly tale
-👽️ alien creature extraterrestrial face fairy fairytale fantasy monster space tale ufo
+👽 alien creature extraterrestrial face fairy fairytale fantasy monster space tale ufo
 👾 alien monster alien creature extraterrestrial face fairy fairytale fantasy game gamer games monster pixelated space tale ufo
 🤖 robot face monster
 😺 grinning cat animal cat face grinning mouth open smile smiling
@@ -187,7 +188,7 @@
 💞 revolving hearts 143 adorbs anniversary emotion heart hearts revolving
 💕 two hearts 143 anniversary date dating emotion heart hearts ily kisses love loving two xoxo
 💟 heart decoration 143 decoration emotion heart hearth purple white
-❣️ heart exclamation exclamation heart heavy mark punctuation
+❣️ heart exclamation bang exclamation heart heavy mark punctuation
 💔 </3 broken heart break broken crushed emotion heart heartbroken lonely sad
 ❤️‍🔥 heart on fire burn fire heart love lust sacred
 ❤️‍🩹 mending heart healthier heart improving mending recovering recuperating well
@@ -204,7 +205,7 @@
 🩶 grey heart 143 emotion gray grey heart ily love silver slate special
 🤍 white heart 143 heart white
 💋 kiss mark dating emotion heart kiss kissing lips mark romance sexy
-💯 hundred points 100 a+ agree clearly definitely faithful fleek full hundred keep perfect point score true truth yup
+💯 hundred points 100 TRUE a+ agree clearly definitely faithful fleek full hundred keep perfect point score truth yup
 💢 anger symbol anger angry comic mad symbol upset
 🫯 fight cloud argument brawl debate disagreement fight ruckus wrestle
 💥 collision bomb boom collide comic explode
@@ -221,33 +222,35 @@
 👋 waving hand bye cya g2g greetings gtg hand hello hey hi later outtie ttfn ttyl wave yo you
 🤚 raised back of hand back backhand hand raised
 🖐️ hand with fingers splayed finger fingers hand raised splayed stop
-✋️ raised hand 5 five hand high raised stop
-🖖 vulcan salute finger hand hands salute vulcan
+✋ raised hand 5 five hand high raised stop
+🖖 vulcan salute Vulcan finger hand hands salute
 🫱 rightwards hand hand handshake hold reach right rightward rightwards shake
 🫲 leftwards hand hand handshake hold left leftward leftwards reach shake
 🫳 palm down hand dismiss down drop dropped hand palm pick shoo up
 🫴 palm up hand beckon catch come hand hold know lift me offer palm tell
 🫷 leftwards pushing hand block five halt hand high hold leftward leftwards pause push pushing refuse slap stop wait
 🫸 rightwards pushing hand block five halt hand high hold pause push pushing refuse rightward rightwards slap stop wait
-👌 OK hand awesome bet dope fleek fosho got gotcha hand legit ok okay pinch rad sure sweet three
+👌 OK hand OK awesome bet dope fleek fosho got gotcha hand legit okay pinch rad sure sweet three
 🤌 pinched fingers fingers gesture hand hold huh interrogation patience pinched relax sarcastic ugh what zip
 🤏 pinching hand amount bit fingers hand little pinching small sort
 ✌️ victory hand hand peace v victory
 🤞 crossed fingers cross crossed finger fingers hand luck
 🫰 hand with index finger and thumb crossed <3 crossed expensive finger hand heart index love money snap thumb
-🤟 love-you gesture fingers gesture hand ily love love-you three you
+🤟 love-you gesture ILY fingers gesture hand love love-you three you
 🤘 \m/ \M/ sign of the horns finger hand horns rock-on sign
-🤙 call me hand call hand hang loose me shaka
-👈️ backhand index pointing left backhand finger hand index left point pointing
-👉️ backhand index pointing right backhand finger hand index point pointing right
-👆️ backhand index pointing up backhand finger hand index point pointing up
+🤙 call me hand Shaka call hand hang loose me
+👈 backhand index pointing left backhand finger hand index left point pointing
+👉 backhand index pointing right backhand finger hand index point pointing right
+👆 backhand index pointing up backhand finger hand index point pointing up
 🖕 middle finger finger hand middle
-👇️ backhand index pointing down backhand down finger hand index point pointing
+👇 backhand index pointing down backhand down finger hand index point pointing
 ☝️ index pointing up finger hand index point pointing this up
 🫵 index pointing at the viewer at finger hand index pointing poke viewer you
-👍️ thumbs up +1 good hand like thumb up yes
-👎️ thumbs down -1 bad dislike down good hand no nope thumb thumbs
-✊️ raised fist clenched fist hand punch raised solidarity
+👍 thumbs up +1 good hand like thumb up yes
+👎 thumbs down -1 bad dislike down good hand no nope thumb thumbs
+🫹 leftwards thumb sign grip left neutral point that this
+🫺 rightwards thumb sign grip neutral point right that this
+✊ raised fist clenched fist hand punch raised solidarity
 👊 oncoming fist absolutely agree boom bro bruh bump clenched correct fist hand knuckle oncoming pound punch rock ttyl
 🤛 left-facing fist fist left-facing leftwards
 🤜 right-facing fist fist right-facing rightwards
@@ -266,7 +269,7 @@
 🦿 mechanical leg accessibility leg mechanical prosthetic
 🦵 leg bent foot kick knee limb
 🦶 foot ankle feet kick stomp
-👂️ ear body ears hear hearing listen listening sound
+👂 ear body ears hear hearing listen listening sound
 🦻 ear with hearing aid accessibility aid ear hard hearing
 👃 nose body noses nosey odor smell smells
 🧠 brain intelligent smart
@@ -282,7 +285,7 @@
 👶 baby babies children goo infant newborn pregnant young
 🧒 child bright-eyed grandchild kid young younger
 👦 boy bright-eyed child grandson kid son young younger
-👧 girl bright-eyed child daughter granddaughter kid virgo young younger zodiac
+👧 girl Virgo bright-eyed child daughter granddaughter kid young younger zodiac
 🧑 person adult
 👱 person: blond hair blond blond-haired human person
 👨 man adult bro
@@ -313,12 +316,12 @@
 🙎 person pouting disappointed downtrodden frown grimace person pouting scowl sulk upset whine
 🙎‍♂️ man pouting disappointed downtrodden frown grimace man pouting scowl sulk upset whine
 🙎‍♀️ woman pouting disappointed downtrodden frown grimace pouting scowl sulk upset whine woman
-🙅 person gesturing NO forbidden gesture hand no not person prohibit
-🙅‍♂️ man gesturing NO forbidden gesture hand man no not prohibit
-🙅‍♀️ woman gesturing NO forbidden gesture hand no not prohibit woman
-🙆 person gesturing OK exercise gesture gesturing hand ok omg person
-🙆‍♂️ man gesturing OK exercise gesture gesturing hand man ok omg
-🙆‍♀️ woman gesturing OK exercise gesture gesturing hand ok omg woman
+🙅 person gesturing NO NO forbidden gesture hand not person prohibit
+🙅‍♂️ man gesturing NO NO forbidden gesture hand man not prohibit
+🙅‍♀️ woman gesturing NO NO forbidden gesture hand not prohibit woman
+🙆 person gesturing OK OK exercise gesture gesturing hand omg person
+🙆‍♂️ man gesturing OK OK exercise gesture gesturing hand man omg
+🙆‍♀️ woman gesturing OK OK exercise gesture gesturing hand omg woman
 💁 person tipping hand fetch flick flip gossip hand person sarcasm sarcastic sassy seriously tipping whatever
 💁‍♂️ man tipping hand fetch flick flip gossip hand man sarcasm sarcastic sassy seriously tipping whatever
 💁‍♀️ woman tipping hand fetch flick flip gossip hand sarcasm sarcastic sassy seriously tipping whatever woman
@@ -404,7 +407,7 @@
 👳 person wearing turban person turban wearing
 👳‍♂️ man wearing turban man turban wearing
 👳‍♀️ woman wearing turban turban wearing woman
-👲 person with skullcap cap chinese gua guapi hat mao person pi skullcap
+👲 person with skullcap Chinese cap gua guapi hat mao person pi skullcap
 🧕 woman with headscarf bandana head headscarf hijab kerchief mantilla tichel woman
 🤵 person in tuxedo formal person tuxedo wedding
 🤵‍♂️ man in tuxedo formal groom man tuxedo wedding
@@ -420,9 +423,9 @@
 👨‍🍼 man feeding baby baby dad father feed feeding man nanny newborn nursing
 🧑‍🍼 person feeding baby baby feed feeding nanny newborn nursing parent
 👼 baby angel angel baby church face fairy fairytale fantasy tale
-🎅 Santa Claus celebration christmas claus fairy fantasy father holiday merry santa tale xmas
-🤶 Mrs. Claus celebration christmas claus fairy fantasy holiday merry mother mrs santa tale xmas
-🧑‍🎄 Mx Claus celebration christmas claus fairy fantasy holiday merry mx santa tale xmas
+🎅 Santa Claus Christmas celebration claus fairy fantasy father holiday merry santa tale xmas
+🤶 Mrs. Claus Christmas Mrs celebration claus fairy fantasy holiday merry mother santa tale xmas
+🧑‍🎄 Mx Claus Christmas Mx celebration claus fairy fantasy holiday merry santa tale xmas
 🦸 superhero good hero superpower
 🦸‍♂️ man superhero good hero man superhero superpower
 🦸‍♀️ woman superhero good hero heroine superhero superpower woman
@@ -433,13 +436,13 @@
 🧙‍♂️ :{> man mage fantasy mage magic man play sorcerer sorceress sorcery spell summon witch wizard
 🧙‍♀️ woman mage fantasy mage magic play sorcerer sorceress sorcery spell summon witch wizard woman
 🧚 fairy fairytale fantasy myth person pixie tale wings
-🧚‍♂️ man fairy fairy fairytale fantasy man myth oberon person pixie puck tale wings
-🧚‍♀️ woman fairy fairy fairytale fantasy myth person pixie tale titania wings woman
-🧛 :E vampire blood dracula fangs halloween scary supernatural teeth undead
+🧚‍♂️ man fairy Oberon Puck fairy fairytale fantasy man myth person pixie tale wings
+🧚‍♀️ woman fairy Titania fairy fairytale fantasy myth person pixie tale wings woman
+🧛 :E vampire Dracula blood fangs halloween scary supernatural teeth undead
 🧛‍♂️ man vampire blood fangs halloween man scary supernatural teeth undead vampire
 🧛‍♀️ woman vampire blood fangs halloween scary supernatural teeth undead vampire woman
 🧜 merperson creature fairytale folklore ocean sea siren trident
-🧜‍♂️ merman creature fairytale folklore neptune ocean poseidon sea siren trident triton
+🧜‍♂️ merman Neptune Poseidon Triton creature fairytale folklore ocean sea siren trident
 🧜‍♀️ mermaid creature fairytale folklore merwoman ocean sea siren trident
 🧝 elf elves enchantment fantasy folklore magic magical myth
 🧝‍♂️ man elf elf elves enchantment fantasy folklore magic magical man myth
@@ -513,17 +516,17 @@
 🤺 person fencing fencer fencing person sword
 🏇 horse racing horse jockey racehorse racing riding sport
 ⛷️ skier ski snow
-🏂️ snowboarder ski snow snowboard sport
+🏂 snowboarder ski snow snowboard sport
 🏌️ person golfing ball birdie caddy driving golf golfing green person pga putt range tee
 🏌️‍♂️ man golfing ball birdie caddy driving golf golfing green man pga putt range tee
 🏌️‍♀️ woman golfing ball birdie caddy driving golf golfing green pga putt range tee woman
-🏄️ person surfing beach ocean person sport surf surfer surfing swell waves
+🏄 person surfing beach ocean person sport surf surfer surfing swell waves
 🏄‍♂️ man surfing beach man ocean sport surf surfer surfing swell waves
 🏄‍♀️ woman surfing beach ocean person sport surf surfer surfing swell waves
 🚣 person rowing boat boat canoe cruise fishing lake oar paddle person raft river row rowboat rowing
 🚣‍♂️ man rowing boat boat canoe cruise fishing lake man oar paddle raft river row rowboat rowing
 🚣‍♀️ woman rowing boat boat canoe cruise fishing lake oar paddle raft river row rowboat rowing woman
-🏊️ person swimming freestyle person sport swim swimmer swimming triathlon
+🏊 person swimming freestyle person sport swim swimmer swimming triathlon
 🏊‍♂️ man swimming freestyle man sport swim swimmer swimming triathlon
 🏊‍♀️ woman swimming freestyle man sport swim swimmer swimming triathlon
 ⛹️ person bouncing ball athletic ball basketball bouncing championship dribble net person player throw
@@ -599,7 +602,7 @@
 👤 bust in silhouette bust mysterious shadow silhouette
 👥 busts in silhouette bff bust busts everyone friend friends people silhouette
 🫂 people hugging comfort embrace farewell friendship goodbye hello hug hugging love people thanks
-👪️ family child
+👪 family child
 🧑‍🧑‍🧒 family: adult, adult, child adult child family
 🧑‍🧑‍🧒‍🧒 family: adult, adult, child, child adult child family
 🧑‍🧒 family: adult, child adult child family
@@ -620,7 +623,7 @@
 🦍 gorilla animal
 🦧 orangutan animal ape monkey
 🐶 dog face adorbs animal dog face pet puppies puppy
-🐕️ dog animal animals dogs pet
+🐕 dog animal animals dogs pet
 🦮 guide dog accessibility animal blind dog guide
 🐕‍🦺 service dog accessibility animal assistance dog service
 🐩 poodle animal dog fluffy
@@ -628,9 +631,9 @@
 🦊 fox animal face
 🦝 raccoon animal curious sly
 🐱 cat face animal cat face kitten kitty pet
-🐈️ cat animal animals cats kitten pet
+🐈 cat animal animals cats kitten pet
 🐈‍⬛ black cat animal black cat feline halloween meow unlucky
-🦁 lion alpha animal face leo mane order rawr roar safari strong zodiac
+🦁 lion Leo alpha animal face mane order rawr roar safari strong zodiac
 🐯 tiger face animal big cat face predator tiger
 🐅 tiger animal big cat predator zoo
 🐆 leopard animal big cat predator zoo
@@ -643,16 +646,16 @@
 🦌 deer animal
 🦬 bison animal buffalo herd wisent
 🐮 cow face animal cow face farm milk moo
-🐂 ox animal animals bull farm taurus zodiac
+🐂 ox Taurus animal animals bull farm zodiac
 🐃 water buffalo animal buffalo water zoo
 🐄 cow animal animals farm milk moo
 🐷 pig face animal bacon face farm pig pork
 🐖 pig animal bacon farm pork sow
 🐗 boar animal pig
 🐽 pig nose animal face farm nose pig smell snout
-🐏 ram animal aries horns male sheep zodiac zoo
+🐏 ram Aries animal horns male sheep zodiac zoo
 🐑 ewe animal baa farm female fluffy lamb sheep wool
-🐐 goat animal capricorn farm milk zodiac
+🐐 goat Capricorn animal farm milk zodiac
 🐪 camel animal desert dromedary hump one
 🐫 two-hump camel animal bactrian camel desert hump two two-hump
 🦙 llama alpaca animal guanaco vicuña wool
@@ -687,7 +690,7 @@
 🐣 hatching chick animal baby bird chick egg hatching
 🐤 baby chick animal baby bird chick ornithology
 🐥 front-facing baby chick animal baby bird chick front-facing newborn ornithology
-🐦️ bird animal ornithology
+🐦 bird animal ornithology
 🐧 penguin animal antarctica bird ornithology
 🕊️ dove bird fly ornithology peace
 🦅 eagle animal bird ornithology
@@ -707,17 +710,17 @@
 🐊 crocodile animal zoo
 🐢 turtle animal terrapin tortoise
 🦎 lizard animal reptile
-🐍 snake animal bearer ophiuchus serpent zodiac
+🐍 snake Ophiuchus animal bearer serpent zodiac
 🐲 dragon face animal dragon face fairy fairytale tale
 🐉 dragon animal fairy fairytale knights tale
 🦕 sauropod brachiosaurus brontosaurus dinosaur diplodocus
-🦖 T-Rex dinosaur rex t t-rex tyrannosaurus
+🦖 T-Rex Rex T Tyrannosaurus dinosaur
 🐳 spouting whale animal beach face ocean spouting whale
 🐋 whale animal beach ocean
 🐬 dolphin animal beach flipper ocean
 🫍 orca marine ocean whale
 🦭 seal animal lion ocean sea
-🐟️ fish animal dinner fishes fishing pisces zodiac
+🐟 fish Pisces animal dinner fishes fishing zodiac
 🐠 tropical fish animal fish fishes tropical
 🐡 blowfish animal fish
 🦈 shark animal fish
@@ -725,23 +728,24 @@
 🐚 spiral shell animal beach conch sea shell spiral
 🪸 coral change climate ocean reef sea
 🪼 jellyfish animal aquarium burn invertebrate jelly life marine ocean ouch plankton sea sting stinger tentacles
-🦀 crab cancer zodiac
+🦀 crab Cancer zodiac
 🦞 lobster animal bisque claws seafood
 🦐 shrimp food shellfish small
 🦑 squid animal food mollusk
 🦪 oyster diving pearl
 🐌 snail animal escargot garden nature slug
 🦋 butterfly insect pretty
+🫌 monarch butterfly caterpillar change fragile hope insect metamorphosis migration transformation
 🐛 bug animal garden insect
 🐜 ant animal garden insect
 🐝 honeybee animal bee bumblebee honey insect nature spring
 🪲 beetle animal bug insect
 🐞 lady beetle animal beetle garden insect lady ladybird ladybug nature
-🦗 cricket animal bug grasshopper insect orthoptera
+🦗 cricket Orthoptera animal bug grasshopper insect
 🪳 cockroach animal insect pest roach
 🕷️ spider animal insect
 🕸️ spider web spider web
-🦂 scorpion scorpio scorpius zodiac
+🦂 scorpion Scorpio Scorpius zodiac
 🦟 mosquito bite disease fever insect malaria pest virus
 🪰 fly animal disease insect maggot pest rotting
 🪱 worm animal annelid earthworm parasite
@@ -749,7 +753,7 @@
 💐 bouquet anniversary birthday date flower love plant romance
 🌸 cherry blossom blossom cherry flower plant spring springtime
 💮 white flower flower white
-🪷 lotus beauty buddhism calm flower hinduism peace purity serenity
+🪷 lotus Buddhism Hinduism beauty calm flower peace purity serenity
 🏵️ rosette plant
 🌹 rose beauty elegant flower love plant red valentine
 🥀 wilted flower dying flower wilted
@@ -775,7 +779,7 @@
 🪺 nest with eggs bird branch egg eggs nest nesting
 🍄 mushroom fungus toadstool
 🪾 leafless tree bare barren branches dead drought leafless tree trunk winter wood
-🍇 grapes dionysus fruit grape
+🍇 grapes Dionysus fruit grape
 🍈 melon cantaloupe fruit
 🍉 watermelon fruit
 🍊 tangerine c citrus fruit nectarine orange vitamin
@@ -803,6 +807,7 @@
 🌶️ hot pepper hot pepper
 🫑 bell pepper bell capsicum food pepper vegetable
 🥒 cucumber food pickle vegetable
+🫝 pickle brine condiment cucumber ferment gherkin relish trouble
 🥬 leafy green bok burgers cabbage choy green kale leafy lettuce salad
 🥦 broccoli cabbage wild
 🧄 garlic flavoring
@@ -850,7 +855,7 @@
 🥫 canned food can canned food
 🍱 bento box bento box food
 🍘 rice cracker cracker food rice
-🍙 rice ball ball food japanese rice
+🍙 rice ball Japanese ball food rice
 🍚 cooked rice cooked food rice
 🍛 curry rice curry food rice
 🍜 steaming bowl bowl chopsticks food noodle pho ramen soup steaming
@@ -861,7 +866,7 @@
 🍤 fried shrimp fried prawn shrimp tempura
 🍥 fish cake with swirl cake fish food pastry restaurant swirl
 🥮 moon cake autumn cake festival moon yuèbǐng
-🍡 dango dessert japanese skewer stick sweet
+🍡 dango Japanese dessert skewer stick sweet
 🥟 dumpling empanada gyōza jiaozi pierogi potsticker
 🥠 fortune cookie cookie fortune prophecy
 🥡 takeout box box chopsticks delivery food oyster pail takeout
@@ -881,13 +886,13 @@
 🍯 honey pot barrel bear food honey honeypot jar pot sweet
 🍼 baby bottle babies baby birth born bottle drink infant milk newborn
 🥛 glass of milk drink glass milk
-☕️ hot beverage beverage cafe caffeine chai coffee drink hot morning steaming tea
+☕ hot beverage beverage cafe caffeine chai coffee drink hot morning steaming tea
 🫖 teapot brew drink food pot tea
 🍵 teacup without handle beverage cup drink handle oolong tea teacup
 🍶 sake bar beverage bottle cup drink restaurant
 🍾 bottle with popping cork bar bottle cork drink popping
 🍷 wine glass alcohol bar beverage booze club drink drinking drinks glass restaurant wine
-🍸️ cocktail glass alcohol bar booze club cocktail drink drinking drinks glass mad martini men
+🍸 cocktail glass alcohol bar booze club cocktail drink drinking drinks glass mad martini men
 🍹 tropical drink alcohol bar booze club cocktail drink drinking drinks drunk mai party tai tropical tropics
 🍺 beer mug alcohol ale bar beer booze drink drinking drinks mug octoberfest oktoberfest pint stein summer
 🍻 clinking beer mugs alcohol bar beer booze bottoms cheers clink clinking drinking drinks mugs
@@ -905,13 +910,13 @@
 🥄 spoon eat tableware
 🔪 kitchen knife chef cooking hocho kitchen knife tool weapon
 🫙 jar condiment container empty nothing sauce store
-🏺 amphora aquarius cooking drink jug tool weapon zodiac
-🌍️ globe showing Europe-Africa africa earth europe europe-africa globe showing world
-🌎️ globe showing Americas americas earth globe showing world
-🌏️ globe showing Asia-Australia asia asia-australia australia earth globe showing world
+🏺 amphora Aquarius cooking drink jug tool weapon zodiac
+🌍 globe showing Europe-Africa Africa Europe Europe-Africa earth globe showing world
+🌎 globe showing Americas Americas earth globe showing world
+🌏 globe showing Asia-Australia Asia Asia-Australia Australia earth globe showing world
 🌐 globe with meridians earth globe internet meridians web world worldwide
 🗺️ world map map world
-🗾 map of Japan japan map
+🗾 map of Japan Japan map
 🧭 compass direction magnetic navigation orienteering
 🏔️ snow-capped mountain cold mountain snow snow-capped
 ⛰️ mountain mountain
@@ -932,11 +937,11 @@
 🛖 hut home house roundhouse shelter yurt
 🏘️ houses house
 🏚️ derelict house derelict home house
-🏠️ house building country heart home ranch settle simple suburban suburbia where
+🏠 house building country heart home ranch settle simple suburban suburbia where
 🏡 house with garden building country garden heart home house ranch settle simple suburban suburbia where
 🏢 office building building city cubical job office
-🏣 Japanese post office building japanese office post
-🏤 post office building european office post
+🏣 Japanese post office Japanese building office post
+🏤 post office European building office post
 🏥 hospital building doctor medicine
 🏦 bank building
 🏨 hotel building
@@ -944,20 +949,20 @@
 🏪 convenience store 24 building convenience hours store
 🏫 school building
 🏬 department store building department store
-🏭️ factory building
-🏯 Japanese castle building castle japanese
-🏰 castle building european
+🏭 factory building
+🏯 Japanese castle Japanese building castle
+🏰 castle European building
 💒 wedding chapel hitched nuptials romance
-🗼 Tokyo tower tokyo tower
-🗽 Statue of Liberty liberty new ny nyc statue york
-⛪️ church bless chapel christian cross religion
-🕌 mosque islam masjid muslim religion
+🗼 Tokyo tower Tokyo tower
+🗽 Statue of Liberty Liberty Statue liberty new ny nyc statue york
+⛪ church Christian bless chapel cross religion
+🕌 mosque Muslim islam masjid religion
 🛕 hindu temple hindu temple
-🕍 synagogue jew jewish judaism religion temple
+🕍 synagogue Jew Jewish judaism religion temple
 ⛩️ shinto shrine religion shinto shrine
-🕋 kaaba hajj islam muslim religion umrah
-⛲️ fountain fountain
-⛺️ tent camping
+🕋 kaaba Muslim hajj islam religion umrah
+⛲ fountain fountain
+⛺ tent camping
 🌁 foggy fog
 🌃 night with stars night star stars
 🏙️ cityscape city
@@ -978,7 +983,7 @@
 🚄 high-speed train high-speed railway shinkansen speed train
 🚅 bullet train bullet high-speed nose railway shinkansen speed train travel
 🚆 train arrived choo railway
-🚇️ metro subway travel
+🚇 metro subway travel
 🚈 light rail arrived light monorail rail railway
 🚉 station railway train
 🚊 tram trolleybus
@@ -986,17 +991,17 @@
 🚞 mountain railway car mountain railway trip
 🚋 tram car bus car tram trolley trolleybus
 🚌 bus school vehicle
-🚍️ oncoming bus bus cars oncoming
+🚍 oncoming bus bus cars oncoming
 🚎 trolleybus bus tram trolley
 🚐 minibus bus drive van vehicle
-🚑️ ambulance emergency vehicle
+🚑 ambulance emergency vehicle
 🚒 fire engine engine fire truck
 🚓 police car 5–0 car cops patrol police
-🚔️ oncoming police car car oncoming police
+🚔 oncoming police car car oncoming police
 🚕 taxi cab cabbie car drive vehicle yellow
 🚖 oncoming taxi cab cabbie cars drove hail oncoming taxi yellow
 🚗 automobile car driving vehicle
-🚘️ oncoming automobile automobile car cars drove oncoming vehicle
+🚘 oncoming automobile automobile car cars drove oncoming vehicle
 🚙 sport utility vehicle car drive recreational sport sportutility utility vehicle
 🛻 pickup truck automobile car flatbed pick-up pickup transportation truck
 🚚 delivery truck car delivery drive truck vehicle
@@ -1008,7 +1013,7 @@
 🦽 manual wheelchair accessibility manual wheelchair
 🦼 motorized wheelchair accessibility motorized wheelchair
 🛺 auto rickshaw auto rickshaw tuk
-🚲️ bicycle bike class cycle cycling cyclist gang ride spin spinning
+🚲 bicycle bike class cycle cycling cyclist gang ride spin spinning
 🛴 kick scooter kick scooter
 🛹 skateboard board skate skater wheels
 🛼 roller skate blades roller skate skates sport
@@ -1016,16 +1021,17 @@
 🛣️ motorway highway road
 🛤️ railway track railway track train
 🛢️ oil drum drum oil
-⛽️ fuel pump diesel fuel fuelpump gas gasoline pump station
+⛽ fuel pump diesel fuel fuelpump gas gasoline pump station
 🛞 wheel car circle tire turn vehicle
 🚨 police car light alarm alert beacon car emergency light police revolving siren
 🚥 horizontal traffic light horizontal intersection light signal stop stoplight traffic
 🚦 vertical traffic light drove intersection light signal stop stoplight traffic vertical
 🛑 stop sign octagonal sign stop
 🚧 construction barrier
-⚓️ anchor ship tool
+🛙 lighthouse beacon enlightenment guidance hope light maritime navigation sea signal
+⚓ anchor ship tool
 🛟 ring buoy buoy float life lifesaver preserver rescue ring safety save saver swim
-⛵️ sailboat boat resort sailing sea yacht
+⛵ sailboat boat resort sailing sea yacht
 🛶 canoe boat
 🚤 speedboat billionaire boat lake luxury millionaire summer travel
 🛳️ passenger ship passenger ship
@@ -1044,63 +1050,63 @@
 🚡 aerial tramway aerial cable car gondola ropeway tramway
 🛰️ satellite space
 🚀 rocket launch rockets space travel
-🛸 flying saucer aliens extra flying saucer terrestrial ufo
+🛸 flying saucer UFO aliens extra flying saucer terrestrial
 🛎️ bellhop bell bell bellhop hotel
 🧳 luggage bag packing roller suitcase travel
-⌛️ hourglass done done hourglass sand time timer
-⏳️ hourglass not done done flowing hourglass hours not sand timer waiting yolo
-⌚️ watch clock time
-⏰️ alarm clock alarm clock hours hrs late time waiting
+⌛ hourglass done done hourglass sand time timer
+⏳ hourglass not done done flowing hourglass hours not sand timer waiting yolo
+⌚ watch clock time
+⏰ alarm clock alarm clock hours hrs late time waiting
 ⏱️ stopwatch clock time
 ⏲️ timer clock clock timer
 🕰️ mantelpiece clock clock mantelpiece time
-🕛️ twelve o’clock 12 12:00 clock o’clock time twelve
-🕧️ twelve-thirty 12 12:30 30 clock thirty time twelve
-🕐️ one o’clock 1 1:00 clock one o’clock time
-🕜️ one-thirty 1 1:30 30 clock one thirty time
-🕑️ two o’clock 2 2:00 clock o’clock time two
-🕝️ two-thirty 2 2:30 30 clock thirty time two
-🕒️ three o’clock 3 3:00 clock o’clock three time
-🕞️ three-thirty 3 30 3:30 clock thirty three time
-🕓️ four o’clock 4 4:00 clock four o’clock time
-🕟️ four-thirty 30 4 4:30 clock four thirty time
-🕔️ five o’clock 5 5:00 clock five o’clock time
-🕠️ five-thirty 30 5 5:30 clock five thirty time
-🕕️ six o’clock 6 6:00 clock o’clock six time
-🕡️ six-thirty 30 6 6:30 clock six thirty
-🕖️ seven o’clock 0 7 7:00 clock o’clock seven
-🕢️ seven-thirty 30 7 7:30 clock seven thirty
-🕗️ eight o’clock 8 8:00 clock eight o’clock time
-🕣️ eight-thirty 30 8 8:30 clock eight thirty time
-🕘️ nine o’clock 9 9:00 clock nine o’clock time
-🕤️ nine-thirty 30 9 9:30 clock nine thirty time
-🕙️ ten o’clock 0 10 10:00 clock o’clock ten
-🕥️ ten-thirty 10 10:30 30 clock ten thirty time
-🕚️ eleven o’clock 11 11:00 clock eleven o’clock time
-🕦️ eleven-thirty 11 11:30 30 clock eleven thirty time
+🕛 twelve o’clock 12 12:00 clock o’clock time twelve
+🕧 twelve-thirty 12 12:30 30 clock thirty time twelve
+🕐 one o’clock 1 1:00 clock one o’clock time
+🕜 one-thirty 1 1:30 30 clock one thirty time
+🕑 two o’clock 2 2:00 clock o’clock time two
+🕝 two-thirty 2 2:30 30 clock thirty time two
+🕒 three o’clock 3 3:00 clock o’clock three time
+🕞 three-thirty 3 30 3:30 clock thirty three time
+🕓 four o’clock 4 4:00 clock four o’clock time
+🕟 four-thirty 30 4 4:30 clock four thirty time
+🕔 five o’clock 5 5:00 clock five o’clock time
+🕠 five-thirty 30 5 5:30 clock five thirty time
+🕕 six o’clock 6 6:00 clock o’clock six time
+🕡 six-thirty 30 6 6:30 clock six thirty
+🕖 seven o’clock 0 7 7:00 clock o’clock seven
+🕢 seven-thirty 30 7 7:30 clock seven thirty
+🕗 eight o’clock 8 8:00 clock eight o’clock time
+🕣 eight-thirty 30 8 8:30 clock eight thirty time
+🕘 nine o’clock 9 9:00 clock nine o’clock time
+🕤 nine-thirty 30 9 9:30 clock nine thirty time
+🕙 ten o’clock 0 10 10:00 clock o’clock ten
+🕥 ten-thirty 10 10:30 30 clock ten thirty time
+🕚 eleven o’clock 11 11:00 clock eleven o’clock time
+🕦 eleven-thirty 11 11:30 30 clock eleven thirty time
 🌑 new moon dark moon new space
 🌒 waxing crescent moon crescent dreams moon space waxing
 🌓 first quarter moon first moon quarter space
 🌔 waxing gibbous moon gibbous moon space waxing
-🌕️ full moon full moon space
+🌕 full moon full moon space
 🌖 waning gibbous moon gibbous moon space waning
 🌗 last quarter moon last moon quarter space
 🌘 waning crescent moon crescent moon space waning
 🌙 crescent moon crescent moon ramadan space
 🌚 new moon face face moon new space
 🌛 first quarter moon face face first moon quarter space
-🌜️ last quarter moon face dreams face last moon quarter
+🌜 last quarter moon face dreams face last moon quarter
 🌡️ thermometer weather
 ☀️ sun bright rays space sunny weather
 🌝 full moon face bright face full moon
 🌞 sun with face beach bright day face heat shine sun sunny sunshine weather
 🪐 ringed planet planet ringed saturn saturnine
-⭐️ star astronomy medium stars white
+⭐ star astronomy medium stars white
 🌟 glowing star glittery glow glowing night shining sparkle star win
 🌠 shooting star falling night shooting space star
 🌌 milky way milky space way
 ☁️ cloud weather
-⛅️ sun behind cloud behind cloud cloudy sun weather
+⛅ sun behind cloud behind cloud cloudy sun weather
 ⛈️ cloud with lightning and rain cloud lightning rain thunder thunderstorm
 🌤️ sun behind small cloud behind cloud sun weather
 🌥️ sun behind large cloud behind cloud sun weather
@@ -1115,28 +1121,29 @@
 🌈 rainbow gay genderqueer glbt glbtq lesbian lgbt lgbtq lgbtqia nature pride queer rain trans transgender weather
 🌂 closed umbrella closed clothing rain umbrella
 ☂️ umbrella clothing rain
-☔️ umbrella with rain drops clothing drop drops rain umbrella weather
+☔ umbrella with rain drops clothing drop drops rain umbrella weather
 ⛱️ umbrella on ground ground rain sun umbrella
-⚡️ high voltage danger electric electricity high lightning nature thunder thunderbolt voltage zap
+⚡ high voltage danger electric electricity high lightning nature thunder thunderbolt voltage zap
 ❄️ snowflake cold snow weather
 ☃️ snowman cold man snow
-⛄️ snowman without snow cold man snow snowman
+⛄ snowman without snow cold man snow snowman
 ☄️ comet space
+🪋 meteor apocalypse falling fireball gravity rock space star
 🔥 fire af burn flame hot lit litaf tool
 💧 droplet cold comic drop nature sad sweat tear water weather
 🌊 water wave nature ocean surf surfer surfing water wave
 🎃 jack-o-lantern celebration halloween jack lantern pumpkin
-🎄 Christmas tree celebration christmas tree
+🎄 Christmas tree Christmas celebration tree
 🎆 fireworks boom celebration entertainment yolo
 🎇 sparkler boom celebration fireworks sparkle
 🧨 firecracker dynamite explosive fire fireworks light pop popping spark
-✨️ sparkles * magic sparkle star
+✨ sparkles * magic sparkle star
 🎈 balloon birthday celebrate celebration
 🎉 party popper awesome birthday celebrate celebration excited hooray party popper tada woohoo
 🎊 confetti ball ball celebrate celebration confetti party woohoo
-🎋 tanabata tree banner celebration japanese tanabata tree
-🎍 pine decoration bamboo celebration decoration japanese pine plant
-🎎 Japanese dolls celebration doll dolls festival japanese
+🎋 tanabata tree Japanese banner celebration tanabata tree
+🎍 pine decoration Japanese bamboo celebration decoration pine plant
+🎎 Japanese dolls Japanese celebration doll dolls festival
 🎏 carp streamer carp celebration streamer
 🎐 wind chime bell celebration chime wind
 🎑 moon viewing ceremony celebration ceremony moon viewing
@@ -1147,13 +1154,13 @@
 🎟️ admission tickets admission ticket tickets
 🎫 ticket admission stub
 🎖️ military medal award celebration medal military
-🏆️ trophy champion champs prize slay sport victory win winning
+🏆 trophy champion champs prize slay sport victory win winning
 🏅 sports medal award gold medal sports winner
 🥇 1st place medal 1st first gold medal place
 🥈 2nd place medal 2nd medal place second silver
 🥉 3rd place medal 3rd bronze medal place third
-⚽️ soccer ball ball football futbol soccer sport
-⚾️ baseball ball sport
+⚽ soccer ball ball football futbol soccer sport
+⚾ baseball ball sport
 🥎 softball ball glove sports underarm
 🏀 basketball ball hoop sport
 🏐 volleyball ball game
@@ -1171,7 +1178,7 @@
 🥊 boxing glove boxing glove
 🥋 martial arts uniform arts judo karate martial taekwondo uniform
 🥅 goal net goal net
-⛳️ flag in hole flag golf hole sport
+⛳ flag in hole flag golf hole sport
 ⛸️ ice skate ice skate skating
 🎣 fishing pole entertainment fish fishing pole sport
 🤿 diving mask diving mask scuba snorkeling
@@ -1186,7 +1193,7 @@
 🎱 pool 8 ball 8 8ball ball billiard eight game pool
 🔮 crystal ball ball crystal fairy fairytale fantasy fortune future magic tale tool
 🪄 magic wand magic magician wand witch wizard
-🎮️ video game controller entertainment game video
+🎮 video game controller entertainment game video
 🕹️ joystick game video videogame
 🎰 slot machine casino gamble gambling game machine slot slots
 🎲 game die dice die entertainment game
@@ -1201,16 +1208,16 @@
 ♣️ club suit card club clubs game suit
 ♟️ chess pawn chess dupe expendable pawn
 🃏 joker card game wildcard
-🀄️ mahjong red dragon dragon game mahjong red
-🎴 flower playing cards card cards flower game japanese playing
-🎭️ performing arts actor actress art arts entertainment mask performing theater theatre thespian
+🀄 mahjong red dragon dragon game mahjong red
+🎴 flower playing cards Japanese card cards flower game playing
+🎭 performing arts actor actress art arts entertainment mask performing theater theatre thespian
 🖼️ framed picture art frame framed museum painting picture
 🎨 artist palette art artist artsy arty colorful creative entertainment museum painter painting palette
 🧵 thread needle sewing spool string
 🪡 sewing needle embroidery needle sew sewing stitches sutures tailoring thread
 🧶 yarn ball crochet knit
 🪢 knot cord rope tangled tie twine twist
-👓️ glasses clothing eye eyeglasses eyewear
+👓 glasses clothing eye eyeglasses eyewear
 🕶️ sunglasses dark eye eyewear glasses
 🥽 goggles dive eye protection scuba swimming welding
 🥼 lab coat clothes coat doctor dr experiment jacket lab scientist white
@@ -1245,11 +1252,11 @@
 👡 woman’s sandal clothing sandal shoe woman woman’s
 🩰 ballet shoes ballet dance shoes
 👢 woman’s boot boot clothes clothing dress shoe shoes shopping woman woman’s
-🪮 hair pick afro comb groom hair pick
+🪮 hair pick Afro comb groom hair pick
 👑 crown clothing family king medieval queen royal royalty win
 👒 woman’s hat clothes clothing garden hat hats party woman woman’s
 🎩 top hat clothes clothing fancy formal hat magic top tophat
-🎓️ graduation cap cap celebration clothing education graduation hat scholar
+🎓 graduation cap cap celebration clothing education graduation hat scholar
 🧢 billed cap baseball bent billed cap dad hat
 🪖 military helmet army helmet military soldier war warrior
 ⛑️ rescue worker’s helmet aid cross face hat helmet rescue worker’s
@@ -1258,7 +1265,7 @@
 💍 ring diamond engaged engagement married romance shiny sparkling wedding
 💎 gem stone diamond engagement gem jewel money romance stone wedding
 🔇 muted speaker mute muted quiet silent sound speaker
-🔈️ speaker low volume low soft sound speaker volume
+🔈 speaker low volume low soft sound speaker volume
 🔉 speaker medium volume medium sound speaker volume
 🔊 speaker high volume high loud music sound speaker volume
 📢 loudspeaker address communication loud public sound
@@ -1273,8 +1280,8 @@
 🎚️ level slider level music slider
 🎛️ control knobs control knobs music
 🎤 microphone karaoke mic music sing sound
-🎧️ headphone earbud sound
-📻️ radio entertainment tbt video
+🎧 headphone earbud sound
+📻 radio entertainment tbt video
 🎷 saxophone instrument music sax
 🎺 trumpet instrument music
 🪊 trombone brass instrument jazz music sad slide
@@ -1292,12 +1299,12 @@
 📲 mobile phone with arrow arrow build call cell communication mobile phone receive telephone
 ☎️ telephone phone
 📞 telephone receiver communication phone receiver telephone voip
-📟️ pager communication
+📟 pager communication
 📠 fax machine communication fax machine
 🔋 battery battery
 🪫 low battery battery drained electronic energy low power
 🔌 electric plug electric electricity plug
-💻️ laptop computer office pc personal
+💻 laptop computer office pc personal
 🖥️ desktop computer computer desktop monitor
 🖨️ printer computer
 ⌨️ keyboard computer
@@ -1305,19 +1312,19 @@
 🖲️ trackball computer
 💽 computer disk computer disk minidisk optical
 💾 floppy disk computer disk floppy
-💿️ optical disk blu-ray cd computer disk dvd optical
-📀 dvd blu-ray cd computer disk optical
+💿 optical disk CD blu-ray computer disk dvd optical
+📀 dvd Blu-ray DVD cd computer disk optical
 🧮 abacus calculation calculator
 🎥 movie camera bollywood camera cinema film hollywood movie record
 🎞️ film frames cinema film frames movie
 📽️ film projector cinema film movie projector video
-🎬️ clapper board action board clapper movie
-📺️ television tv video
-📷️ camera photo selfie snap tbt trip video
+🎬 clapper board action board clapper movie
+📺 television tv video
+📷 camera photo selfie snap tbt trip video
 📸 camera with flash camera flash video
-📹️ video camera camcorder camera tbt video
+📹 video camera camcorder camera tbt video
 📼 videocassette old school tape vcr vhs video
-🔍️ magnifying glass tilted left glass lab left left-pointing magnifying science search tilted tool
+🔍 magnifying glass tilted left glass lab left left-pointing magnifying science search tilted tool
 🔎 magnifying glass tilted right contact glass lab magnifying right right-pointing science search tilted tool
 🕯️ candle light
 💡 light bulb bulb comic electric idea light
@@ -1330,7 +1337,7 @@
 📗 green book book education fantasy green library reading
 📘 blue book blue book education fantasy library reading
 📙 orange book book education fantasy library orange reading
-📚️ books book education fantasy knowledge library novels reading school study
+📚 books book education fantasy knowledge library novels reading school study
 📓 notebook notebook
 📒 ledger notebook
 📃 page with curl curl document page paper
@@ -1342,27 +1349,27 @@
 🔖 bookmark mark
 🏷️ label tag
 🪙 coin dollar euro gold metal money rich silver treasure
-💰️ money bag bag bank bet billion cash cost dollar gold million money moneybag paid paying pot rich win
+💰 money bag bag bank bet billion cash cost dollar gold million money moneybag paid paying pot rich win
 🪎 treasure chest gem gold jewels loot money prize silver valuables wealth
 💴 yen banknote bank banknote bill currency money note yen
 💵 dollar banknote bank banknote bill currency dollar money note
 💶 euro banknote 100 bank banknote bill currency euro money note rich
 💷 pound banknote bank banknote bill billion cash currency money note pound pounds
 💸 money with wings bank banknote bill billion cash dollar fly million money note pay wings
-💳️ credit card bank card cash charge credit money pay
+💳 credit card bank card cash charge credit money pay
 🧾 receipt accounting bookkeeping evidence invoice proof
 💹 chart increasing with yen bank chart currency graph growth increasing market money rise trend upward yen
 ✉️ envelope e-mail email letter
 📧 e-mail email letter mail
 📨 incoming envelope delivering e-mail email envelope incoming letter mail receive sent
 📩 envelope with arrow arrow communication down e-mail email envelope letter mail outgoing send sent
-📤️ outbox tray box email letter mail outbox sent tray
-📥️ inbox tray box email inbox letter mail receive tray zero
-📦️ package box communication delivery parcel shipping
-📫️ closed mailbox with raised flag closed communication flag mail mailbox postbox raised
-📪️ closed mailbox with lowered flag closed flag lowered mail mailbox postbox
-📬️ open mailbox with raised flag flag mail mailbox open postbox raised
-📭️ open mailbox with lowered flag flag lowered mail mailbox open postbox
+📤 outbox tray box email letter mail outbox sent tray
+📥 inbox tray box email inbox letter mail receive tray zero
+📦 package box communication delivery parcel shipping
+📫 closed mailbox with raised flag closed communication flag mail mailbox postbox raised
+📪 closed mailbox with lowered flag closed flag lowered mail mailbox postbox
+📬 open mailbox with raised flag flag mail mailbox open postbox raised
+📭 open mailbox with lowered flag flag lowered mail mailbox open postbox
 📮 postbox mail mailbox
 🗳️ ballot box with ballot ballot box
 ✏️ pencil pencil
@@ -1372,6 +1379,7 @@
 🖌️ paintbrush painting
 🖍️ crayon crayon
 📝 memo communication media notes pencil
+🪌 eraser correction delete drawing erase error mistake remove rub undo writing
 💼 briefcase office
 📁 file folder file folder
 📂 open file folder file folder open
@@ -1384,7 +1392,7 @@
 📈 chart increasing chart data graph growth increasing right trend up upward
 📉 chart decreasing chart data decreasing down downward graph negative trend
 📊 bar chart bar chart data graph
-📋️ clipboard do list notes
+📋 clipboard do list notes
 📌 pushpin collage pin
 📍 round pushpin location map pin pushpin round
 📎 paperclip paperclip
@@ -1395,12 +1403,13 @@
 🗃️ card file box box card file
 🗄️ file cabinet cabinet file filing paper
 🗑️ wastebasket can garbage trash waste
-🔒️ locked closed lock private
-🔓️ unlocked cracked lock open unlock
+🔒 locked closed lock private
+🔓 unlocked cracked lock open unlock
 🔏 locked with pen ink lock locked nib pen privacy
 🔐 locked with key bike closed key lock locked secure
 🔑 key keys lock major password unlock
 🗝️ old key clue key lock old
+🪍 net with handle catch collect mesh trap
 🔨 hammer home improvement repairs tool
 🪓 axe ax chop hatchet split wood
 ⛏️ pick hammer mining tool
@@ -1408,9 +1417,9 @@
 🛠️ hammer and wrench hammer spanner tool wrench
 🗡️ dagger knife weapon
 ⚔️ crossed swords crossed swords weapon
-💣️ bomb boom comic dangerous explosion hot
+💣 bomb boom comic dangerous explosion hot
 🪃 boomerang rebound repercussion weapon
-🏹 bow and arrow archer archery arrow bow sagittarius tool weapon zodiac
+🏹 bow and arrow Sagittarius archer archery arrow bow tool weapon zodiac
 🛡️ shield weapon
 🪚 carpentry saw carpenter carpentry cut lumber saw tool trim
 🔧 wrench home improvement spanner tool
@@ -1418,7 +1427,7 @@
 🔩 nut and bolt bolt home improvement nut tool
 ⚙️ gear cog cogwheel tool
 🗜️ clamp compress tool vice
-⚖️ balance scale balance justice libra scale scales tool weight zodiac
+⚖️ balance scale Libra balance justice scale scales tool weight zodiac
 🦯 white cane accessibility blind cane probing white
 🔗 link links
 ⛓️‍💥 broken chain break breaking broken chain cuffs freedom
@@ -1472,29 +1481,29 @@
 🪦 headstone cemetery dead grave graveyard memorial rip tomb tombstone
 ⚱️ funeral urn ashes death funeral urn
 🧿 nazar amulet amulet bead blue charm evil-eye nazar talisman
-🪬 hamsa amulet fatima fortune guide hand mary miriam palm protect protection
+🪬 hamsa Fatima Mary Miriam amulet fortune guide hand palm protect protection
 🗿 moai face moyai statue stoneface travel
 🪧 placard card demonstration notice picket plaque protest sign
-🪪 identification card card credentials document id identification license security
-🏧 ATM sign atm automated bank cash money sign teller
+🪪 identification card ID card credentials document identification license security
+🏧 ATM sign ATM automated bank cash money sign teller
 🚮 litter in bin sign bin litter litterbin sign
 🚰 potable water drinking potable water
-♿️ wheelchair symbol access handicap symbol wheelchair
-🚹️ men’s room bathroom lavatory man men’s restroom room toilet wc
-🚺️ women’s room bathroom lavatory restroom room toilet wc woman women’s
-🚻 restroom bathroom lavatory toilet wc
-🚼️ baby symbol baby changing symbol
-🚾 water closet bathroom closet lavatory restroom toilet water wc
+♿ wheelchair symbol access handicap symbol wheelchair
+🚹 men’s room WC bathroom lavatory man men’s restroom room toilet
+🚺 women’s room WC bathroom lavatory restroom room toilet woman women’s
+🚻 restroom WC bathroom lavatory toilet
+🚼 baby symbol baby changing symbol
+🚾 water closet WC bathroom closet lavatory restroom toilet water
 🛂 passport control control passport
 🛃 customs packing
 🛄 baggage claim arrived baggage bags case checked claim journey packing plane ready travel trip
 🛅 left luggage baggage case left locker luggage
 ⚠️ warning caution
 🚸 children crossing child children crossing pedestrian traffic
-⛔️ no entry do entry fail forbidden no not pass prohibited traffic
+⛔ no entry do entry fail forbidden no not pass prohibited traffic
 🚫 prohibited entry forbidden no not smoke
 🚳 no bicycles bicycle bicycles bike forbidden no not prohibited
-🚭️ no smoking forbidden no not prohibited smoke smoking
+🚭 no smoking forbidden no not prohibited smoke smoking
 🚯 no littering forbidden litter littering no not prohibited
 🚱 non-potable water dry non-drinking non-potable prohibited water
 🚷 no pedestrians forbidden no not pedestrian pedestrians prohibited
@@ -1518,51 +1527,51 @@
 ⤵️ right arrow curving down arrow curving down right
 🔃 clockwise vertical arrows arrow arrows clockwise refresh reload vertical
 🔄 counterclockwise arrows button again anticlockwise arrow arrows button counterclockwise deja refresh rewindershins vu
-🔙 BACK arrow arrow back
-🔚 END arrow arrow end
-🔛 ON! arrow arrow mark on!
-🔜 SOON arrow arrow brb omw soon
-🔝 TOP arrow arrow homie top up
+🔙 BACK arrow BACK arrow
+🔚 END arrow END arrow
+🔛 ON! arrow ON! arrow mark
+🔜 SOON arrow SOON arrow brb omw
+🔝 TOP arrow TOP arrow homie up
 🛐 place of worship place pray religion worship
 ⚛️ atom symbol atheist atom symbol
-🕉️ om hindu religion
-✡️ star of David david jew jewish judaism religion star
-☸️ wheel of dharma buddhist dharma religion wheel
+🕉️ om Hindu religion
+✡️ star of David David Jew Jewish judaism religion star
+☸️ wheel of dharma Buddhist dharma religion wheel
 ☯️ yin yang difficult lives religion tao taoist total yang yin yinyang
-✝️ latin cross christ christian cross latin religion
-☦️ orthodox cross christian cross orthodox religion
-☪️ star and crescent crescent islam muslim ramadan religion star
+✝️ latin cross Christian christ cross latin religion
+☦️ orthodox cross Christian cross orthodox religion
+☪️ star and crescent Muslim crescent islam ramadan religion star
 ☮️ peace symbol healing peace peaceful symbol
 🕎 menorah candelabrum candlestick hanukkah jewish judaism religion
 🔯 dotted six-pointed star dotted fortune jewish judaism six-pointed star
-🪯 khanda deg fateh khalsa religion sikh sikhism tegh
-♈️ Aries aries horoscope ram zodiac
-♉️ Taurus bull horoscope ox taurus zodiac
-♊️ Gemini gemini horoscope twins zodiac
-♋️ Cancer cancer crab horoscope zodiac
-♌️ Leo horoscope leo lion zodiac
-♍️ Virgo horoscope virgo zodiac
-♎️ Libra balance horoscope justice libra scales zodiac
-♏️ Scorpio horoscope scorpio scorpion scorpius zodiac
-♐️ Sagittarius archer horoscope sagittarius zodiac
-♑️ Capricorn capricorn goat horoscope zodiac
-♒️ Aquarius aquarius bearer horoscope water zodiac
-♓️ Pisces fish horoscope pisces zodiac
-⛎️ Ophiuchus bearer ophiuchus serpent snake zodiac
+🪯 khanda Deg Fateh Khalsa Khanda Sikh Sikhism Tegh religion
+♈ Aries horoscope ram zodiac
+♉ Taurus bull horoscope ox zodiac
+♊ Gemini horoscope twins zodiac
+♋ Cancer crab horoscope zodiac
+♌ Leo horoscope lion zodiac
+♍ Virgo horoscope zodiac
+♎ Libra balance horoscope justice scales zodiac
+♏ Scorpio Scorpius horoscope scorpion zodiac
+♐ Sagittarius archer horoscope zodiac
+♑ Capricorn goat horoscope zodiac
+♒ Aquarius bearer horoscope water zodiac
+♓ Pisces fish horoscope zodiac
+⛎ Ophiuchus bearer serpent snake zodiac
 🔀 shuffle tracks button arrow button crossed shuffle tracks
 🔁 repeat button arrow button clockwise repeat
 🔂 repeat single button arrow button clockwise once repeat single
 ▶️ play button arrow button play right triangle
-⏩️ fast-forward button arrow button double fast fast-forward forward
+⏩ fast-forward button arrow button double fast fast-forward forward
 ⏭️ next track button arrow button next scene track triangle
 ⏯️ play or pause button arrow button pause play right triangle
 ◀️ reverse button arrow button left reverse triangle
-⏪️ fast reverse button arrow button double fast reverse rewind
+⏪ fast reverse button arrow button double fast reverse rewind
 ⏮️ last track button arrow button last previous scene track triangle
 🔼 upwards button arrow button red up upwards
-⏫️ fast up button arrow button double fast up
+⏫ fast up button arrow button double fast up
 🔽 downwards button arrow button down downwards red
-⏬️ fast down button arrow button double down fast
+⏬ fast down button arrow button double down fast
 ⏸️ pause button bar button double pause vertical
 ⏹️ stop button button square stop
 ⏺️ record button button circle record
@@ -1578,17 +1587,17 @@
 ♂️ male sign male man sign
 ⚧️ transgender symbol symbol transgender
 ✖️ multiply cancel multiplication sign x ×
-➕️ plus +
-➖️ minus - heavy math sign −
-➗️ divide division heavy math sign ÷
+➕ plus +
+➖ minus - heavy math sign −
+➗ divide division heavy math sign ÷
 🟰 heavy equals sign answer equal equality equals heavy math sign
 ♾️ infinity forever unbounded universal
 ‼️ double exclamation mark ! !! bangbang double exclamation mark punctuation
 ⁉️ exclamation question mark ! !? ? exclamation interrobang mark punctuation question
-❓️ red question mark ? mark punctuation question red
-❔️ white question mark ? mark outlined punctuation question white
-❕️ white exclamation mark ! exclamation mark outlined punctuation white
-❗️ red exclamation mark ! exclamation mark punctuation red
+❓ red question mark ? mark punctuation question red
+❔ white question mark ? mark outlined punctuation question white
+❕ white exclamation mark ! bang exclamation mark outlined punctuation white
+❗ red exclamation mark ! bang exclamation mark punctuation red
 〰️ wavy dash dash punctuation wavy
 💱 currency exchange bank currency exchange money
 💲 heavy dollar sign billion cash charge currency dollar heavy million money pay sign
@@ -1597,22 +1606,22 @@
 ⚜️ fleur-de-lis knights
 🔱 trident emblem anchor emblem poseidon ship tool trident
 📛 name badge badge name
-🔰 Japanese symbol for beginner beginner chevron green japanese leaf symbol tool yellow
-⭕️ hollow red circle circle heavy hollow large o red
-✅️ check mark button button check checked checkmark complete completed done fixed mark tick ✓
+🔰 Japanese symbol for beginner Japanese beginner chevron green leaf symbol tool yellow
+⭕ hollow red circle circle heavy hollow large o red
+✅ check mark button button check checked checkmark complete completed done fixed mark tick ✓
 ☑️ check box with check ballot box check checked done off tick ✓
 ✔️ check mark check checked checkmark done heavy mark tick ✓
-❌️ cross mark cancel cross mark multiplication multiply x ×
-❎️ cross mark button button cross mark multiplication multiply square x ×
-➰️ curly loop curl curly loop
-➿️ double curly loop curl curly double loop
+❌ cross mark cancel cross mark multiplication multiply x ×
+❎ cross mark button button cross mark multiplication multiply square x ×
+➰ curly loop curl curly loop
+➿ double curly loop curl curly double loop
 〽️ part alternation mark alternation mark part
 ✳️ eight-spoked asterisk * asterisk eight-spoked
 ✴️ eight-pointed star * eight-pointed star
 ❇️ sparkle *
-©️ copyright c
-®️ registered r
-™️ trade mark mark tm trade trademark
+©️ copyright C
+®️ registered R
+™️ trade mark TM mark trade trademark
 🫟 splatter drip holi ink liquid mess paint spill stain
 #️⃣ keycap: # keycap
 *️⃣ keycap: * keycap
@@ -1627,45 +1636,45 @@
 8️⃣ keycap: 8 8 eight keycap
 9️⃣ keycap: 9 9 keycap nine
 🔟 keycap: 10 keycap
-🔠 input latin uppercase abcd input latin letters uppercase
+🔠 input latin uppercase ABCD input latin letters uppercase
 🔡 input latin lowercase abcd input latin letters lowercase
 🔢 input numbers 1234 input numbers
 🔣 input symbols % & input symbols ♪ 〒
 🔤 input latin letters abc alphabet input latin letters
 🅰️ A button (blood type) blood button type
-🆎 AB button (blood type) ab blood button type
-🅱️ B button (blood type) b blood button type
-🆑 CL button button cl
-🆒 COOL button button cool
-🆓 FREE button button free
-ℹ️ information i
-🆔 ID button button id identity
-Ⓜ️ circled M circle circled m
-🆕 NEW button button new
-🆖 NG button button ng
-🅾️ O button (blood type) blood button o type
-🆗 OK button button ok okay
-🅿️ P button button p parking
-🆘 SOS button button help sos
-🆙 UP! button button mark up up!
-🆚 VS button button versus vs
-🈁 Japanese “here” button button here japanese katakana
-🈂️ Japanese “service charge” button button charge japanese katakana service
-🈷️ Japanese “monthly amount” button amount button ideograph japanese monthly
-🈶 Japanese “not free of charge” button button charge free ideograph japanese not
-🈯️ Japanese “reserved” button button ideograph japanese reserved
-🉐 Japanese “bargain” button bargain button ideograph japanese
-🈹 Japanese “discount” button button discount ideograph japanese
-🈚️ Japanese “free of charge” button button charge free ideograph japanese
-🈲 Japanese “prohibited” button button ideograph japanese prohibited
-🉑 Japanese “acceptable” button acceptable button ideograph japanese
-🈸 Japanese “application” button application button ideograph japanese
-🈴 Japanese “passing grade” button button grade ideograph japanese passing
-🈳 Japanese “vacancy” button button ideograph japanese vacancy
-㊗️ Japanese “congratulations” button button congratulations ideograph japanese
-㊙️ Japanese “secret” button button ideograph japanese secret
-🈺 Japanese “open for business” button business button ideograph japanese open
-🈵 Japanese “no vacancy” button button ideograph japanese no vacancy
+🆎 AB button (blood type) AB blood button type
+🅱️ B button (blood type) B blood button type
+🆑 CL button CL button
+🆒 COOL button COOL button
+🆓 FREE button FREE button
+ℹ️ information I
+🆔 ID button ID button identity
+Ⓜ️ circled M M circle circled
+🆕 NEW button NEW button
+🆖 NG button NG button
+🅾️ O button (blood type) O blood button type
+🆗 OK button OK button okay
+🅿️ P button P button parking
+🆘 SOS button SOS button help
+🆙 UP! button UP UP! button mark
+🆚 VS button VS button versus
+🈁 Japanese “here” button Japanese button here katakana
+🈂️ Japanese “service charge” button Japanese button charge katakana service
+🈷️ Japanese “monthly amount” button Japanese amount button ideograph monthly
+🈶 Japanese “not free of charge” button Japanese button charge free ideograph not
+🈯 Japanese “reserved” button Japanese button ideograph reserved
+🉐 Japanese “bargain” button Japanese bargain button ideograph
+🈹 Japanese “discount” button Japanese button discount ideograph
+🈚 Japanese “free of charge” button Japanese button charge free ideograph
+🈲 Japanese “prohibited” button Japanese button ideograph prohibited
+🉑 Japanese “acceptable” button Japanese acceptable button ideograph
+🈸 Japanese “application” button Japanese application button ideograph
+🈴 Japanese “passing grade” button Japanese button grade ideograph passing
+🈳 Japanese “vacancy” button Japanese button ideograph vacancy
+㊗️ Japanese “congratulations” button Japanese button congratulations ideograph
+㊙️ Japanese “secret” button Japanese button ideograph secret
+🈺 Japanese “open for business” button Japanese business button ideograph open
+🈵 Japanese “no vacancy” button Japanese button ideograph no vacancy
 🔴 red circle circle geometric red
 🟠 orange circle circle orange
 🟡 yellow circle circle yellow
@@ -1673,8 +1682,8 @@
 🔵 blue circle blue circle geometric
 🟣 purple circle circle purple
 🟤 brown circle brown circle
-⚫️ black circle black circle geometric
-⚪️ white circle circle geometric white
+⚫ black circle black circle geometric
+⚪ white circle circle geometric white
 🟥 red square card penalty red square
 🟧 orange square orange square
 🟨 yellow square card penalty square yellow
@@ -1682,12 +1691,12 @@
 🟦 blue square blue square
 🟪 purple square purple square
 🟫 brown square brown square
-⬛️ black large square black geometric large square
-⬜️ white large square geometric large square white
+⬛ black large square black geometric large square
+⬜ white large square geometric large square white
 ◼️ black medium square black geometric medium square
 ◻️ white medium square geometric medium square white
-◾️ black medium-small square black geometric medium-small square
-◽️ white medium-small square geometric medium-small square white
+◾ black medium-small square black geometric medium-small square
+◽ white medium-small square geometric medium-small square white
 ▪️ black small square black geometric small square
 ▫️ white small square geometric small square white
 🔶 large orange diamond diamond geometric large orange
@@ -1702,12 +1711,12 @@
 🔲 black square button black button geometric square
 🏁 chequered flag checkered chequered finish flag flags game race racing sport win
 🚩 triangular flag construction flag golf post triangular
-🎌 crossed flags celebration cross crossed flags japanese
+🎌 crossed flags Japanese celebration cross crossed flags
 🏴 black flag black flag waving
 🏳️ white flag flag waving white
 🏳️‍🌈 rainbow flag bisexual flag gay genderqueer glbt glbtq lesbian lgbt lgbtq lgbtqia pride queer rainbow trans transgender
 🏳️‍⚧️ transgender flag blue flag light pink transgender white
-🏴‍☠️ pirate flag flag jolly pirate plunder roger treasure
+🏴‍☠️ pirate flag Jolly Roger flag pirate plunder treasure
 🇦🇨 flag: Ascension Island AC flag
 🇦🇩 flag: Andorra AD flag
 🇦🇪 flag: United Arab Emirates AE flag
@@ -1809,7 +1818,7 @@
 🇬🇼 flag: Guinea-Bissau GW flag
 🇬🇾 flag: Guyana GY flag
 🇭🇰 flag: Hong Kong SAR China HK flag
-🇭🇲 flag: Heard & McDonald Islands HM flag
+🇭🇲 flag: Heard Island & McDonald Islands HM flag
 🇭🇳 flag: Honduras HN flag
 🇭🇷 flag: Croatia HR flag
 🇭🇹 flag: Haiti HT flag
@@ -1913,7 +1922,7 @@
 🇸🇩 flag: Sudan SD flag
 🇸🇪 flag: Sweden SE flag
 🇸🇬 flag: Singapore SG flag
-🇸🇭 flag: St. Helena SH flag
+🇸🇭 flag: St. Helena, Ascension & Tristan da Cunha SH flag
 🇸🇮 flag: Slovenia SI flag
 🇸🇯 flag: Svalbard & Jan Mayen SJ flag
 🇸🇰 flag: Slovakia SK flag
@@ -1931,7 +1940,7 @@
 🇹🇦 flag: Tristan da Cunha TA flag
 🇹🇨 flag: Turks & Caicos Islands TC flag
 🇹🇩 flag: Chad TD flag
-🇹🇫 flag: French Southern Territories TF flag
+🇹🇫 flag: French Southern and Antarctic Lands TF flag
 🇹🇬 flag: Togo TG flag
 🇹🇭 flag: Thailand TH flag
 🇹🇯 flag: Tajikistan TJ flag
