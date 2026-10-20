@@ -65,7 +65,10 @@ def get_size(wall: Path) -> tuple[int, int]:
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
-    width, height = get_size(wall)
+    try:
+        width, height = get_size(wall)
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        return False
     return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
 
 
