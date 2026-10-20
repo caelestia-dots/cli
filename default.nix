@@ -27,7 +27,6 @@ python3.pkgs.buildPythonApplication {
   pyproject = true;
 
   build-system = with python3.pkgs; [
-    hatch-vcs
     hatchling
   ];
 
@@ -57,7 +56,6 @@ python3.pkgs.buildPythonApplication {
     ]
     ++ lib.optional withShell caelestia-shell;
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = 1;
 
   patchPhase = ''
     # Replace qs config call with nix shell pkg bin

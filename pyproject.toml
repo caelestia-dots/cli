@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
@@ -13,9 +13,6 @@ dependencies = [
 
 [project.scripts]
 caelestia = "caelestia:main"
-
-[tool.hatch.version]
-source = "vcs"
 
 [tool.hatch.build.targets.sdist]
 only-include = [
