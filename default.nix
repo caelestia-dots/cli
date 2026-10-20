@@ -58,15 +58,9 @@ python3.pkgs.buildPythonApplication {
     ]
     ++ lib.optional withShell caelestia-shell;
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = "${rev}";
+  SETUPTOOLS_SCM_PRETEND_VERSION = "0+g${lib.removeSuffix "-dirty" rev}";
 
   patchPhase = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail 'source = "vcs"' 'source = "independent"' \
-      --replace-fail 'version = "${rev}"' || true
-
-    echo "${rev}" > .version
-    
     # Replace qs config call with nix shell pkg bin
     substituteInPlace src/caelestia/subcommands/shell.py \
     	--replace-fail '"qs", "-c", "caelestia"' '"caelestia-shell"'
