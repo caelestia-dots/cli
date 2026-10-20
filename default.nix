@@ -51,6 +51,7 @@ python3.pkgs.buildPythonApplication {
       grim
       fuzzel
       gpu-screen-recorder
+      ffmpeg
       dconf
       killall
     ]
