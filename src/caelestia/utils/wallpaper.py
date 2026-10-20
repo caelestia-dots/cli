@@ -52,12 +52,13 @@ def get_size(wall: Path) -> tuple[int, int]:
                 "-show_entries",
                 "stream=width,height",
                 "-of",
-                "csv=p=0",
+                "default=nw=1:nk=1",
                 wall,
             ],
             text=True,
+            stderr=subprocess.DEVNULL,
         )
-        width, height = out.strip().split(",")
+        width, height = out.split()
         return int(width), int(height)
 
     with Image.open(wall) as img:
