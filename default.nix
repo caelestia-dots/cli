@@ -13,6 +13,7 @@
   grim,
   fuzzel,
   gpu-screen-recorder,
+  ffmpeg,
   dconf,
   killall,
   caelestia-shell,
