@@ -63,13 +63,16 @@ class Score:
             if primary:
                 break
 
-        if primary:
+        if primary is not None:
             return DislikeAnalyzer.fix_if_disliked(primary)
 
-        if scored_hct:
-            return scored_hct[0]["hct"]
+        if filter_enabled:
+            return Score.score(colors_to_population, False)
 
-        return DislikeAnalyzer.fix_if_disliked(None)
+        if scored_hct:
+            return DislikeAnalyzer.fix_if_disliked(scored_hct[0]["hct"])
+
+        raise ValueError("No colors available for scoring")
 
 
 def score(image: str) -> Hct:
