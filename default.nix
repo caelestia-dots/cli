@@ -13,6 +13,7 @@
   grim,
   fuzzel,
   gpu-screen-recorder,
+  ffmpeg,
   dconf,
   killall,
   caelestia-shell,
@@ -57,7 +58,7 @@ python3.pkgs.buildPythonApplication {
     ]
     ++ lib.optional withShell caelestia-shell;
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = 1;
+  env.SETUPTOOLS_SCM_PRETEND_VERSION = 1;
 
   patchPhase = ''
     # Replace qs config call with nix shell pkg bin
