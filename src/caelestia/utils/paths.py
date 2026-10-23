@@ -31,6 +31,7 @@ dots_state_path: Path = c_state_dir / "dots-state.json"
 
 scheme_path: Path = c_state_dir / "scheme.json"
 scheme_data_dir: Path = cli_data_dir / "schemes"
+user_scheme_data_dir: Path = c_config_dir / "schemes"
 scheme_cache_dir: Path = c_cache_dir / "schemes"
 
 wallpapers_dir: Path = Path(os.getenv("CAELESTIA_WALLPAPERS_DIR", pictures_dir / "Wallpapers"))
