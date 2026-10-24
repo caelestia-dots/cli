@@ -16,14 +16,15 @@ def message(msg: str, is_json: bool = True) -> str | dict[str, Any]:
 
         if is_json:
             msg = f"j/{msg}"
-        sock.send(msg.encode())
+        sock.sendall(msg.encode())
 
-        resp = sock.recv(8192).decode()
+        chunks = []
         while True:
-            new_resp = sock.recv(8192)
-            if not new_resp:
+            chunk = sock.recv(8192)
+            if not chunk:
                 break
-            resp += new_resp.decode()
+            chunks.append(chunk)
+        resp = b"".join(chunks).decode()
 
         return json.loads(resp) if is_json else resp
 
