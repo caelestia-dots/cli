@@ -141,7 +141,7 @@ private slots:
         const auto result = set({ .name = u"dynamic"_s });
         QCOMPARE(result.exit, 0);
         QVERIFY(result.err.isEmpty());
-        QCOMPARE(lib::loadStateRef()->name, u"dynamic"_s);
+        QCOMPARE(current().name, u"dynamic"_s);
     }
 
     void dispatchesFromParser() {

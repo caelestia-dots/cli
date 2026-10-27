@@ -21,14 +21,21 @@ private:
         });
     }
 
-    static void verifyCurrentExists() {
+    [[nodiscard]] static lib::SchemeRef current() {
         const auto state = lib::loadStateRef();
-        QVERIFY(state);
-        const auto scheme = lib::Scheme::forName(state->name).result();
+        if (!state)
+            throw std::runtime_error("no scheme state");
+        return *state;
+    }
+
+    static void verifyCurrentExists() {
+        const auto state = current();
+        const auto scheme = lib::Scheme::forName(state.name).result();
         QVERIFY(scheme);
-        const auto flavour = scheme->flavour(state->flavour);
-        QVERIFY(flavour);
-        QVERIFY(flavour->modes().contains(state->mode));
+        const auto flavour = scheme->flavour(state.flavour);
+        if (!flavour)
+            QFAIL("flavour does not exist");
+        QVERIFY(flavour->modes().contains(state.mode));
     }
 
 private slots:
@@ -44,7 +51,7 @@ private slots:
             QCOMPARE(result.exit, 0);
             QVERIFY(result.err.isEmpty());
             verifyCurrentExists();
-            const auto state = *lib::loadStateRef();
+            const auto state = current();
             QCOMPARE(
                 result.out, u"Scheme set to %1 (%2, %3)\n"_s.arg(state.name, state.flavour, lib::modeName(state.mode)));
             seen.insert(state.name);
@@ -56,7 +63,7 @@ private slots:
         const auto result = random(true);
         QCOMPARE(result.exit, 0);
         verifyCurrentExists();
-        const auto state = *lib::loadStateRef();
+        const auto state = current();
         const auto json = result.json();
         QCOMPARE(json.value(u"name"_s).toString(), state.name);
         QCOMPARE(json.value(u"flavour"_s).toString(), state.flavour);

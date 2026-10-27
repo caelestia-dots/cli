@@ -44,7 +44,7 @@ private slots:
     }
 
     void listsAllJson() {
-        const auto result = list({}, true);
+        const auto result = list(scheme::ListArgs(), true);
         QCOMPARE(result.exit, 0);
         const auto schemes = result.json().value(u"schemes"_s).toArray();
         QCOMPARE(schemes.last().toObject().value(u"name"_s).toString(), u"dynamic"_s);
@@ -54,7 +54,7 @@ private slots:
         QCOMPARE(entry(flavours, u"latte"_s).value(u"modes"_s).toArray(), QJsonArray{ u"light"_s });
     }
 
-    void allFlagsMatchNoFlags() { QCOMPARE(list({ true, true, true }, true).out, list({}, true).out); }
+    void allFlagsMatchNoFlags() { QCOMPARE(list({ true, true, true }, true).out, list(scheme::ListArgs(), true).out); }
 
     void listsNames() {
         const auto result = list({ .names = true });

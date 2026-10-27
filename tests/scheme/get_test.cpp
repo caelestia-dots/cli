@@ -33,7 +33,7 @@ private slots:
     }
 
     void failsWhenUnsetJson() {
-        const auto result = get({}, true);
+        const auto result = get(scheme::GetArgs(), true);
         QCOMPARE(result.exit, 1);
         QVERIFY(result.err.isEmpty());
         QCOMPARE(result.json().value(u"error"_s).toString(), u"Scheme has not been set or is invalid"_s);
@@ -54,7 +54,7 @@ private slots:
 
     void printsAllJson() {
         seedScheme(u"caelestia"_s, u"default"_s, lib::Mode::Light);
-        const auto result = get({}, true);
+        const auto result = get(scheme::GetArgs(), true);
         QCOMPARE(result.exit, 0);
         const auto json = result.json();
         QCOMPARE(json.value(u"name"_s).toString(), u"caelestia"_s);
