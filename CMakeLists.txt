@@ -19,6 +19,12 @@ qt_standard_project_setup()
 
 add_subdirectory(src)
 
+option(BUILD_TESTING "Build tests" OFF)
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 install(FILES completions/caelestia.fish
     DESTINATION "${CMAKE_INSTALL_DATADIR}/fish/vendor_completions.d"
 )
