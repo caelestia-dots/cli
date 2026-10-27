@@ -246,6 +246,8 @@ private slots:
         QVERIFY(m_out.context.json);
         QCOMPARE(run({ u"scheme"_s, u"set"_s, u"-n"_s, u"x"_s, u"--json"_s }), 0);
         QVERIFY(m_out.context.json);
+        QCOMPARE(run({ u"-j"_s, u"scheme"_s, u"set"_s, u"-jn"_s, u"x"_s }), 0);
+        QVERIFY(m_out.context.json);
     }
 
     void runExitCodePropagates() { QCOMPARE(run({ u"scheme"_s, u"random"_s }), 7); }

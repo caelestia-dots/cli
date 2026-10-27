@@ -40,7 +40,7 @@ const QList<GlobalSpec>& globalSpecs() {
         },
         {
             .id = Global::Json,
-            .spec = { .longName = u"json"_s, .help = u"print machine-readable output where supported"_s },
+            .spec = { .shortName = u'j', .longName = u"json"_s, .help = u"print machine-readable output"_s },
         },
     };
     return k_specs;
