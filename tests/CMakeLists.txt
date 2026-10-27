@@ -12,4 +12,5 @@ function(create_test module name)
 endfunction()
 
 add_subdirectory(parser)
+add_subdirectory(scheme)
 add_subdirectory(wallpaper)

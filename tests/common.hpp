@@ -15,6 +15,7 @@
 #include <qtest.h>
 
 #include <caelestia/config/config.hpp>
+#include <caelestia/scheme/scheme.hpp>
 #include <unistd.h>
 
 #include <cstdio>
@@ -51,6 +52,11 @@ inline QString saveImage(const QString& path, QRgb colour = 0xFF2962FF) {
     QImage image(8, 8, QImage::Format_RGB32);
     image.fill(colour);
     return image.save(path) ? path : QString();
+}
+
+inline void seedScheme(const QString& name, const QString& flavour, caelestia::scheme::Mode mode) {
+    const auto seed = caelestia::scheme::defaultScheme().result();
+    QVERIFY(caelestia::scheme::saveState({ .name = name, .flavour = flavour, .mode = mode, .colours = seed.colours }));
 }
 
 struct Output {
