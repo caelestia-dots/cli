@@ -20,16 +20,29 @@ namespace ansi = common::ansi;
 namespace {
 
 constexpr QStringView k_dynamic = u"dynamic";
+constexpr QStringView k_noState = u"Scheme has not been set or is invalid";
+
+using Entries = QList<std::pair<QString, QStringList>>;
 
 void printJson(const QJsonObject& json) {
     QTextStream(stdout) << QJsonDocument(json).toJson(QJsonDocument::Indented) << u'\n';
 }
 
-int printError(const QString& err, bool json) {
-    if (json)
-        QTextStream(stdout) << u"{ \"error\": \""_s << err << u"\" }\n"_s;
-    else
+void printWarnings(const QStringList& warnings) {
+    for (const auto& warning : warnings)
+        QTextStream(stderr) << warning << u'\n';
+}
+
+int printError(const QString& err, bool json, const QStringList& warnings = {}) {
+    if (json) {
+        QJsonObject obj{ { u"error"_s, err } };
+        if (!warnings.isEmpty())
+            obj.insert(u"warnings"_s, QJsonArray::fromStringList(warnings));
+        printJson(obj);
+    } else {
+        printWarnings(warnings);
         QTextStream(stderr) << err << u'\n';
+    }
     return 1;
 }
 
@@ -70,153 +83,189 @@ QList<lib::Mode> schemeModes(const lib::Scheme& scheme) {
     return modes;
 }
 
-} // namespace
+Entries flavourEntries(const lib::Scheme& scheme) {
+    Entries entries;
+    const auto flavours = scheme.flavours();
+    for (const auto& flavour : flavours)
+        entries << std::pair{ flavour.name(), modeNames(flavour.modes()) };
+    return entries;
+}
 
-int list(const ListArgs& args, const parser::Context& context) {
-    const auto argCount = args.names + args.flavours + args.modes;
-    const auto all = argCount == 0 || argCount == 3;
+std::shared_ptr<lib::Scheme> schemeForName(const QString& name) {
+    return name == k_dynamic ? lib::Scheme::forColour(Qt::black) : lib::Scheme::forName(name).takeResult();
+}
 
-    QList<std::shared_ptr<lib::Scheme>> schemes;
-    std::shared_ptr<lib::Scheme> current;
-    std::optional<lib::Flavour> currentFlavour;
-    try {
-        if (all || args.names) {
-            schemes = lib::Scheme::all().takeResult();
-            schemes << lib::Scheme::forColour(Qt::black);
-        } else {
-            const auto state = lib::loadStateRef();
-            if (!state)
-                return printError(u"Scheme has not been set or is invalid"_s, context.json);
-            current = state->name == k_dynamic ? lib::Scheme::forColour(Qt::black)
-                                               : lib::Scheme::forName(state->name).takeResult();
-            if (!current)
-                return printError(u"Scheme \"%1\" does not exist"_s.arg(state->name), context.json);
-            currentFlavour = current->flavour(state->flavour);
-        }
-    } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), context.json);
+void printValues(const QString& key, const QStringList& values, bool json) {
+    if (json) {
+        printJson({ { key, QJsonArray::fromStringList(values) } });
+        return;
     }
 
-    if (argCount == 1) {
-        QString key;
-        QStringList values;
-        if (args.names) {
-            key = u"names"_s;
-            for (const auto& scheme : std::as_const(schemes))
-                values << scheme->name();
-        } else if (args.flavours) {
-            key = u"flavours"_s;
-            values = flavourNames(*current);
-        } else {
-            if (!currentFlavour)
-                return printError(u"Scheme flavour has not been set or is invalid"_s, context.json);
-            key = u"modes"_s;
-            values = modeNames(currentFlavour->modes());
-        }
+    for (const auto& value : values)
+        QTextStream(stdout) << value << u'\n';
+}
 
-        if (context.json) {
-            printJson({ { key, QJsonArray::fromStringList(values) } });
-        } else {
-            for (const auto& value : std::as_const(values))
-                QTextStream(stdout) << value << u'\n';
-        }
-        return 0;
-    }
-
-    if (all) {
-        QJsonArray schemeArr;
-        for (const auto& scheme : std::as_const(schemes)) {
-            const auto flavours = scheme->flavours();
-            if (context.json) {
-                QJsonArray flavourArr;
-                for (const auto& flavour : flavours)
-                    flavourArr << entry(flavour.name(), u"modes"_s, modeNames(flavour.modes()));
-                schemeArr << QJsonObject{ { u"name"_s, scheme->name() }, { u"flavours"_s, flavourArr } };
-            } else {
-                QTextStream(stdout) << ansi::styled(ansi::Bold | ansi::Cyan, scheme->name()) << u'\n';
-                for (const auto& flavour : flavours)
-                    printLine(flavour.name(), modeNames(flavour.modes()), 2, {}, ansi::Dim);
-            }
-        }
-
-        if (context.json)
-            printJson({ { u"schemes"_s, schemeArr } });
-
-        return 0;
-    }
-
-    QString key;
-    QString childKey;
-    QList<std::pair<QString, QStringList>> entries;
-    if (args.names && args.flavours) {
-        key = u"schemes"_s;
-        childKey = u"flavours"_s;
-        for (const auto& scheme : std::as_const(schemes))
-            entries << std::pair{ scheme->name(), flavourNames(*scheme) };
-    } else if (args.names && args.modes) {
-        key = u"schemes"_s;
-        childKey = u"modes"_s;
-        for (const auto& scheme : std::as_const(schemes))
-            entries << std::pair{ scheme->name(), modeNames(schemeModes(*scheme)) };
-    } else {
-        key = u"flavours"_s;
-        childKey = u"modes"_s;
-        const auto flavours = current->flavours();
-        for (const auto& flavour : flavours)
-            entries << std::pair{ flavour.name(), modeNames(flavour.modes()) };
-    }
-
-    if (context.json) {
+void printEntries(const QString& key, const QString& childKey, const Entries& entries, bool json) {
+    if (json) {
         QJsonArray arr;
-        for (const auto& [name, values] : std::as_const(entries))
+        for (const auto& [name, values] : entries)
             arr << entry(name, childKey, values);
         printJson({ { key, arr } });
+        return;
+    }
+
+    for (const auto& [name, values] : entries)
+        printLine(name, values);
+}
+
+void printAll(const QList<std::shared_ptr<lib::Scheme>>& schemes, bool json) {
+    QJsonArray schemeArr;
+    for (const auto& scheme : schemes) {
+        const auto entries = flavourEntries(*scheme);
+        if (json) {
+            QJsonArray flavourArr;
+            for (const auto& [name, modes] : entries)
+                flavourArr << entry(name, u"modes"_s, modes);
+            schemeArr << QJsonObject{ { u"name"_s, scheme->name() }, { u"flavours"_s, flavourArr } };
+        } else {
+            QTextStream(stdout) << ansi::styled(ansi::Bold | ansi::Cyan, scheme->name()) << u'\n';
+            for (const auto& [name, modes] : entries)
+                printLine(name, modes, 2, {}, ansi::Dim);
+        }
+    }
+
+    if (json)
+        printJson({ { u"schemes"_s, schemeArr } });
+}
+
+int listCurrent(const ListArgs& args, const parser::Context& context) {
+    const auto state = lib::loadStateRef();
+    if (!state)
+        return printError(k_noState.toString(), context.json);
+
+    const auto current = schemeForName(state->name);
+    if (!current)
+        return printError(u"Scheme \"%1\" does not exist"_s.arg(state->name), context.json);
+
+    if (args.flavours && args.modes) {
+        printEntries(u"flavours"_s, u"modes"_s, flavourEntries(*current), context.json);
+    } else if (args.flavours) {
+        printValues(u"flavours"_s, flavourNames(*current), context.json);
     } else {
-        for (const auto& [name, values] : std::as_const(entries))
-            printLine(name, values);
+        const auto flavour = current->flavour(state->flavour);
+        if (!flavour)
+            return printError(u"Scheme flavour has not been set or is invalid"_s, context.json);
+
+        printValues(u"modes"_s, modeNames(flavour->modes()), context.json);
     }
 
     return 0;
 }
 
-int get(const GetArgs& args, const parser::Context& context) {
-    const auto state = lib::loadStateRef();
-    if (!state) {
-        const auto err = u"Scheme has not been set or is invalid"_s;
-        if (context.json)
-            QTextStream(stdout) << u"{ \"error\": \""_s << err << u"\" }\n"_s;
-        else
-            QTextStream(stderr) << err << u'\n';
-        return 1;
-    }
+int listNamed(const ListArgs& args, const parser::Context& context) {
+    auto schemes = lib::Scheme::all().takeResult();
+    schemes << lib::Scheme::forColour(Qt::black);
 
-    if (args.name + args.flavour + args.mode == 1) {
-        const auto print = [json = context.json](const QString& label, const QString& val) {
-            if (json)
-                QTextStream(stdout) << u"{ \""_s << label << u"\": \""_s << val << u"\" }\n"_s;
-            else
-                QTextStream(stdout) << val << u'\n';
-        };
-
-        if (args.name)
-            print(u"name"_s, state->name);
-        if (args.flavour)
-            print(u"flavour"_s, state->flavour);
-        if (args.mode)
-            print(u"mode"_s, lib::modeName(state->mode));
-
+    if (args.flavours == args.modes) {
+        if (!args.flavours) {
+            QStringList names;
+            for (const auto& scheme : std::as_const(schemes))
+                names << scheme->name();
+            printValues(u"names"_s, names, context.json);
+        } else {
+            printAll(schemes, context.json);
+        }
         return 0;
     }
 
+    Entries entries;
+    for (const auto& scheme : std::as_const(schemes))
+        entries << std::pair{ scheme->name(), args.flavours ? flavourNames(*scheme) : modeNames(schemeModes(*scheme)) };
+    printEntries(u"schemes"_s, args.flavours ? u"flavours"_s : u"modes"_s, entries, context.json);
+    return 0;
+}
+
+std::shared_ptr<lib::Scheme> resolveScheme(const std::optional<QString>& requested, QStringList& warnings) {
+    auto name = requested;
+    if (name && *name != k_dynamic && !std::ranges::any_of(lib::Scheme::all().takeResult(), [&name](const auto& s) {
+            return s->name() == *name;
+        })) {
+        warnings << u"Scheme \"%1\" does not exist"_s.arg(*name);
+        name.reset();
+    }
+
+    if (!name) {
+        const auto state = lib::loadStateRef();
+        name = state ? state->name : lib::defaultScheme().takeResult().name;
+    }
+
+    return *name == k_dynamic ? lib::Scheme::forMedia(wallpaper::currentWallpaper()).takeResult()
+                              : lib::Scheme::forName(*name).takeResult();
+}
+
+lib::Flavour resolveFlavour(const lib::Scheme& scheme, const std::optional<QString>& requested, QStringList& warnings) {
+    if (requested) {
+        if (auto flavour = scheme.flavour(*requested))
+            return *flavour;
+        warnings << u"\"%1\" is not a flavour of scheme %2"_s.arg(*requested, scheme.name());
+    }
+
+    if (const auto state = lib::loadStateRef())
+        if (auto flavour = scheme.flavour(state->flavour))
+            return *flavour;
+
+    if (scheme.name() == k_dynamic)
+        if (auto flavour = scheme.flavour(
+                lib::smartChoice(media::analyseForPath(wallpaper::currentWallpaper()).takeResult()).flavour))
+            return *flavour;
+
+    return scheme.defaultFlavour();
+}
+
+lib::Mode resolveMode(const QString& schemeName, const lib::Flavour& flavour, const std::optional<lib::Mode>& requested,
+    QStringList& warnings) {
+    if (requested && flavour.modes().contains(*requested))
+        return *requested;
+
+    if (requested)
+        warnings << u"\"%1\" is not a mode of scheme %2 (%3)"_s.arg(
+            lib::modeName(*requested), schemeName, flavour.name());
+
+    return flavour.defaultMode();
+}
+
+} // namespace
+
+int list(const ListArgs& args, const parser::Context& context) {
+    const auto argCount = args.names + args.flavours + args.modes;
+    const auto listAll = argCount == 0 || argCount == 3;
+    try {
+        return listAll || args.names
+                   ? listNamed(listAll ? ListArgs{ .names = true, .flavours = true, .modes = true } : args, context)
+                   : listCurrent(args, context);
+    } catch (const std::exception& e) {
+        return printError(QString::fromUtf8(e.what()), context.json);
+    }
+}
+
+int get(const GetArgs& args, const parser::Context& context) {
+    const auto state = lib::loadStateRef();
+    if (!state)
+        return printError(k_noState.toString(), context.json);
+
+    const auto single = args.name + args.flavour + args.mode == 1;
+    const auto printAll = args.name + args.flavour + args.mode == 0;
+
     QJsonObject json;
-    const auto print = [&json, jsonOut = context.json](const QString& label, const QString& val) {
-        if (jsonOut)
+    const auto print = [&](const QString& label, const QString& val) {
+        if (context.json)
             json.insert(label.toLower(), val);
+        else if (single)
+            QTextStream(stdout) << val << u'\n';
         else
             QTextStream(stdout) << ansi::styled(ansi::Bold | ansi::Cyan, label + u':') << u' ' << val << u'\n';
     };
 
-    const auto printAll = args.name + args.flavour + args.mode == 0;
     if (printAll || args.name)
         print(u"Name"_s, state->name);
     if (printAll || args.flavour)
@@ -233,76 +282,26 @@ int get(const GetArgs& args, const parser::Context& context) {
 int set(const SetArgs& args, const parser::Context& context) {
     QStringList warnings;
     try {
-        const auto invalidName =
-            args.name && *args.name != k_dynamic &&
-            !std::ranges::any_of(lib::Scheme::all().takeResult(), [name = *args.name](const auto& s) {
-                return s->name() == name;
-            });
-        if (invalidName)
-            warnings << u"Scheme \"%1\" does not exist"_s.arg(*args.name);
+        const auto scheme = resolveScheme(args.name, warnings);
+        const auto flavour = resolveFlavour(*scheme, args.flavour, warnings);
+        const auto mode = resolveMode(scheme->name(), flavour, args.mode, warnings);
 
-        auto name = args.name;
-        if (!name || invalidName) {
-            const auto state = lib::loadStateRef();
-            name = state ? state->name : lib::defaultScheme().takeResult().name;
-        }
-        const auto scheme = *name == k_dynamic ? lib::Scheme::forMedia(wallpaper::currentWallpaper()).takeResult()
-                                               : lib::Scheme::forName(*name).takeResult();
-
-        const auto invalidFlavour = args.flavour && !std::ranges::any_of(scheme->flavours(), [args](const auto& f) {
-            return f.name() == *args.flavour;
-        });
-        if (invalidFlavour)
-            warnings << u"\"%1\" is not a flavour of scheme %2"_s.arg(*args.flavour, scheme->name());
-        std::optional<lib::Flavour> flavour;
-        if (args.flavour && !invalidFlavour) {
-            flavour = scheme->flavour(*args.flavour);
-        } else {
-            const auto state = lib::loadStateRef();
-            if (state && std::ranges::any_of(scheme->flavours(), [flavour = state->flavour](const auto& f) {
-                    return f.name() == flavour;
-                }))
-                flavour = scheme->flavour(state->flavour);
-            else if (*name == k_dynamic)
-                flavour = scheme->flavour(
-                    lib::smartChoice(media::analyseForPath(wallpaper::currentWallpaper()).takeResult()).flavour);
-            else
-                flavour = scheme->defaultFlavour();
-        }
-
-        const auto invalidMode = args.mode && !flavour->modes().contains(*args.mode);
-        if (invalidMode)
-            warnings << u"\"%1\" is not a mode of scheme %2 (%3)"_s.arg(
-                lib::modeName(*args.mode), scheme->name(), flavour->name());
-        const auto mode = args.mode && !invalidMode ? *args.mode : flavour->defaultMode();
-
-        theme::Theme(flavour->data(mode).takeResult()).apply().waitForFinished();
+        theme::Theme(flavour.data(mode).takeResult()).apply().waitForFinished();
 
         if (context.json) {
-            QJsonObject json;
-            json.insert(u"name"_s, scheme->name());
-            json.insert(u"flavour"_s, flavour->name());
-            json.insert(u"mode"_s, lib::modeName(mode));
-            json.insert(u"warnings"_s, QJsonArray::fromStringList(warnings));
-            QTextStream(stdout) << QJsonDocument(json).toJson(QJsonDocument::Indented) << u'\n';
+            printJson({
+                { u"name"_s, scheme->name() },
+                { u"flavour"_s, flavour.name() },
+                { u"mode"_s, lib::modeName(mode) },
+                { u"warnings"_s, QJsonArray::fromStringList(warnings) },
+            });
         } else {
-            for (const auto& warning : std::as_const(warnings))
-                QTextStream(stderr) << warning << u'\n';
+            printWarnings(warnings);
             QTextStream(stdout) << u"Scheme set to %1 (%2, %3)\n"_s.arg(
-                scheme->name(), flavour->name(), lib::modeName(mode));
+                scheme->name(), flavour.name(), lib::modeName(mode));
         }
     } catch (const std::exception& e) {
-        if (context.json) {
-            QJsonObject json;
-            json.insert(u"error"_s, QString::fromUtf8(e.what()));
-            json.insert(u"warnings"_s, QJsonArray::fromStringList(warnings));
-            QTextStream(stdout) << QJsonDocument(json).toJson(QJsonDocument::Indented) << u'\n';
-        } else {
-            for (const auto& warning : std::as_const(warnings))
-                QTextStream(stderr) << warning << u'\n';
-            QTextStream(stderr) << e.what() << u'\n';
-        }
-        return 1;
+        return printError(QString::fromUtf8(e.what()), context.json, warnings);
     }
     return 0;
 }
