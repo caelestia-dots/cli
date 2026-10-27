@@ -263,7 +263,7 @@ int set(const SetArgs& args, const parser::Context& context) {
                     return f.name() == flavour;
                 }))
                 flavour = scheme->flavour(state->flavour);
-            else if (args.flavour && *args.flavour == k_dynamic)
+            else if (*name == k_dynamic)
                 flavour = scheme->flavour(
                     lib::smartChoice(media::analyseForPath(wallpaper::currentWallpaper()).takeResult()).flavour);
             else

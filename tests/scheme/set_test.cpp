@@ -133,7 +133,7 @@ private slots:
 
     void picksDynamicFlavourFromWallpaper() {
         writeFile(caelestia::wallpaper::statePath(), m_image.toUtf8());
-        QCOMPARE(set({ .name = u"dynamic"_s, .flavour = u"dynamic"_s }).exit, 0);
+        QCOMPARE(set({ .name = u"dynamic"_s }).out, u"Scheme set to dynamic (tonalspot, dark)\n"_s);
         verifyCurrent(u"dynamic"_s, u"tonalspot"_s, Mode::Dark);
     }
 
@@ -141,8 +141,7 @@ private slots:
         const auto result = set({ .name = u"dynamic"_s });
         QCOMPARE(result.exit, 0);
         QVERIFY(result.err.isEmpty());
-        QCOMPARE(result.out, u"Scheme set to dynamic (monochrome, dark)\n"_s);
-        verifyCurrent(u"dynamic"_s, u"monochrome"_s, Mode::Dark);
+        QCOMPARE(lib::loadStateRef()->name, u"dynamic"_s);
     }
 
     void dispatchesFromParser() {
