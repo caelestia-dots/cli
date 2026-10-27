@@ -118,9 +118,9 @@ constexpr std::array<QStringView, 23> k_extraLines = {
     u"󰖳 windows super key",
 };
 
-QJsonDocument download(QStringView url) {
+QJsonDocument download(const QString& url) {
     QNetworkAccessManager manager;
-    QNetworkReply* const reply = manager.get(QNetworkRequest(QUrl(url.toString())));
+    QNetworkReply* const reply = manager.get(QNetworkRequest(QUrl(url)));
 
     QEventLoop loop;
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
@@ -181,24 +181,35 @@ QStringList glyphLines(const QJsonObject& glyphs) {
 
 } // namespace
 
-int fetch(const parser::NoArgs& args, const parser::Context& context) {
-    Q_UNUSED(args);
+FetchSources defaultFetchSources() {
+    return {
+        .emojiUrl = k_emojiUrl.toString(),
+        .glyphUrl = k_glyphUrl.toString(),
+        .outPath = QStringLiteral(CAELESTIA_EMOJI_DATA_PATH),
+    };
+}
 
+int fetchFrom(const FetchSources& sources, bool json) {
     try {
         QStringList lines;
         for (const auto line : k_extraLines)
             lines << line.toString();
-        lines << emojiLines(download(k_emojiUrl).array()) << glyphLines(download(k_glyphUrl).object());
+        lines << emojiLines(download(sources.emojiUrl).array()) << glyphLines(download(sources.glyphUrl).object());
 
-        QSaveFile file(QStringLiteral(CAELESTIA_EMOJI_DATA_PATH));
+        QSaveFile file(sources.outPath);
         if (!file.open(QIODevice::WriteOnly) || file.write(lines.join(u'\n').toUtf8()) < 0 || !file.commit())
             throw std::runtime_error(
                 u"Failed to write %1: %2"_s.arg(file.fileName(), file.errorString()).toStdString());
     } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), context.json);
+        return printError(QString::fromUtf8(e.what()), json);
     }
 
     return 0;
+}
+
+int fetch(const parser::NoArgs& args, const parser::Context& context) {
+    Q_UNUSED(args);
+    return fetchFrom(defaultFetchSources(), context.json);
 }
 
 #endif
