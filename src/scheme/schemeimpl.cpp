@@ -319,7 +319,25 @@ int set(const SetArgs& args, const parser::Context& context) {
 }
 
 int random(const parser::NoArgs& args, const parser::Context& context) {
-    return 0;
+    Q_UNUSED(args);
+
+    SetArgs setArgs;
+    try {
+        auto* const gen = QRandomGenerator::global();
+        const auto schemes = lib::Scheme::all().takeResult();
+        if (schemes.isEmpty())
+            return printError(u"No schemes available"_s, context.json);
+
+        const auto& scheme = schemes[gen->bounded(schemes.size())];
+        const auto flavours = scheme->flavours();
+        const auto& flavour = flavours[gen->bounded(flavours.size())];
+        const auto modes = flavour.modes();
+        setArgs = { .name = scheme->name(), .flavour = flavour.name(), .mode = modes[gen->bounded(modes.size())] };
+    } catch (const std::exception& e) {
+        return printError(QString::fromUtf8(e.what()), context.json);
+    }
+
+    return set(setArgs, context);
 }
 
 } // namespace caelestia::cli::scheme
