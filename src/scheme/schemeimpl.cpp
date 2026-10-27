@@ -208,15 +208,13 @@ int get(const GetArgs& args, const parser::Context& context) {
         return 0;
     }
 
-    const auto print = [json = context.json](const QString& label, const QString& val) {
-        if (json)
-            QTextStream(stdout) << u"    \""_s + label.toLower() + u"\": \""_s << val << u"\"\n"_s;
+    QJsonObject json;
+    const auto print = [&json, jsonOut = context.json](const QString& label, const QString& val) {
+        if (jsonOut)
+            json.insert(label.toLower(), val);
         else
             QTextStream(stdout) << ansi::styled(ansi::Bold | ansi::Cyan, label + u':') << u' ' << val << u'\n';
     };
-
-    if (context.json)
-        QTextStream(stdout) << u"{\n"_s;
 
     const auto printAll = args.name + args.flavour + args.mode == 0;
     if (printAll || args.name)
@@ -227,7 +225,7 @@ int get(const GetArgs& args, const parser::Context& context) {
         print(u"Mode"_s, lib::modeName(state->mode));
 
     if (context.json)
-        QTextStream(stdout) << u"}\n"_s;
+        printJson(json);
 
     return 0;
 }
