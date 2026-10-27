@@ -4,11 +4,13 @@
 #include <algorithm>
 #include <cstdio>
 
+#include "common/ansi.hpp"
 #include "node.hpp"
 
 namespace caelestia::cli::parser {
 
 using Qt::StringLiterals::operator""_s;
+namespace ansi = common::ansi;
 
 namespace {
 
@@ -121,23 +123,37 @@ std::optional<QList<Global>> globalFlags(const QString& arg, bool allowVersion, 
     return flags;
 }
 
-QString optionLabel(const OptionSpec& spec) {
-    QString label;
-    if (!spec.shortName.isNull())
-        label += u'-' + QString(spec.shortName) + u", "_s;
+struct Label {
+    QString text;
+    qsizetype width = 0;
 
-    label += u"--"_s + spec.longName;
+    Label& add(const QString& piece, ansi::Codes codes = {}) {
+        text += ansi::styled(codes, piece);
+        width += piece.size();
+        return *this;
+    }
+};
+
+using Row = std::pair<Label, QString>;
+
+Label optionLabel(const OptionSpec& spec) {
+    Label label;
+    if (!spec.shortName.isNull())
+        label.add(u'-' + QString(spec.shortName), ansi::Bold | ansi::Green).add(u", "_s);
+
+    label.add(u"--"_s + spec.longName, ansi::Bold | ansi::Cyan);
 
     if (!spec.isFlag())
-        label += u' ' + spec.metavar;
+        label.add(u" "_s).add(spec.metavar, ansi::Bold | ansi::Yellow);
 
     return label;
 }
 
 QString optionUsage(const OptionSpec& spec) {
-    auto usage = spec.shortName.isNull() ? u"--"_s + spec.longName : u'-' + QString(spec.shortName);
+    auto usage = spec.shortName.isNull() ? ansi::styled(ansi::Cyan, u"--"_s + spec.longName)
+                                         : ansi::styled(ansi::Green, u'-' + QString(spec.shortName));
     if (!spec.isFlag())
-        usage += u' ' + spec.metavar;
+        usage += u' ' + ansi::styled(ansi::Yellow, spec.metavar);
     return u'[' + usage + u']';
 }
 
@@ -149,57 +165,66 @@ QString positionalName(const PositionalSpec& spec) {
 
 QString positionalUsage(const PositionalSpec& spec) {
     auto name = positionalName(spec);
-    if (spec.required)
-        return name;
     if (spec.variadic)
-        return u'[' + name + u" ...]"_s;
-    return u'[' + name + u']';
+        name = u'[' + name + u" ...]"_s;
+    else if (!spec.required)
+        name = u'[' + name + u']';
+    return ansi::styled(ansi::Green, name);
 }
 
-QString rows(const QList<std::pair<QString, QString>>& entries) {
+QString heading(const QString& title) {
+    return u'\n' + ansi::styled(ansi::Bold | ansi::Blue, title + u':') + u'\n';
+}
+
+QString rows(const QList<Row>& entries) {
     qsizetype width = 0;
     for (const auto& [label, help] : entries)
-        width = std::max(width, label.size());
+        width = std::max(width, label.width);
     width = std::min(width, k_helpColumn);
 
     QString text;
     for (const auto& [label, help] : entries) {
-        text += k_indent + label;
-        if (label.size() > width)
+        text += k_indent + label.text;
+        if (label.width > width)
             text += u'\n' + QString(width + 4, u' ');
         else
-            text += QString(width - label.size() + 2, u' ');
+            text += QString(width - label.width + 2, u' ');
         text += help + u'\n';
     }
     return text;
 }
 
+QString usageLine(const QString& command, const QStringList& parts) {
+    QStringList all = { optionUsage(globalSpecs().first().spec) };
+    all << parts;
+    return ansi::styled(ansi::Bold | ansi::Blue, u"usage: "_s) + ansi::styled(ansi::Bold | ansi::Magenta, command) +
+           u' ' + all.join(u' ') + u'\n';
+}
+
 QString leafUsage(const QString& command, const LeafShape& shape) {
-    QStringList parts{ u"usage:"_s, command, u"[-h]"_s };
+    QStringList parts;
     for (const auto& option : shape.options)
         parts << optionUsage(option);
     for (const auto& positional : shape.positionals)
         parts << positionalUsage(positional);
-    return parts.join(u' ') + u'\n';
+    return usageLine(command, parts);
 }
 
 QString leafHelp(const QString& command, const LeafShape& shape) {
     auto text = leafUsage(command, shape) + u'\n' + shape.help + u'\n';
 
     if (!shape.positionals.isEmpty()) {
-        QList<std::pair<QString, QString>> entries;
+        QList<Row> entries;
         for (const auto& positional : shape.positionals)
-            entries.emplaceBack(positionalName(positional), positional.help);
-        text += u"\npositional arguments:\n"_s + rows(entries);
+            entries.emplaceBack(Label().add(positionalName(positional), ansi::Bold | ansi::Green), positional.help);
+        text += heading(u"positional arguments"_s) + rows(entries);
     }
 
     const auto& helpSpec = globalSpecs().first().spec;
-    QList<std::pair<QString, QString>> entries = {
-        { optionLabel(helpSpec), helpSpec.help },
-    };
+    QList<Row> entries = { { optionLabel(helpSpec), helpSpec.help } };
     for (const auto& option : shape.options)
         entries.emplaceBack(optionLabel(option), option.help);
-    text += u"\noptions:\n"_s + rows(entries);
+    text += heading(u"options"_s) + rows(entries);
 
     return text;
 }
@@ -406,7 +431,7 @@ const Node* Group::child(const QString& name) const {
 }
 
 QString Group::usage(const QString& command) const {
-    QStringList parts{ u"usage:"_s, command, u"[-h]"_s };
+    QStringList parts;
 
     if (m_spec.version) {
         for (const auto& global : globalSpecs())
@@ -414,22 +439,23 @@ QString Group::usage(const QString& command) const {
                 parts << optionUsage(global.spec);
     }
 
-    parts << u"COMMAND ..."_s;
-    return parts.join(u' ') + u'\n';
+    parts << ansi::styled(ansi::Green, u"COMMAND ..."_s);
+    return usageLine(command, parts);
 }
 
 QString Group::helpText(const QString& command) const {
-    QList<std::pair<QString, QString>> commands;
+    QList<Row> commands;
     for (const auto& node : m_spec.children)
-        commands.emplaceBack(node->name(), node->help());
+        commands.emplaceBack(Label().add(node->name(), ansi::Bold | ansi::Green), node->help());
 
-    QList<std::pair<QString, QString>> options;
+    QList<Row> options;
     for (const auto& global : globalSpecs()) {
         if (global.id == Global::Help || m_spec.version)
             options.emplaceBack(optionLabel(global.spec), global.spec.help);
     }
 
-    return u"%1\n%2\n\ncommands:\n%3\noptions:\n%4"_s.arg(usage(command), m_spec.help, rows(commands), rows(options));
+    return usage(command) + u'\n' + m_spec.help + u'\n' + heading(u"commands"_s) + rows(commands) +
+           heading(u"options"_s) + rows(options);
 }
 
 int Group::dispatch(const QStringList& args, Context context) const {

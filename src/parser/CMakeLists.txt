@@ -4,4 +4,4 @@ add_library(caelestia-parser STATIC
     spec.hpp
 )
 add_include(caelestia-parser)
-target_link_libraries(caelestia-parser PUBLIC Qt::Core)
+target_link_libraries(caelestia-parser PUBLIC Qt::Core caelestia-common)
