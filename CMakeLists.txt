@@ -19,6 +19,9 @@ qt_standard_project_setup()
 
 option(BUILD_TESTING "Build tests" OFF)
 option(CAELESTIA_DEV_COMMANDS "Enable commands intended for CI/dev builds only" OFF)
+if(CAELESTIA_DEV_COMMANDS)
+    find_package(Qt6 REQUIRED COMPONENTS Network)
+endif()
 
 add_subdirectory(src)
 
