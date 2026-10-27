@@ -39,6 +39,7 @@ parser::NodePtr parserNode() {
                     parser::choice(&SetArgs::mode, u'm', u"mode"_s, u"MODE"_s, u"the mode to switch to"_s,
                         { { u"dark"_s, Mode::Dark }, { u"light"_s, Mode::Light } }),
                 },
+                .requireOption = true,
                 .run = set,
             }),
             parser::leaf<parser::NoArgs>({

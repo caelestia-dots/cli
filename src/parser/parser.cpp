@@ -154,7 +154,22 @@ QString optionUsage(const OptionSpec& spec) {
                                          : ansi::styled(ansi::Green, u'-' + QString(spec.shortName));
     if (!spec.isFlag())
         usage += u' ' + ansi::styled(ansi::Yellow, spec.metavar);
-    return u'[' + usage + u']';
+    return usage;
+}
+
+QString optionalUsage(const OptionSpec& spec) {
+    return u'[' + optionUsage(spec) + u']';
+}
+
+QString optionNames(const QList<OptionSpec>& options) {
+    QStringList names;
+    for (const auto& spec : options) {
+        auto name = u"--"_s + spec.longName;
+        if (!spec.shortName.isNull())
+            name.prepend(u'-' + QString(spec.shortName) + u'/');
+        names << name;
+    }
+    return names.join(u' ');
 }
 
 QString positionalName(const PositionalSpec& spec) {
@@ -195,7 +210,7 @@ QString rows(const QList<Row>& entries) {
 }
 
 QString usageLine(const QString& command, const QStringList& parts) {
-    QStringList all = { optionUsage(globalSpecs().first().spec) };
+    QStringList all = { optionalUsage(globalSpecs().first().spec) };
     all << parts;
     return ansi::styled(ansi::Bold | ansi::Blue, u"usage: "_s) + ansi::styled(ansi::Bold | ansi::Magenta, command) +
            u' ' + all.join(u' ') + u'\n';
@@ -203,8 +218,15 @@ QString usageLine(const QString& command, const QStringList& parts) {
 
 QString leafUsage(const QString& command, const LeafShape& shape) {
     QStringList parts;
-    for (const auto& option : shape.options)
-        parts << optionUsage(option);
+    if (shape.requireOption) {
+        QStringList options;
+        for (const auto& option : shape.options)
+            options << optionUsage(option);
+        parts << u'(' + options.join(u" | "_s) + u')';
+    } else {
+        for (const auto& option : shape.options)
+            parts << optionalUsage(option);
+    }
     for (const auto& positional : shape.positionals)
         parts << positionalUsage(positional);
     return usageLine(command, parts);
@@ -286,6 +308,9 @@ public:
             }
         }
 
+        if (m_shape.requireOption && !m_optionSeen)
+            return fail(m_usage, m_context, u"one of the options %1 is required"_s.arg(optionNames(m_shape.options)));
+
         return assignPositionals(positionals);
     }
 
@@ -364,6 +389,7 @@ private:
         if (!m_assignOption(found.option, value))
             return fail(m_usage, m_context, u"argument --%1: invalid value: '%1'"_s.arg(spec.longName, value));
 
+        m_optionSeen = true;
         return std::nullopt;
     }
 
@@ -404,6 +430,7 @@ private:
     const AssignIndexed& m_assignOption;
     const AssignIndexed& m_assignPositional;
     QString m_usage;
+    bool m_optionSeen = false;
 };
 
 } // namespace
@@ -436,7 +463,7 @@ QString Group::usage(const QString& command) const {
     if (m_spec.version) {
         for (const auto& global : globalSpecs())
             if (global.id != Global::Help)
-                parts << optionUsage(global.spec);
+                parts << optionalUsage(global.spec);
     }
 
     parts << ansi::styled(ansi::Green, u"COMMAND ..."_s);

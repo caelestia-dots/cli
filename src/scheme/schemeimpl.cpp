@@ -233,15 +233,6 @@ int get(const GetArgs& args, const parser::Context& context) {
 }
 
 int set(const SetArgs& args, const parser::Context& context) {
-    if (args.name.has_value() + args.flavour.has_value() + args.mode.has_value() == 0) {
-        const auto err = u"Missing scheme name, flavour or mode"_s;
-        if (context.json)
-            QTextStream(stdout) << u"{ \"error\": \""_s << err << u"\" }\n"_s;
-        else
-            QTextStream(stderr) << err << u'\n';
-        return 1;
-    }
-
     QStringList warnings;
     try {
         const auto invalidName =

@@ -89,6 +89,7 @@ parser::NodePtr tree(Captured& out) {
                                 { { u"dark"_s, Mode::Dark }, { u"light"_s, Mode::Light } }),
                             parser::value(&SetArgs::minSize, {}, u"min-size"_s, u"FRACTION"_s, u"size"_s),
                         },
+                        .requireOption = true,
                         .run = [=](const SetArgs& a, const parser::Context& c) { return remember(a, c, &Captured::set); },
                     }),
                     parser::leaf<parser::NoArgs>({
@@ -206,6 +207,16 @@ private slots:
         QCOMPARE(run({ u"scheme"_s, u"set"_s, u"--min-size"_s, u"big"_s }), 2);
     }
 
+    void requiredOption() {
+        QCOMPARE(run({ u"scheme"_s, u"set"_s }), 2);
+        QCOMPARE(run({ u"scheme"_s, u"set"_s, u"--json"_s }), 2);
+        QCOMPARE(m_out.runs, 0);
+        QCOMPARE(run({ u"scheme"_s, u"set"_s, u"-n"_s, u"x"_s }), 0);
+        QCOMPARE(m_out.runs, 1);
+        QCOMPARE(run({ u"scheme"_s, u"set"_s, u"-h"_s }), 0);
+        QCOMPARE(m_out.runs, 1);
+    }
+
     void groupRequiresSubcommand() {
         QCOMPARE(run({}), 2);
         QCOMPARE(run({ u"scheme"_s }), 2);
@@ -229,11 +240,11 @@ private slots:
     }
 
     void globalsAnywhere() {
-        QCOMPARE(run({ u"--json"_s, u"scheme"_s, u"set"_s }), 0);
+        QCOMPARE(run({ u"--json"_s, u"scheme"_s, u"set"_s, u"-n"_s, u"x"_s }), 0);
         QVERIFY(m_out.context.json);
-        QCOMPARE(run({ u"scheme"_s, u"--json"_s, u"set"_s }), 0);
+        QCOMPARE(run({ u"scheme"_s, u"--json"_s, u"set"_s, u"-n"_s, u"x"_s }), 0);
         QVERIFY(m_out.context.json);
-        QCOMPARE(run({ u"scheme"_s, u"set"_s, u"--json"_s }), 0);
+        QCOMPARE(run({ u"scheme"_s, u"set"_s, u"-n"_s, u"x"_s, u"--json"_s }), 0);
         QVERIFY(m_out.context.json);
     }
 

@@ -33,6 +33,7 @@ struct LeafShape {
     QString help;
     QList<OptionSpec> options;
     QList<PositionalSpec> positionals;
+    bool requireOption = false;
 };
 
 using AssignIndexed = std::function<bool(qsizetype, const QString&)>;
@@ -48,6 +49,7 @@ template <typename T> struct LeafSpec {
     QString help;
     QList<Option<T>> options;
     QList<Positional<T>> positionals;
+    bool requireOption = false;
     std::function<int(const T&, const Context&)> run;
 };
 
@@ -56,6 +58,7 @@ public:
     explicit Leaf(LeafSpec<T> spec)
         : m_spec(std::move(spec)) {
         m_shape.help = m_spec.help;
+        m_shape.requireOption = m_spec.requireOption;
         for (const auto& option : m_spec.options)
             m_shape.options << option.spec;
         for (const auto& positional : m_spec.positionals)
