@@ -1,5 +1,5 @@
 add_library(caelestia-wallpaper STATIC
-    wallpaper.cpp
-    wallpaper.hpp
+    wallnode.cpp
+    wallimpl.cpp
 )
-target_link_libraries(caelestia-wallpaper PUBLIC caelestia-parser)
+target_link_libraries(caelestia-wallpaper PUBLIC caelestia-parser PRIVATE caelestia::caelestia)
