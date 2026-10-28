@@ -1,3 +1,3 @@
-create_test(wallpaper get caelestia::caelestia)
-create_test(wallpaper set caelestia::caelestia)
-create_test(wallpaper random caelestia::caelestia)
+create_test(wallpaper get)
+create_test(wallpaper set)
+create_test(wallpaper random)
