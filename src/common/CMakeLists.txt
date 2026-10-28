@@ -1,6 +1,8 @@
-add_library(caelestia-common INTERFACE
+add_library(caelestia-common STATIC
     ansi.hpp
+    hypr.cpp
+    hypr.hpp
     target.hpp
 )
-add_include(caelestia-common INTERFACE)
-target_link_libraries(caelestia-common INTERFACE Qt::Core)
+add_include(caelestia-common)
+target_link_libraries(caelestia-common PUBLIC Qt::Core Qt::Network)

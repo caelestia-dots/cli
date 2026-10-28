@@ -14,14 +14,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wno-missing-designated-field-initializers)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
 qt_standard_project_setup()
 
 option(BUILD_TESTING "Build tests" OFF)
 option(CAELESTIA_DEV_COMMANDS "Enable commands intended for CI/dev builds only" OFF)
-if(CAELESTIA_DEV_COMMANDS)
-    find_package(Qt6 REQUIRED COMPONENTS Network)
-endif()
 
 add_subdirectory(src)
 

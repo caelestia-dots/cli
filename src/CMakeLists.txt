@@ -3,12 +3,7 @@ function(add_include target)
     file(MAKE_DIRECTORY "${include_dir}")
     cmake_path(GET CMAKE_CURRENT_SOURCE_DIR FILENAME dir_name)
     file(CREATE_LINK "${CMAKE_CURRENT_SOURCE_DIR}" "${include_dir}/${dir_name}" SYMBOLIC)
-
-    set(scope PUBLIC)
-    if(${ARGC} GREATER 1)
-        set(scope ${ARGV1})
-    endif()
-    target_include_directories(${target} ${scope} "${include_dir}")
+    target_include_directories(${target} PUBLIC "${include_dir}")
 endfunction()
 
 add_subdirectory(common)

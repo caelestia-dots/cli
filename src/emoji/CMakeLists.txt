@@ -12,7 +12,6 @@ qt_add_resources(caelestia-emoji "emojis"
 )
 
 if(CAELESTIA_DEV_COMMANDS)
-    target_link_libraries(caelestia-emoji PRIVATE Qt::Network)
     target_compile_definitions(caelestia-emoji PRIVATE
         CAELESTIA_DEV_COMMANDS
         CAELESTIA_EMOJI_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/data/emojis.txt"
