@@ -1,8 +1,8 @@
 add_library(caelestia-common STATIC
     ansi.hpp
     hypr.cpp
-    hypr.hpp
+    notify.cpp
     target.hpp
 )
 add_include(caelestia-common)
-target_link_libraries(caelestia-common PUBLIC Qt::Core Qt::Network)
+target_link_libraries(caelestia-common PUBLIC Qt::Core Qt::Network Qt::DBus)
