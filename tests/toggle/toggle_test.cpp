@@ -4,15 +4,16 @@
 #include <qtemporarydir.h>
 #include <qtest.h>
 
+#include <caelestia/utils/hypr.hpp>
+
 #include <optional>
 
-#include "common.hpp"
 #include "common/fakesocket.hpp"
-#include "common/hypr.hpp"
 #include "toggle/toggle.hpp"
+#include "common.hpp"
 
 using namespace caelestia::cli::test;
-namespace hypr = caelestia::cli::common::hypr;
+namespace hypr = caelestia::utils::hypr;
 namespace toggle = caelestia::cli::toggle;
 
 namespace {

@@ -6,15 +6,17 @@
 #include <qstring.h>
 #include <qthread.h>
 
+#include <caelestia/utils/hypr.hpp>
+
 #include <functional>
 #include <utility>
-
-#include "common/hypr.hpp"
 
 namespace caelestia::cli::test {
 
 class FakeSocket : public QThread {
 public:
+    static constexpr int k_timeoutMs = 5000;
+
     FakeSocket(QString path, std::function<void(QLocalSocket&)> handler)
         : m_path(std::move(path))
         , m_handler(std::move(handler)) {
@@ -27,13 +29,13 @@ protected:
         QLocalServer server;
         const auto listening = server.listen(m_path);
         m_listening.release();
-        if (!listening || !server.waitForNewConnection(common::hypr::k_timeoutMs))
+        if (!listening || !server.waitForNewConnection(k_timeoutMs))
             return;
         auto* conn = server.nextPendingConnection();
         m_handler(*conn);
         conn->disconnectFromServer();
         if (conn->state() != QLocalSocket::UnconnectedState)
-            conn->waitForDisconnected(common::hypr::k_timeoutMs);
+            conn->waitForDisconnected(k_timeoutMs);
     }
 
 private:

@@ -2,7 +2,8 @@
 
 #include <qtextstream.h>
 
-#include "common/hypr.hpp"
+#include <caelestia/utils/hypr.hpp>
+
 #include "parser/node.hpp"
 
 namespace caelestia::cli::toggle {
@@ -16,7 +17,7 @@ struct Args {
 };
 
 int run(const Args& args, const parser::Context& context) {
-    const auto success = common::hypr::eval(u"require(\"utils.functions\").toggle(\"%1\")()"_s.arg(args.workspace));
+    const auto success = utils::hypr::eval(u"require(\"utils.functions\").toggle(\"%1\")()"_s.arg(args.workspace));
     if (!success) {
         const auto err = u"Failed to toggle workspace %1"_s.arg(args.workspace);
         if (context.json)

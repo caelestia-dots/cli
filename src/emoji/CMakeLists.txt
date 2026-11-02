@@ -3,7 +3,7 @@ add_library(caelestia-emoji STATIC
     emojiimpl.cpp
 )
 add_include(caelestia-emoji)
-target_link_libraries(caelestia-emoji PUBLIC caelestia-parser)
+target_link_libraries(caelestia-emoji PUBLIC caelestia-parser PRIVATE Qt::Network)
 
 qt_add_resources(caelestia-emoji "emojis"
     PREFIX "/emoji"
