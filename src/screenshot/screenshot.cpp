@@ -9,6 +9,7 @@
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
+#include <qprocess.h>
 #include <qscreen.h>
 
 #include <caelestia/ipc/client.hpp>
@@ -34,6 +35,7 @@ struct Args {
     QString geometry;
     bool edit = false;
     QString savePath;
+    bool clipboard = false;
     bool quiet = false;
 };
 
@@ -63,7 +65,7 @@ QScreen* focusedScreen() {
     return screen == screens.end() ? QGuiApplication::primaryScreen() : *screen;
 }
 
-void notify(const QString& cachePath, const QString& savePath, bool ok, bool showEdit = true) {
+void notify(const QString& cachePath, const QString& savePath, bool copied, bool ok, bool showEdit = true) {
     QStringList actions;
     if (showEdit)
         actions << u"Edit"_s;
@@ -81,7 +83,7 @@ void notify(const QString& cachePath, const QString& savePath, bool ok, bool sho
 
     common::notify::send({
         .summary = ok ? u"Screenshot taken"_s : u"Failed to save screenshot"_s,
-        .body = ok ? u"Saved to %1"_s.arg(path)
+        .body = ok ? u"Saved to %1"_s.arg(path) + (copied ? u" and copied to clipboard"_s : u""_s)
                    : u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, path),
         .image = cachePath,
         .actions = actions,
@@ -149,7 +151,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
         }
 
     if (!args.quiet)
-        notify(cachePath, args.savePath, ok);
+        notify(cachePath, args.savePath, args.clipboard, ok);
 
     return { ok ? 0 : 1, cachePath };
 }
@@ -168,7 +170,7 @@ QString messageForError(ipc::Error err) {
     Q_UNREACHABLE_RETURN({});
 }
 
-int saveAndNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
+int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
     if (const auto* err = std::get_if<ipc::Error>(&scResult)) {
         const auto msg = messageForError(*err);
         printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
@@ -199,8 +201,16 @@ int saveAndNotify(const ipc::Result<QString>& scResult, const Args& args, const 
             ok = false;
         }
 
+    if (args.clipboard) {
+        QProcess proc;
+        proc.setProgram(u"wl-copy"_s);
+        proc.setArguments({ u"--type"_s, u"image/png"_s });
+        proc.setStandardInputFile(cachePath);
+        proc.startDetached();
+    }
+
     if (!args.quiet)
-        notify(cachePath, args.savePath, ok);
+        notify(cachePath, args.savePath, args.clipboard, ok);
 
     return ok ? 0 : 1;
 }
@@ -210,7 +220,7 @@ int captureScreen(const Args& args, const parser::Context& context) {
         return captureLocal(args, context).first;
 
     const auto scResult = ipc::screenshot(false, true);
-    return saveAndNotify(scResult, args, context);
+    return saveCopyNotify(scResult, args, context);
 }
 
 int captureAndAnnotate(const Args& args, const parser::Context& context) {
@@ -221,7 +231,7 @@ int captureAndAnnotate(const Args& args, const parser::Context& context) {
 
     if (code != 0) {
         if (!args.quiet && !cachePath.isEmpty())
-            notify(cachePath, args.savePath, false);
+            notify(cachePath, args.savePath, false, false);
         return code;
     }
 
@@ -246,7 +256,7 @@ int captureAndAnnotate(const Args& args, const parser::Context& context) {
         if (annotatedPath.isEmpty())
             notifyCopied();
         else
-            notify(annotatedPath, annotatedPath, true, false);
+            notify(annotatedPath, annotatedPath, false, true, false);
     }
 
     return 0;
@@ -257,7 +267,7 @@ int captureRegion(const Args& args, const parser::Context& context) {
         return args.edit ? captureAndAnnotate(args, context) : captureLocal(args, context).first;
 
     const auto scResult = ipc::screenshot(true, args.edit);
-    return saveAndNotify(scResult, args, context);
+    return saveCopyNotify(scResult, args, context);
 }
 
 int run(const Args& args, const parser::Context& context) {
@@ -280,6 +290,7 @@ parser::NodePtr parserNode() {
             parser::value(&Args::geometry, u'g', u"geometry"_s, u"GEOM"_s, u"capture a fixed region ('X,Y WxH')"_s),
             parser::value(&Args::savePath, u's', u"save"_s, u"PATH"_s, u"save to PATH"_s),
             parser::flag(&Args::edit, u'e', u"edit"_s, u"annotate the captured image"_s),
+            parser::flag(&Args::clipboard, u'c', u"clipboard"_s, u"copy to clipboard"_s),
             parser::flag(&Args::quiet, u'q', u"quiet"_s, u"don't send a notification"_s),
         },
         .positionals = {
