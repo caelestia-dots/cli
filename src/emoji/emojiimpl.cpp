@@ -14,6 +14,7 @@
 #include <stdexcept>
 #endif
 
+#include "common/error.hpp"
 #include "emoji.hpp"
 
 namespace caelestia::cli::emoji {
@@ -29,15 +30,6 @@ QByteArray data() {
     if (!file.open(QIODevice::ReadOnly))
         return {};
     return file.readAll();
-}
-
-int printError(const QString& err, bool json) {
-    if (json)
-        QTextStream(stdout) << QJsonDocument(QJsonObject{ { u"error"_s, err } }).toJson(QJsonDocument::Indented)
-                            << u'\n';
-    else
-        QTextStream(stderr) << err << u'\n';
-    return 1;
 }
 
 int run(QProcess& proc, const QString& program, const QStringList& args, const QByteArray& input) {
@@ -68,7 +60,7 @@ int pick(const parser::NoArgs& args, const parser::Context& context) {
     fuzzel.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     const auto exit = run(fuzzel, u"fuzzel"_s, { u"--dmenu"_s, u"--placeholder=Type to search emojis"_s }, data());
     if (exit < 0)
-        return printError(u"Failed to run fuzzel: %1"_s.arg(fuzzel.errorString()), context.json);
+        return common::printError(u"Failed to run fuzzel: %1"_s.arg(fuzzel.errorString()), context.json);
     if (exit != 0)
         return exit;
 
@@ -79,7 +71,7 @@ int pick(const parser::NoArgs& args, const parser::Context& context) {
     QProcess wlCopy;
     wlCopy.setProcessChannelMode(QProcess::ForwardedChannels);
     if (run(wlCopy, u"wl-copy"_s, {}, chosen.toUtf8()) != 0)
-        return printError(u"Failed to run wl-copy: %1"_s.arg(wlCopy.errorString()), context.json);
+        return common::printError(u"Failed to run wl-copy: %1"_s.arg(wlCopy.errorString()), context.json);
     return 0;
 }
 
@@ -201,7 +193,7 @@ int fetchFrom(const FetchSources& sources, bool json) {
             throw std::runtime_error(
                 u"Failed to write %1: %2"_s.arg(file.fileName(), file.errorString()).toStdString());
     } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), json);
+        return common::printError(QString::fromUtf8(e.what()), json);
     }
 
     return 0;

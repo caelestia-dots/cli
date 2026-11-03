@@ -1,5 +1,6 @@
 add_library(caelestia-common STATIC
     ansi.hpp
+    error.cpp
     notify.cpp
     target.hpp
 )

@@ -1,9 +1,8 @@
-#include <qjsondocument.h>
-#include <qjsonobject.h>
 #include <qprocess.h>
 
 #include <optional>
 
+#include "common/error.hpp"
 #include "clipboard.hpp"
 
 namespace caelestia::cli::clipboard {
@@ -11,15 +10,6 @@ namespace caelestia::cli::clipboard {
 using Qt::StringLiterals::operator""_s;
 
 namespace {
-
-int printError(const QString& err, bool json) {
-    if (json)
-        QTextStream(stdout) << QJsonDocument(QJsonObject{ { u"error"_s, err } }).toJson(QJsonDocument::Indented)
-                            << u'\n';
-    else
-        QTextStream(stderr) << err << u'\n';
-    return 1;
-}
 
 int run(QProcess& proc, const QString& program, const QStringList& args, const QByteArray& input) {
     proc.start(program, args);
@@ -36,7 +26,7 @@ std::optional<QByteArray> cliphist(const QStringList& args, const QByteArray& in
     QProcess proc;
     proc.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     if (run(proc, u"cliphist"_s, args, input) != 0) {
-        printError(u"Failed to run cliphist: %1"_s.arg(proc.errorString()), context.json);
+        common::printError(u"Failed to run cliphist: %1"_s.arg(proc.errorString()), context.json);
         return std::nullopt;
     }
     return proc.readAllStandardOutput();
@@ -51,7 +41,7 @@ int choose(const QStringList& fuzzelArgs, const parser::Context& context, QByteA
     fuzzel.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     const auto exit = run(fuzzel, u"fuzzel"_s, QStringList{ u"--dmenu"_s } + fuzzelArgs, *history);
     if (exit < 0)
-        return printError(u"Failed to run fuzzel: %1"_s.arg(fuzzel.errorString()), context.json);
+        return common::printError(u"Failed to run fuzzel: %1"_s.arg(fuzzel.errorString()), context.json);
     if (exit != 0)
         return exit;
 
@@ -75,7 +65,7 @@ int pick(const parser::NoArgs& args, const parser::Context& context) {
     QProcess wlCopy;
     wlCopy.setProcessChannelMode(QProcess::ForwardedChannels);
     if (run(wlCopy, u"wl-copy"_s, {}, *decoded) != 0)
-        return printError(u"Failed to run wl-copy: %1"_s.arg(wlCopy.errorString()), context.json);
+        return common::printError(u"Failed to run wl-copy: %1"_s.arg(wlCopy.errorString()), context.json);
     return 0;
 }
 

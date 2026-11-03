@@ -6,6 +6,7 @@
 #include <caelestia/media/analysis.hpp>
 #include <caelestia/wallpaper/wallpaper.hpp>
 
+#include "common/error.hpp"
 #include "wallpaper.hpp"
 
 namespace caelestia::cli::wallpaper {
@@ -36,12 +37,7 @@ int get(const parser::NoArgs& args, const parser::Context& context) {
         else
             QTextStream(stdout) << wall << u'\n';
     } else {
-        const auto err = u"Wallpaper has not been set or is invalid"_s;
-        if (context.json)
-            QTextStream(stdout) << u"{ \"error\": \""_s << err << u"\" }\n"_s;
-        else
-            QTextStream(stderr) << err << u'\n';
-        return 1;
+        return common::printError(u"Wallpaper has not been set or is invalid"_s, context.json);
     }
     return 0;
 }
@@ -50,11 +46,7 @@ int set(const SetArgs& args, const parser::Context& context) {
     try {
         lib::set(args.path, !args.noSmart).waitForFinished();
     } catch (const std::exception& e) {
-        if (context.json)
-            QTextStream(stdout) << u"{ \"error\": \""_s << escape(QString::fromUtf8(e.what())) << u"\" }\n"_s;
-        else
-            QTextStream(stderr) << e.what() << u'\n';
-        return 1;
+        return common::printError(QString::fromUtf8(e.what()), context.json);
     }
 
     const auto path = QFileInfo(args.path).absoluteFilePath();

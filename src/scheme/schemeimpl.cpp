@@ -9,6 +9,7 @@
 #include <caelestia/wallpaper/wallpaper.hpp>
 
 #include "common/ansi.hpp"
+#include "common/error.hpp"
 #include "scheme.hpp"
 
 namespace caelestia::cli::scheme {
@@ -31,19 +32,6 @@ void printJson(const QJsonObject& json) {
 void printWarnings(const QStringList& warnings) {
     for (const auto& warning : warnings)
         QTextStream(stderr) << warning << u'\n';
-}
-
-int printError(const QString& err, bool json, const QStringList& warnings = {}) {
-    if (json) {
-        QJsonObject obj{ { u"error"_s, err } };
-        if (!warnings.isEmpty())
-            obj.insert(u"warnings"_s, QJsonArray::fromStringList(warnings));
-        printJson(obj);
-    } else {
-        printWarnings(warnings);
-        QTextStream(stderr) << err << u'\n';
-    }
-    return 1;
 }
 
 void printLine(const QString& key, const QStringList& values, int indent = 0,
@@ -141,11 +129,11 @@ void printAll(const QList<std::shared_ptr<lib::Scheme>>& schemes, bool json) {
 int listCurrent(const ListArgs& args, const parser::Context& context) {
     const auto state = lib::loadStateRef();
     if (!state)
-        return printError(k_noState.toString(), context.json);
+        return common::printError(k_noState.toString(), context.json);
 
     const auto current = schemeForName(state->name);
     if (!current)
-        return printError(u"Scheme \"%1\" does not exist"_s.arg(state->name), context.json);
+        return common::printError(u"Scheme \"%1\" does not exist"_s.arg(state->name), context.json);
 
     if (args.flavours && args.modes) {
         printEntries(u"flavours"_s, u"modes"_s, flavourEntries(*current), context.json);
@@ -154,7 +142,7 @@ int listCurrent(const ListArgs& args, const parser::Context& context) {
     } else {
         const auto flavour = current->flavour(state->flavour);
         if (!flavour)
-            return printError(u"Scheme flavour has not been set or is invalid"_s, context.json);
+            return common::printError(u"Scheme flavour has not been set or is invalid"_s, context.json);
 
         printValues(u"modes"_s, modeNames(flavour->modes()), context.json);
     }
@@ -244,14 +232,14 @@ int list(const ListArgs& args, const parser::Context& context) {
                    ? listNamed(listAll ? ListArgs{ .names = true, .flavours = true, .modes = true } : args, context)
                    : listCurrent(args, context);
     } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), context.json);
+        return common::printError(QString::fromUtf8(e.what()), context.json);
     }
 }
 
 int get(const GetArgs& args, const parser::Context& context) {
     const auto state = lib::loadStateRef();
     if (!state)
-        return printError(k_noState.toString(), context.json);
+        return common::printError(k_noState.toString(), context.json);
 
     const auto single = args.name + args.flavour + args.mode == 1;
     const auto printAll = args.name + args.flavour + args.mode == 0;
@@ -301,7 +289,7 @@ int set(const SetArgs& args, const parser::Context& context) {
                 scheme->name(), flavour.name(), lib::modeName(mode));
         }
     } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), context.json, warnings);
+        return common::printError(QString::fromUtf8(e.what()), context.json, warnings);
     }
     return 0;
 }
@@ -314,7 +302,7 @@ int random(const parser::NoArgs& args, const parser::Context& context) {
         auto* const gen = QRandomGenerator::global();
         const auto schemes = lib::Scheme::all().takeResult();
         if (schemes.isEmpty())
-            return printError(u"No schemes available"_s, context.json);
+            return common::printError(u"No schemes available"_s, context.json);
 
         const auto& scheme = schemes[gen->bounded(schemes.size())];
         const auto flavours = scheme->flavours();
@@ -322,7 +310,7 @@ int random(const parser::NoArgs& args, const parser::Context& context) {
         const auto modes = flavour.modes();
         setArgs = { .name = scheme->name(), .flavour = flavour.name(), .mode = modes[gen->bounded(modes.size())] };
     } catch (const std::exception& e) {
-        return printError(QString::fromUtf8(e.what()), context.json);
+        return common::printError(QString::fromUtf8(e.what()), context.json);
     }
 
     return set(setArgs, context);

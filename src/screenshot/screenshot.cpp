@@ -7,7 +7,6 @@
 #include <qfuturewatcher.h>
 #include <qguiapplication.h>
 #include <qjsonarray.h>
-#include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qprocess.h>
 #include <qscreen.h>
@@ -19,6 +18,7 @@
 #include <algorithm>
 #include <optional>
 
+#include "common/error.hpp"
 #include "common/notify.hpp"
 #include "common/target.hpp"
 #include "parser/node.hpp"
@@ -38,15 +38,6 @@ struct Args {
     bool clipboard = false;
     bool quiet = false;
 };
-
-int printError(const QString& err, bool json) {
-    if (json)
-        QTextStream(stdout) << QJsonDocument(QJsonObject{ { u"error"_s, err } }).toJson(QJsonDocument::Indented)
-                            << u'\n';
-    else
-        QTextStream(stderr) << err << u'\n';
-    return 1;
-}
 
 QScreen* focusedScreen() {
     const auto monitors = utils::hypr::requestJson(u"monitors"_s).array();
@@ -123,13 +114,13 @@ std::optional<QImage> doLocalCapture(const Args& args) {
 std::pair<int, QString> captureLocal(const Args& args, const parser::Context& context) {
     const auto img = doLocalCapture(args);
     if (!img) {
-        printError(u"Invalid region geometry: %1"_s.arg(args.geometry), context.json);
+        common::printError(u"Invalid region geometry: %1"_s.arg(args.geometry), context.json);
         return { 1, {} };
     }
 
     if (img->isNull()) {
         const auto target = args.target == common::Target::Screen ? u"screen"_s : u"region"_s;
-        printError(u"Failed to capture %1"_s.arg(target), context.json);
+        common::printError(u"Failed to capture %1"_s.arg(target), context.json);
 
         if (!args.quiet)
             common::notify::send({
@@ -146,7 +137,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
 
     if (!args.savePath.isEmpty())
         if (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !img->save(args.savePath)) {
-            printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
+            common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
             ok = false;
         }
 
@@ -173,7 +164,7 @@ QString messageForError(ipc::Error err) {
 int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
     if (const auto* err = std::get_if<ipc::Error>(&scResult)) {
         const auto msg = messageForError(*err);
-        printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
+        common::printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
 
         if (!args.quiet)
             common::notify::send({
@@ -197,7 +188,7 @@ int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const
 
     if (!args.savePath.isEmpty())
         if (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !QFile::copy(cachePath, args.savePath)) {
-            printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
+            common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
             ok = false;
         }
 
@@ -238,7 +229,7 @@ int captureAndAnnotate(const Args& args, const parser::Context& context) {
     const auto anResult = ipc::annotate(cachePath);
     if (const auto* err = std::get_if<ipc::Error>(&anResult)) {
         const auto msg = messageForError(*err);
-        printError(u"Failed to annotate screenshot: %1"_s.arg(msg), context.json);
+        common::printError(u"Failed to annotate screenshot: %1"_s.arg(msg), context.json);
 
         if (!args.quiet)
             common::notify::send({
