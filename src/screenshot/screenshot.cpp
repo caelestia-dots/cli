@@ -63,27 +63,36 @@ QScreen* focusedScreen() {
     return screen == screens.end() ? QGuiApplication::primaryScreen() : *screen;
 }
 
-void notify(const QString& cachePath, const QString& savePath, bool ok) {
+void notify(const QString& cachePath, const QString& savePath, bool ok, bool showEdit = true) {
     QStringList actions;
-    actions << u"Edit"_s;
+    if (showEdit)
+        actions << u"Edit"_s;
     if (!ok || savePath.isEmpty())
         actions << u"Save"_s;
 
-    const auto path = QFileInfo(savePath.isEmpty() ? cachePath : savePath).absoluteFilePath();
+    const auto path = QFileInfo(!ok || savePath.isEmpty() ? cachePath : savePath).absoluteFilePath();
     QVariantMap hints;
     // TODO: replace "helper" with helper bin. edit should open the shell annotation tool, save should open the
     // file dialog
-    hints.insert(u"x-caelestia-action-edit"_s, QStringList{ u"helper"_s, u"edit"_s, path });
+    if (showEdit)
+        hints.insert(u"x-caelestia-action-edit"_s, QStringList{ u"helper"_s, u"edit"_s, path });
     if (!ok || savePath.isEmpty())
         hints.insert(u"x-caelestia-action-save"_s, QStringList{ u"helper"_s, u"save"_s, path });
 
     common::notify::send({
         .summary = ok ? u"Screenshot taken"_s : u"Failed to save screenshot"_s,
-        .body = ok ? u"Saved to %1"_s.arg(savePath.isEmpty() ? cachePath : savePath)
-                   : u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, cachePath),
+        .body = ok ? u"Saved to %1"_s.arg(path)
+                   : u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, path),
         .image = cachePath,
         .actions = actions,
         .hints = hints,
+    });
+}
+
+void notifyCopied() {
+    common::notify::send({
+        .summary = u"Screenshot taken"_s,
+        .body = u"Screenshot copied to clipboard"_s,
     });
 }
 
@@ -109,11 +118,11 @@ std::optional<QImage> doLocalCapture(const Args& args) {
     return awaitFuture(lib::capture(*geom));
 }
 
-int captureLocal(const Args& args, const parser::Context& context) {
+std::pair<int, QString> captureLocal(const Args& args, const parser::Context& context) {
     const auto img = doLocalCapture(args);
     if (!img) {
         printError(u"Invalid region geometry: %1"_s.arg(args.geometry), context.json);
-        return 1;
+        return { 1, {} };
     }
 
     if (img->isNull()) {
@@ -127,7 +136,7 @@ int captureLocal(const Args& args, const parser::Context& context) {
                 .urgency = common::notify::Urgency::Critical,
             });
 
-        return 1;
+        return { 1, {} };
     }
 
     const auto cachePath = lib::cache(*img).takeResult();
@@ -142,15 +151,15 @@ int captureLocal(const Args& args, const parser::Context& context) {
     if (!args.quiet)
         notify(cachePath, args.savePath, ok);
 
-    return ok ? 0 : 1;
+    return { ok ? 0 : 1, cachePath };
 }
 
 QString messageForError(ipc::Error err) {
     switch (err) {
     case ipc::Error::Busy:
-        return u"Already attempting to take a screenshot"_s;
+        return u"The shell is currently busy"_s;
     case ipc::Error::Cancelled:
-        return u"Screenshot cancelled"_s;
+        return u"Action cancelled"_s;
     case ipc::Error::NotRunning:
         return u"The shell is not currently running"_s;
     case ipc::Error::Failed:
@@ -175,6 +184,13 @@ int saveAndNotify(const ipc::Result<QString>& scResult, const Args& args, const 
     }
 
     const auto cachePath = std::get<QString>(scResult);
+    // Empty path means copied to clipboard
+    if (cachePath.isEmpty()) {
+        if (!args.quiet)
+            notifyCopied();
+        return 0;
+    }
+
     auto ok = true;
 
     if (!args.savePath.isEmpty())
@@ -191,20 +207,54 @@ int saveAndNotify(const ipc::Result<QString>& scResult, const Args& args, const 
 
 int captureScreen(const Args& args, const parser::Context& context) {
     if (!args.edit)
-        return captureLocal(args, context);
+        return captureLocal(args, context).first;
 
     const auto scResult = ipc::screenshot(false, true);
     return saveAndNotify(scResult, args, context);
 }
 
 int captureAndAnnotate(const Args& args, const parser::Context& context) {
-    // TODO: ipc annotate call
+    auto modifiedArgs = args;
+    modifiedArgs.savePath.clear();
+    modifiedArgs.quiet = true;
+    const auto& [code, cachePath] = captureLocal(modifiedArgs, context);
+
+    if (code != 0) {
+        if (!args.quiet && !cachePath.isEmpty())
+            notify(cachePath, args.savePath, false);
+        return code;
+    }
+
+    const auto anResult = ipc::annotate(cachePath);
+    if (const auto* err = std::get_if<ipc::Error>(&anResult)) {
+        const auto msg = messageForError(*err);
+        printError(u"Failed to annotate screenshot: %1"_s.arg(msg), context.json);
+
+        if (!args.quiet)
+            common::notify::send({
+                .summary = u"Failed to annotate screenshot"_s,
+                .body = msg,
+                .urgency = common::notify::Urgency::Critical,
+            });
+
+        return 1;
+    }
+
+    const auto annotatedPath = std::get<QString>(anResult);
+    if (!args.quiet) {
+        // An empty path means the annotation copied to clipboard instead of saving
+        if (annotatedPath.isEmpty())
+            notifyCopied();
+        else
+            notify(annotatedPath, annotatedPath, true, false);
+    }
+
     return 0;
 }
 
 int captureRegion(const Args& args, const parser::Context& context) {
     if (!args.geometry.isEmpty())
-        return args.edit ? captureAndAnnotate(args, context) : captureLocal(args, context);
+        return args.edit ? captureAndAnnotate(args, context) : captureLocal(args, context).first;
 
     const auto scResult = ipc::screenshot(true, args.edit);
     return saveAndNotify(scResult, args, context);
