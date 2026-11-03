@@ -14,7 +14,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wno-missing-designated-field-initializers)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Network DBus)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Network DBus)
 qt_standard_project_setup()
 
 option(BUILD_TESTING "Build tests" OFF)
