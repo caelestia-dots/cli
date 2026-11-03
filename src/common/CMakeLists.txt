@@ -4,4 +4,4 @@ add_library(caelestia-common STATIC
     target.hpp
 )
 add_include(caelestia-common)
-target_link_libraries(caelestia-common PUBLIC Qt::Core Qt::DBus)
+target_link_libraries(caelestia-common PUBLIC caelestia-parser Qt::Core Qt::DBus)
