@@ -1,8 +1,10 @@
+#include <qcoreapplication.h>
 #include <qstringlist.h>
 #include <qtextstream.h>
 
 #include <algorithm>
 #include <cstdio>
+#include <memory>
 
 #include "common/ansi.hpp"
 #include "node.hpp"
@@ -483,6 +485,10 @@ QString Group::helpText(const QString& command) const {
 
     return usage(command) + u'\n' + m_spec.help + u'\n' + heading(u"commands"_s) + rows(commands) +
            heading(u"options"_s) + rows(options);
+}
+
+std::unique_ptr<QCoreApplication> coreApp(int& argc, char** argv) {
+    return std::make_unique<QCoreApplication>(argc, argv);
 }
 
 int Group::dispatch(const QStringList& args, Context context) const {

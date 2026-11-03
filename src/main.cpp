@@ -1,4 +1,3 @@
-#include <qcoreapplication.h>
 #include <qprocess.h>
 #include <qstring.h>
 #include <qstringlist.h>
@@ -63,8 +62,6 @@ QString version() {
 } // namespace
 
 int main(int argc, char** argv) {
-    const QCoreApplication app(argc, argv);
-
     const auto root = parser::group({
         .name = u"caelestia"_s,
         .help = u"A convenience CLI for Caelestia"_s,
@@ -83,5 +80,9 @@ int main(int argc, char** argv) {
         .version = version,
     });
 
-    return root->dispatch(QCoreApplication::arguments().mid(1), parser::Context{ .command = root->name() });
+    QStringList args;
+    for (int i = 1; i < argc; ++i)
+        args << QString::fromLocal8Bit(argv[i]);
+
+    return root->dispatch(args, parser::Context{ .command = root->name(), .argc = &argc, .argv = argv });
 }

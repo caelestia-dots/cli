@@ -14,6 +14,8 @@ namespace caelestia::cli::parser {
 struct Context {
     QString command;
     bool json = false;
+    int* argc = nullptr;
+    char** argv = nullptr;
 };
 
 struct NoArgs {};

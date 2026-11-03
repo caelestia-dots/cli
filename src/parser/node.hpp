@@ -1,5 +1,6 @@
 #pragma once
 
+#include <qcoreapplication.h>
 #include <qlist.h>
 #include <qstring.h>
 #include <qstringlist.h>
@@ -37,6 +38,9 @@ struct LeafShape {
 };
 
 using AssignIndexed = std::function<bool(qsizetype, const QString&)>;
+using AppFactory = std::function<std::unique_ptr<QCoreApplication>(int&, char**)>;
+
+std::unique_ptr<QCoreApplication> coreApp(int& argc, char** argv);
 
 [[nodiscard]] std::optional<int> parseLeaf(const LeafShape& shape, const QStringList& args, Context& context,
     const AssignIndexed& assignOption, const AssignIndexed& assignPositional);
@@ -50,6 +54,7 @@ template <typename T> struct LeafSpec {
     QList<Option<T>> options;
     QList<Positional<T>> positionals;
     bool requireOption = false;
+    AppFactory app = coreApp;
     std::function<int(const T&, const Context&)> run;
 };
 
@@ -81,6 +86,10 @@ public:
             });
         if (exit)
             return *exit;
+
+        std::unique_ptr<QCoreApplication> app;
+        if (context.argc != nullptr)
+            app = m_spec.app(*context.argc, context.argv);
         return m_spec.run(parsed, context);
     }
 
