@@ -19,9 +19,9 @@
 #include <optional>
 
 #include "common/error.hpp"
-#include "common/notify.hpp"
 #include "common/target.hpp"
 #include "parser/node.hpp"
+#include "screenshot/notify.hpp"
 
 namespace caelestia::cli::screenshot {
 
@@ -54,39 +54,6 @@ QScreen* focusedScreen() {
     });
 
     return screen == screens.end() ? QGuiApplication::primaryScreen() : *screen;
-}
-
-void notify(const QString& cachePath, const QString& savePath, bool copied, bool ok, bool showEdit = true) {
-    QStringList actions;
-    if (showEdit)
-        actions << u"Edit"_s;
-    if (!ok || savePath.isEmpty())
-        actions << u"Save"_s;
-
-    const auto path = QFileInfo(!ok || savePath.isEmpty() ? cachePath : savePath).absoluteFilePath();
-    QVariantMap hints;
-    // TODO: replace "helper" with helper bin. edit should open the shell annotation tool, save should open the
-    // file dialog
-    if (showEdit)
-        hints.insert(u"x-caelestia-action-edit"_s, QStringList{ u"helper"_s, u"edit"_s, path });
-    if (!ok || savePath.isEmpty())
-        hints.insert(u"x-caelestia-action-save"_s, QStringList{ u"helper"_s, u"save"_s, path });
-
-    common::notify::send({
-        .summary = ok ? u"Screenshot taken"_s : u"Failed to save screenshot"_s,
-        .body = ok ? u"Saved to %1"_s.arg(path) + (copied ? u" and copied to clipboard"_s : u""_s)
-                   : u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, path),
-        .image = cachePath,
-        .actions = actions,
-        .hints = hints,
-    });
-}
-
-void notifyCopied() {
-    common::notify::send({
-        .summary = u"Screenshot taken"_s,
-        .body = u"Screenshot copied to clipboard"_s,
-    });
 }
 
 template <typename T> T awaitFuture(QFuture<T> future) {
@@ -123,11 +90,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
         common::printError(u"Failed to capture %1"_s.arg(target), context.json);
 
         if (!args.quiet)
-            common::notify::send({
-                .summary = u"Failed to take screenshot"_s,
-                .body = u"Failed to capture %1"_s.arg(target),
-                .urgency = common::notify::Urgency::Critical,
-            });
+            notifyFailed(u"Failed to take screenshot"_s, u"Failed to capture %1"_s.arg(target));
 
         return { 1, {} };
     }
@@ -135,30 +98,15 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
     const auto cachePath = lib::cache(*img).takeResult();
     auto ok = true;
 
-    if (!args.savePath.isEmpty())
-        if (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !img->save(args.savePath)) {
-            common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
-            ok = false;
-        }
+    if (!args.savePath.isEmpty() && (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !img->save(args.savePath))) {
+        common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
+        ok = false;
+    }
 
     if (!args.quiet)
         notify(cachePath, args.savePath, args.clipboard, ok);
 
     return { ok ? 0 : 1, cachePath };
-}
-
-QString messageForError(ipc::Error err) {
-    switch (err) {
-    case ipc::Error::Busy:
-        return u"The shell is currently busy"_s;
-    case ipc::Error::Cancelled:
-        return u"Action cancelled"_s;
-    case ipc::Error::NotRunning:
-        return u"The shell is not currently running"_s;
-    case ipc::Error::Failed:
-        return u"An unknown error occurred"_s;
-    }
-    Q_UNREACHABLE_RETURN({});
 }
 
 int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
@@ -167,11 +115,7 @@ int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const
         common::printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
 
         if (!args.quiet)
-            common::notify::send({
-                .summary = u"Failed to take screenshot"_s,
-                .body = msg,
-                .urgency = common::notify::Urgency::Critical,
-            });
+            notifyFailed(u"Failed to take screenshot"_s, msg);
 
         return 1;
     }
@@ -186,11 +130,11 @@ int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const
 
     auto ok = true;
 
-    if (!args.savePath.isEmpty())
-        if (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !QFile::copy(cachePath, args.savePath)) {
-            common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
-            ok = false;
-        }
+    if (!args.savePath.isEmpty() &&
+        (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !QFile::copy(cachePath, args.savePath))) {
+        common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
+        ok = false;
+    }
 
     if (args.clipboard) {
         QProcess proc;
@@ -226,31 +170,7 @@ int captureAndAnnotate(const Args& args, const parser::Context& context) {
         return code;
     }
 
-    const auto anResult = ipc::annotate(cachePath);
-    if (const auto* err = std::get_if<ipc::Error>(&anResult)) {
-        const auto msg = messageForError(*err);
-        common::printError(u"Failed to annotate screenshot: %1"_s.arg(msg), context.json);
-
-        if (!args.quiet)
-            common::notify::send({
-                .summary = u"Failed to annotate screenshot"_s,
-                .body = msg,
-                .urgency = common::notify::Urgency::Critical,
-            });
-
-        return 1;
-    }
-
-    const auto annotatedPath = std::get<QString>(anResult);
-    if (!args.quiet) {
-        // An empty path means the annotation copied to clipboard instead of saving
-        if (annotatedPath.isEmpty())
-            notifyCopied();
-        else
-            notify(annotatedPath, annotatedPath, false, true, false);
-    }
-
-    return 0;
+    return annotateAndNotify(cachePath, args.quiet, context.json);
 }
 
 int captureRegion(const Args& args, const parser::Context& context) {
