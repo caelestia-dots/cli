@@ -41,7 +41,7 @@ private slots:
 
     void sendPassesImageAsPathHint() {
         QCOMPARE(notify::send({ .summary = u"Shot"_s, .body = u"Saved"_s, .image = u"/tmp/shot.png"_s }), 42u);
-        QVERIFY(log().contains(u"Notify Caelestia Shot Saved [] {image-path=/tmp/shot.png}"_s));
+        QVERIFY(log().contains(u"Notify Caelestia Shot Saved [] {image-path=/tmp/shot.png;urgency=1}"_s));
     }
 
     void sendStripsOnlyActionHintsWithoutActionSupport() {
@@ -53,8 +53,8 @@ private slots:
             .actions = { u"open"_s, u"Open"_s },
             .hints = {
                 { u"x-caelestia-action-open"_s, QStringList{ u"xdg-open"_s, u"/tmp/shot.png"_s } },
-                { u"urgency"_s, QStringList{ u"2"_s } },
             },
+            .urgency = notify::Urgency::Critical,
         });
         QVERIFY(log().contains(u"Notify Caelestia Shot Saved [] {image-path=/tmp/shot.png;urgency=2}"_s));
     }

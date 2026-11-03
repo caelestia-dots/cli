@@ -42,7 +42,7 @@ public slots:
         Q_UNUSED(timeout)
         QStringList hintLines;
         for (auto it = hints.cbegin(); it != hints.cend(); ++it)
-            hintLines << u"%1=%2"_s.arg(it.key(), it.value().toStringList().join(u' '));
+            hintLines << u"%1=%2"_s.arg(it.key(), hintText(it.value()));
         appendLog(m_logPath,
             u"Notify %1 %2 %3 [%4] {%5}"_s.arg(app, summary, body, actions.join(u','), hintLines.join(u';')));
         return 42;
@@ -53,6 +53,14 @@ public slots:
     // NOLINTEND(readability-identifier-naming)
 
 private:
+    static QString hintText(const QVariant& value) {
+        if (value.typeId() == QMetaType::QStringList)
+            return value.toStringList().join(u' ');
+        if (value.typeId() == QMetaType::UChar)
+            return QString::number(value.toUInt());
+        return value.toString();
+    }
+
     QString m_logPath;
 };
 

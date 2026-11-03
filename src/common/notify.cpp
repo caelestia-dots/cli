@@ -31,6 +31,7 @@ quint32 send(Notification notification) {
     }
     if (!notification.image.isEmpty())
         notification.hints.insert(u"image-path"_s, notification.image);
+    notification.hints.insert(u"urgency"_s, QVariant::fromValue(static_cast<uchar>(notification.urgency)));
 
     auto msg = method(u"Notify"_s);
     msg << u"Caelestia"_s << 0u << QString() << notification.summary << notification.body << notification.actions
