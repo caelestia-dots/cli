@@ -1,0 +1,39 @@
+#include "toggle.hpp"
+
+#include <caelestia/utils/hypr.hpp>
+
+#include "common/error.hpp"
+#include "parser/node.hpp"
+
+namespace caelestia::cli::toggle {
+
+using Qt::StringLiterals::operator""_s;
+
+namespace {
+
+struct Args {
+    QString workspace;
+};
+
+int run(const Args& args, const parser::Context& context) {
+    const auto success = utils::hypr::eval(u"require(\"utils.functions\").toggle(\"%1\")()"_s.arg(args.workspace));
+    if (!success)
+        return common::printError(u"Failed to toggle workspace %1"_s.arg(args.workspace), context.json);
+
+    return 0;
+}
+
+} // namespace
+
+parser::NodePtr parserNode() {
+    return parser::leaf<Args>({
+        .name = u"toggle"_s,
+        .help = u"toggle a special workspace"_s,
+        .positionals = {
+            parser::positional(&Args::workspace, u"WORKSPACE"_s, u"the workspace to toggle"_s),
+        },
+        .run = run,
+    });
+}
+
+} // namespace caelestia::cli::toggle
