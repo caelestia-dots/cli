@@ -180,10 +180,15 @@ class ArchInstaller(PackageInstaller):
         if not packages:
             return []
 
+        # Skip packages already satisfied (either installed or provided)
+        unsatisfied = [p for p in packages if self.query(p) is None]
+        if not unsatisfied:
+            return packages
+
         cmd = [self.helper, "-S", "--needed", *self.flags]
         if not explicit:
             cmd.append("--asdeps")  # Set install reason to dep (does not affect already installed packages)
-        _try_run(cmd + packages, f"failed to install packages: {', '.join(packages)}")
+        _try_run(cmd + unsatisfied, f"failed to install packages: {', '.join(unsatisfied)}")
 
         # Resolve virtual/`provides` names (e.g. awk -> gawk)
         resolved = [self._installed_name(pkg) for pkg in packages]
