@@ -104,8 +104,16 @@ class Command:
                     str(round(focused_monitor["refreshRate"])),
                 ]
 
+        # gpu-screen-recorder takes one -a value; desktop output and mic input
+        # are two independent sources within it (pipe-separated), not two
+        # separate flags, so combine whichever of -s/-m were passed.
+        audio_sources = []
         if self.args.sound:
-            args += ["-a", "default_output"]
+            audio_sources.append("default_output")
+        if self.args.mic:
+            audio_sources.append("default_input")
+        if audio_sources:
+            args += ["-a", "|".join(audio_sources)]
 
         config = get_config()
         try:
