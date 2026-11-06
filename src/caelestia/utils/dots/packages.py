@@ -180,8 +180,8 @@ class ArchInstaller(PackageInstaller):
         if not packages:
             return []
 
-        # Skip packages already satisfied (either installed or provided)
-        unsatisfied = [p for p in packages if self.query(p) is None]
+        # Skip packages already provided by another installed package
+        unsatisfied = [p for p in packages if (q := self.query(p)) is None or q[0] == p]
 
         if unsatisfied:
             cmd = [self.helper, "-S", "--needed", *self.flags]
