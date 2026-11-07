@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -181,7 +182,12 @@ class ArchInstaller(PackageInstaller):
             return []
 
         # Skip packages already provided by another installed package
-        to_install = [p for p in packages if (q := self.query(p)) is None or q[0] == p]
+        to_install = [
+            p
+            for p in packages
+            if (q := self.query(p)) is None
+            or q[0] == re.split(r"[<>=]", p, maxsplit=1)[0]
+        ]
 
         if to_install:
             cmd = [self.helper, "-S", "--needed", *self.flags]
