@@ -109,7 +109,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
     return { ok ? 0 : 1, cachePath };
 }
 
-int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
+int saveCopyNotify(const ipc::Result<ipc::SaveResult>& scResult, const Args& args, const parser::Context& context) {
     if (const auto* err = std::get_if<ipc::Error>(&scResult)) {
         if (*err == ipc::Error::Cancelled)
             return 0;
@@ -123,11 +123,10 @@ int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const
         return 1;
     }
 
-    const auto cachePath = std::get<QString>(scResult);
-    // Empty path means copied to clipboard
-    if (cachePath.isEmpty()) {
+    const auto& [cachePath, copied] = std::get<ipc::SaveResult>(scResult);
+    if (copied) {
         if (!args.quiet)
-            notifyCopied();
+            notify(cachePath, {}, true, true);
         return 0;
     }
 

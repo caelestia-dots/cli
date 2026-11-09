@@ -40,20 +40,20 @@ void notify(const QString& cachePath, const QString& savePath, bool copied, bool
     if (!ok || savePath.isEmpty())
         hints.insert(u"x-caelestia-action-save"_s, QStringList{ helper, u"save"_s, path });
 
+    QString body;
+    if (!ok)
+        body = u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, path);
+    else if (copied && savePath.isEmpty())
+        body = u"Copied to clipboard"_s;
+    else
+        body = u"Saved to %1"_s.arg(path) + (copied ? u" and copied to clipboard"_s : QString());
+
     common::notify::send({
         .summary = ok ? u"Screenshot taken"_s : u"Failed to save screenshot"_s,
-        .body = ok ? u"Saved to %1"_s.arg(path) + (copied ? u" and copied to clipboard"_s : u""_s)
-                   : u"Failed to save screenshot to %1. The screenshot is available at %2."_s.arg(savePath, path),
+        .body = body,
         .image = cachePath,
         .actions = actions,
         .hints = hints,
-    });
-}
-
-void notifyCopied() {
-    common::notify::send({
-        .summary = u"Screenshot taken"_s,
-        .body = u"Screenshot copied to clipboard"_s,
     });
 }
 
@@ -75,14 +75,9 @@ int annotateAndNotify(const QString& cachePath, bool quiet, bool json) {
         return 1;
     }
 
-    const auto annotatedPath = *std::get_if<QString>(&result);
-    if (!quiet) {
-        // An empty path means the annotation copied to clipboard instead of saving
-        if (annotatedPath.isEmpty())
-            notifyCopied();
-        else
-            notify(annotatedPath, annotatedPath, false, true, false);
-    }
+    const auto& [annotatedPath, copied] = std::get<ipc::SaveResult>(result);
+    if (!quiet)
+        notify(annotatedPath, copied ? QString() : annotatedPath, copied, true, false);
 
     return 0;
 }
