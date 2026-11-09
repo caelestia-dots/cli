@@ -55,10 +55,10 @@ int main(int argc, char* argv[]) {
     const QCoreApplication app(argc, argv);
     const auto args = QCoreApplication::arguments();
 
-    if (args.size() != 3 || (args[1] != u"edit"_s && args[1] != u"save"_s)) {
+    if (args.size() != 3 || (args[1] != u"edit" && args[1] != u"save")) {
         QTextStream(stderr) << u"Usage: %1 <edit|save> <path>\n"_s.arg(args.value(0, u"caelestia-screenshot-helper"_s));
         return 1;
     }
 
-    return args[1] == u"edit"_s ? screenshot::annotateAndNotify(args[2], false, false) : save(args[2]);
+    return args[1] == u"edit" ? screenshot::annotateAndNotify(args[2], false, false) : save(args[2]);
 }
