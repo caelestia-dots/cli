@@ -98,13 +98,22 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
     const auto cachePath = lib::cache(*img).takeResult();
     auto ok = true;
 
+    if (cachePath.isEmpty()) {
+        common::printError(u"Failed to cache screenshot"_s, context.json);
+        ok = false;
+    }
+
     if (!args.savePath.isEmpty() && (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !img->save(args.savePath))) {
         common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
         ok = false;
     }
 
-    if (!args.quiet)
-        notify(cachePath, args.savePath, args.clipboard, ok);
+    if (!args.quiet) {
+        if (cachePath.isEmpty())
+            notifyFailed(u"Failed to take screenshot"_s, u"Failed to cache screenshot"_s);
+        else
+            notify(cachePath, args.savePath, args.clipboard, ok);
+    }
 
     return { ok ? 0 : 1, cachePath };
 }
