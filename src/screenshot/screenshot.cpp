@@ -111,6 +111,9 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
 
 int saveCopyNotify(const ipc::Result<QString>& scResult, const Args& args, const parser::Context& context) {
     if (const auto* err = std::get_if<ipc::Error>(&scResult)) {
+        if (*err == ipc::Error::Cancelled)
+            return 0;
+
         const auto msg = messageForError(*err);
         common::printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
 
