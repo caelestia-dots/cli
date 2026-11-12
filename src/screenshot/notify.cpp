@@ -1,7 +1,10 @@
 #include "notify.hpp"
 
+#include <qdir.h>
+#include <qfile.h>
 #include <qfileinfo.h>
 
+#include <caelestia/config/config.hpp>
 #include <caelestia/ipc/client.hpp>
 
 #include "common/error.hpp"
@@ -65,6 +68,40 @@ void notifyFailed(const QString& summary, const QString& body) {
     });
 }
 
+int pickAndSave(const QString& cachePath, bool copied, bool quiet, bool json) {
+    const auto result = ipc::pickFile({
+        .title = u"Save screenshot"_s,
+        .nameFilters = { u"*.png"_s },
+        .filter = ipc::FileFilter::Images | ipc::FileFilter::Files,
+        .initialDir = config::Config::instance().paths().screenshotsDir(),
+        .initialName = u"screenshot.png"_s,
+        .mode = ipc::PickFileMode::Save,
+    });
+
+    if (const auto* err = std::get_if<ipc::Error>(&result)) {
+        if (*err == ipc::Error::Cancelled)
+            return 0;
+
+        const auto msg = messageForError(*err);
+        common::printError(u"Failed to save screenshot: %1"_s.arg(msg), json);
+        if (!quiet)
+            notifyFailed(u"Failed to save screenshot"_s, msg);
+
+        return 1;
+    }
+
+    const auto savePath = std::get<QString>(result);
+    const auto ok = QFileInfo(savePath).dir().mkpath(u"."_s) && (!QFile::exists(savePath) || QFile::remove(savePath)) &&
+                    QFile::copy(cachePath, savePath);
+    if (!ok)
+        common::printError(u"Failed to save screenshot to %1"_s.arg(savePath), json);
+
+    if (!quiet)
+        notify(cachePath, savePath, copied, ok);
+
+    return ok ? 0 : 1;
+}
+
 int annotateAndNotify(const QString& cachePath, bool quiet, bool json) {
     const auto result = ipc::annotate(cachePath);
     if (const auto* err = std::get_if<ipc::Error>(&result)) {
@@ -76,8 +113,11 @@ int annotateAndNotify(const QString& cachePath, bool quiet, bool json) {
     }
 
     const auto& [annotatedPath, copied] = std::get<ipc::SaveResult>(result);
+    if (!copied)
+        return pickAndSave(annotatedPath, false, quiet, json);
+
     if (!quiet)
-        notify(annotatedPath, copied ? QString() : annotatedPath, copied, true, false);
+        notify(annotatedPath, {}, true, true, false);
 
     return 0;
 }

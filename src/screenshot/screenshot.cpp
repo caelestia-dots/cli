@@ -139,20 +139,23 @@ int saveCopyNotify(const ipc::Result<ipc::SaveResult>& scResult, const Args& arg
         return 0;
     }
 
-    auto ok = true;
-
-    if (!args.savePath.isEmpty() &&
-        (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !QFile::copy(cachePath, args.savePath))) {
-        common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
-        ok = false;
-    }
-
     if (args.clipboard) {
         QProcess proc;
         proc.setProgram(u"wl-copy"_s);
         proc.setArguments({ u"--type"_s, u"image/png"_s });
         proc.setStandardInputFile(cachePath);
         proc.startDetached();
+    }
+
+    if (args.edit && args.savePath.isEmpty())
+        return pickAndSave(cachePath, args.clipboard, args.quiet, context.json);
+
+    auto ok = true;
+
+    if (!args.savePath.isEmpty() &&
+        (!QFileInfo(args.savePath).dir().mkpath(u"."_s) || !QFile::copy(cachePath, args.savePath))) {
+        common::printError(u"Failed to save screenshot to %1"_s.arg(args.savePath), context.json);
+        ok = false;
     }
 
     if (!args.quiet)

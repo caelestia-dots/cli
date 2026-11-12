@@ -11,6 +11,7 @@ QString messageForError(ipc::Error err);
 void notify(const QString& cachePath, const QString& savePath, bool copied, bool ok, bool showEdit = true);
 void notifyFailed(const QString& summary, const QString& body);
 
+int pickAndSave(const QString& cachePath, bool copied, bool quiet, bool json);
 int annotateAndNotify(const QString& cachePath, bool quiet, bool json);
 
 } // namespace caelestia::cli::screenshot
