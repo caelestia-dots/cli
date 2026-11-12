@@ -78,11 +78,11 @@ std::optional<QImage> doLocalCapture(const Args& args) {
     return awaitFuture(lib::capture(*geom));
 }
 
-std::pair<int, QString> captureLocal(const Args& args, const parser::Context& context) {
+int captureLocal(const Args& args, const parser::Context& context) {
     const auto img = doLocalCapture(args);
     if (!img) {
         common::printError(u"Invalid region geometry: %1"_s.arg(args.geometry), context.json);
-        return { 1, {} };
+        return 1;
     }
 
     if (img->isNull()) {
@@ -92,7 +92,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
         if (!args.quiet)
             notifyFailed(u"Failed to take screenshot"_s, u"Failed to capture %1"_s.arg(target));
 
-        return { 1, {} };
+        return 1;
     }
 
     const auto cachePath = lib::cache(*img).takeResult();
@@ -115,7 +115,7 @@ std::pair<int, QString> captureLocal(const Args& args, const parser::Context& co
             notify(cachePath, args.savePath, args.clipboard, ok);
     }
 
-    return { ok ? 0 : 1, cachePath };
+    return ok ? 0 : 1;
 }
 
 int saveCopyNotify(const ipc::Result<ipc::SaveResult>& scResult, const Args& args, const parser::Context& context) {
@@ -166,33 +166,26 @@ int saveCopyNotify(const ipc::Result<ipc::SaveResult>& scResult, const Args& arg
 
 int captureScreen(const Args& args, const parser::Context& context) {
     if (!args.edit)
-        return captureLocal(args, context).first;
+        return captureLocal(args, context);
 
-    const auto scResult = ipc::screenshot(false, true);
+    const auto scResult = ipc::screenshot(focusedScreen()->geometry(), true);
     return saveCopyNotify(scResult, args, context);
-}
-
-int captureAndAnnotate(const Args& args, const parser::Context& context) {
-    auto modifiedArgs = args;
-    modifiedArgs.savePath.clear();
-    modifiedArgs.quiet = true;
-    const auto& [code, cachePath] = captureLocal(modifiedArgs, context);
-
-    if (code != 0) {
-        if (!args.quiet && !cachePath.isEmpty())
-            notify(cachePath, args.savePath, false, false);
-        return code;
-    }
-
-    return annotateAndNotify(cachePath, args.quiet, context.json);
 }
 
 int captureRegion(const Args& args, const parser::Context& context) {
-    if (!args.geometry.isEmpty())
-        return args.edit ? captureAndAnnotate(args, context) : captureLocal(args, context).first;
+    if (args.geometry.isEmpty())
+        return saveCopyNotify(ipc::screenshot(args.edit), args, context);
 
-    const auto scResult = ipc::screenshot(true, args.edit);
-    return saveCopyNotify(scResult, args, context);
+    if (!args.edit)
+        return captureLocal(args, context);
+
+    const auto geom = common::parseGeometry(args.geometry);
+    if (!geom || geom->size().isEmpty()) {
+        common::printError(u"Invalid region geometry: %1"_s.arg(args.geometry), context.json);
+        return 1;
+    }
+
+    return saveCopyNotify(ipc::screenshot(*geom, true), args, context);
 }
 
 int run(const Args& args, const parser::Context& context) {
