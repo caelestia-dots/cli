@@ -1,5 +1,6 @@
 import glob
 import os
+import platform
 import re
 import tomllib
 from dataclasses import dataclass, field
@@ -32,6 +33,15 @@ def _expand(text: str) -> Path:
 
     env = {**_XDG_DEFAULTS, **os.environ}
     return Path(Template(text).safe_substitute(env)).expanduser()
+
+
+def _distro_id() -> str | None:
+    """Return the distro ID from os-release, if available."""
+
+    try:
+        return platform.freedesktop_os_release().get("ID")
+    except OSError:
+        return None
 
 
 @dataclass(frozen=True)
@@ -84,6 +94,7 @@ class _ManifestData:
 class Manifest:
     components: dict[str, ManifestComponent] = field(default_factory=dict)
     packages: list[str] = field(default_factory=list)
+    packages_by_distro: dict[str, list[str]] = field(default_factory=dict)
     post_package: list[str] = field(default_factory=list)  # Post package install (install cmd only)
     post_install: list[str] = field(default_factory=list)  # Very end of install cmd
     post_update: list[str] = field(default_factory=list)  # Very end of update cmd
@@ -109,6 +120,7 @@ class Manifest:
         post_update = _validate_str_list(raw.get("post_update", []), "post_update")
 
         packages = _validate_str_list(raw.get("packages", []), "packages")
+        packages_by_distro = _validate_packages_by_distro(raw.get("packages_by_distro", {}))
 
         components = {}
         for comp in raw.get("components", []):
@@ -120,6 +132,7 @@ class Manifest:
         return Manifest(
             components=components,
             packages=packages,
+            packages_by_distro=packages_by_distro,
             post_package=post_package,
             post_install=post_install,
             post_update=post_update,
@@ -185,15 +198,23 @@ class Manifest:
         return [p[len(_LOCAL_PREFIX) :] for p in self._all_packages() if p.startswith(_LOCAL_PREFIX)]
 
     def _all_packages(self) -> list[str]:
-        """The manifest's top-level packages plus enabled components', in manifest order.
+        """The manifest's distro, top-level, and enabled component packages.
 
-        Top-level packages come first, then each enabled component's packages in
+        Packages for the current distro come first so an explicitly selected
+        provider can win before dependencies of later packages are resolved.
+        Top-level packages follow, then each enabled component's packages in
         component order. Only the first occurrence of each package is kept.
         """
 
+        distro_packages = self.packages_by_distro.get(_distro_id() or "", [])
+
         seen: set[str] = set()
         ordered: list[str] = []
-        for pkg in (*self.packages, *(p for c in self._data.enabled_comps for p in self.components[c].packages)):
+        for pkg in (
+            *distro_packages,
+            *self.packages,
+            *(p for c in self._data.enabled_comps for p in self.components[c].packages),
+        ):
             if pkg not in seen:
                 seen.add(pkg)
                 ordered.append(pkg)
@@ -210,6 +231,18 @@ def _validate_str_list(value: Any, ctx: str) -> list[str]:
     if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
         raise ManifestError(f"{ctx}: expected a list of strings")
     return value
+
+
+def _validate_packages_by_distro(value: Any) -> dict[str, list[str]]:
+    if not isinstance(value, dict):
+        raise ManifestError("packages_by_distro: expected a table")
+
+    packages_by_distro: dict[str, list[str]] = {}
+    for distro, packages in value.items():
+        if not isinstance(distro, str):
+            raise ManifestError("packages_by_distro: expected string distro IDs")
+        packages_by_distro[distro] = _validate_str_list(packages, f"packages_by_distro.{distro}")
+    return packages_by_distro
 
 
 def _parse_entry(d: Any) -> ManifestEntry:
