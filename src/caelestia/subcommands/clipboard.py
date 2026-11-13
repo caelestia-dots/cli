@@ -9,6 +9,10 @@ class Command:
         self.args = args
 
     def run(self) -> None:
+        if self.args.clear:
+            subprocess.run(["cliphist", "wipe"])
+            return
+
         clip = subprocess.check_output(["cliphist", "list"])
 
         if self.args.delete:
