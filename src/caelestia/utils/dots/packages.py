@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -180,10 +181,50 @@ class ArchInstaller(PackageInstaller):
         if not packages:
             return []
 
-        cmd = [self.helper, "-S", "--needed", *self.flags]
-        if not explicit:
-            cmd.append("--asdeps")  # Set install reason to dep (does not affect already installed packages)
-        _try_run(cmd + packages, f"failed to install packages: {', '.join(packages)}")
+        try:
+            result = subprocess.run(
+                ["pacman", "-T", "--", *packages],
+                stdout=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+        except OSError as e:
+            raise PackageError("failed to check installed dependencies") from e
+
+        # Missing dependencies are an expected result, not a command failure
+        if result.returncode not in (0, 127):
+            raise PackageError("failed to check installed dependencies")
+
+        missing = set(result.stdout.splitlines())
+        satisfied = [p for p in packages if p not in missing]
+
+        # Identify the installed provider for each satisfied dependency
+        providers: dict[str, str] = {}
+        if satisfied:
+            try:
+                result = subprocess.run(
+                    ["pacman", "-Qq", "--", *satisfied],
+                    stdout=subprocess.PIPE,
+                    text=True,
+                    check=True,
+                )
+            except (subprocess.CalledProcessError, OSError) as e:
+                raise PackageError("failed to resolve installed providers") from e
+
+            names = result.stdout.splitlines()
+            if len(names) != len(satisfied):
+                raise PackageError("unexpected number of resolved providers")
+
+            providers = dict(zip(satisfied, names))
+
+        # Skip packages already provided by another installed package
+        to_install = [p for p in packages if p in missing or providers[p] == re.split(r"[<>=]", p, maxsplit=1)[0]]
+
+        if to_install:
+            cmd = [self.helper, "-S", "--needed", *self.flags]
+            if not explicit:
+                cmd.append("--asdeps")  # Set install reason to dep (does not affect already installed packages)
+            _try_run(cmd + to_install, f"failed to install packages: {', '.join(to_install)}")
 
         # Resolve virtual/`provides` names (e.g. awk -> gawk)
         resolved = [self._installed_name(pkg) for pkg in packages]
