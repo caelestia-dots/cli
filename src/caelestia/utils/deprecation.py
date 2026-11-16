@@ -26,3 +26,21 @@ def deprecated(command: str, details: list[str], notification_body: str | None =
         )
     except (OSError, subprocess.CalledProcessError):
         pass  # notify-send missing or no notification daemon, the stderr warning is enough
+
+
+def deprecated_in_favour_of_global(command: str, name: str) -> None:
+    """Warn that `caelestia <command>` is deprecated in favour of the `caelestia:<name>` Hyprland global dispatcher."""
+
+    dsp = f'hl.dsp.global("caelestia:{name}")'
+    cmd = f"hyprctl dispatch '{dsp}'"
+
+    deprecated(
+        command,
+        [
+            "Use the following in your Hyprland config instead:",
+            f"  {dsp}",
+            "or from the command line:",
+            f"  {cmd}",
+        ],
+        notification_body=f"Use {dsp} instead.\nCommand line: {cmd}",
+    )

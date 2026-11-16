@@ -16,7 +16,7 @@ complete -c caelestia -n $not_seen -a 'toggle' -d 'Toggle a special workspace'
 complete -c caelestia -n $not_seen -a 'scheme' -d 'Manage the colour scheme'
 complete -c caelestia -n $not_seen -a 'screenshot' -d 'Take a screenshot'
 complete -c caelestia -n $not_seen -a 'record' -d 'Start a screen recording'
-complete -c caelestia -n $not_seen -a 'clipboard' -d 'Open clipboard history'
+complete -c caelestia -n $not_seen -a 'clipboard' -d '[deprecated] Open clipboard history'
 complete -c caelestia -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c caelestia -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
 complete -c caelestia -n $not_seen -a 'resizer' -d 'Window resizer'
@@ -122,7 +122,7 @@ complete -c caelestia -n "$seen wallpaper" -s 't' -l 'threshold' -d 'The thresho
 complete -c caelestia -n "$seen wallpaper" -s 'N' -l 'no-smart' -d 'Disable smart mode switching'
 
 # Emoji
-complete -c caelestia -n "$seen emoji" -s 'p' -l 'picker' -d 'Open emoji/glyph picker'
+complete -c caelestia -n "$seen emoji" -s 'p' -l 'picker' -d '[deprecated] Open emoji/glyph picker'
 complete -c caelestia -n "$seen emoji" -s 'f' -l 'fetch' -d 'Fetch emoji/glyph data from remote'
 
 # Resizer

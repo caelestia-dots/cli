@@ -155,7 +155,7 @@ subcommands:
     scheme       manage the colour scheme
     screenshot   take a screenshot
     record       start a screen recording
-    clipboard    open clipboard history
+    clipboard    [deprecated] open clipboard history
     emoji        emoji/glyph utilities
     wallpaper    manage the wallpaper
     resizer      window resizer daemon
