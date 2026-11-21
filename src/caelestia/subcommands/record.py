@@ -116,12 +116,19 @@ class Command:
 
         recording_path.parent.mkdir(parents=True, exist_ok=True)
         # The recorder outlives this command, so it must not inherit our stdio
+        # (handled above via the DEVNULL redirects) - but it must stay in our
+        # session. systemd-logind grants seat device ACLs (/dev/dri/*, which
+        # gpu-screen-recorder's KMS/VAAPI capture needs) per active session,
+        # and a process detached into a brand-new session via setsid can
+        # intermittently miss out on that grant, making the recorder die a
+        # few seconds after a perfectly normal start with no error anywhere
+        # (this command has already exited by then, and nothing else is
+        # watching). Not passing start_new_session avoids that race.
         proc = subprocess.Popen(
             [RECORDER, *args, "-o", str(recording_path)],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            start_new_session=True,
         )
 
         notif = notify("-p", "Recording started", "Recording...")
