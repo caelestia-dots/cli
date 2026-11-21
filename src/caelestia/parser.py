@@ -92,14 +92,14 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     record_parser.add_argument("-c", "--clipboard", action="store_true", help="copy recording path to clipboard")
 
     # Create parser for clipboard opts
-    clipboard_parser = command_parser.add_parser("clipboard", help="open clipboard history")
+    clipboard_parser = command_parser.add_parser("clipboard", help="[deprecated] open clipboard history")
     clipboard_parser.set_defaults(cls=clipboard.Command)
     clipboard_parser.add_argument("-d", "--delete", action="store_true", help="delete from clipboard history")
 
     # Create parser for emoji opts
     emoji_parser = command_parser.add_parser("emoji", help="emoji/glyph utilities")
     emoji_parser.set_defaults(cls=emoji.Command)
-    emoji_parser.add_argument("-p", "--picker", action="store_true", help="open the emoji/glyph picker")
+    emoji_parser.add_argument("-p", "--picker", action="store_true", help="[deprecated] open the emoji/glyph picker")
     emoji_parser.add_argument("-f", "--fetch", action="store_true", help="fetch emoji/glyph data from remote")
 
     # Create parser for wallpaper opts
