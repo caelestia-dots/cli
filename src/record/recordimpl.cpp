@@ -151,16 +151,17 @@ void copyToClipboard(const QString& path) {
     proc.waitForFinished();
 }
 
-bool survivesStartup() {
+bool diesDuringStartup() {
     const QDeadlineTimer deadline(k_startupCheckMs);
-    while (!deadline.hasExpired()) {
-        if (!recorder::state().running)
-            return false;
+    do {
+        const auto state = recorder::state();
+        if (!state.running)
+            return state.died;
 
         QThread::msleep(k_startupPollMs);
-    }
+    } while (!deadline.hasExpired());
 
-    return recorder::state().running;
+    return false;
 }
 
 int stopRecording(bool quiet, bool clipboard, const parser::Context& context) {
@@ -213,7 +214,7 @@ int start(const StartArgs& args, const parser::Context& context) {
     };
     session.save();
 
-    if (survivesStartup())
+    if (!diesDuringStartup())
         return 0;
 
     session.end();

@@ -136,6 +136,22 @@ private slots:
         QVERIFY(!QFile::exists(path(u"runtime/caelestia/record-session.json"_s)));
     }
 
+    void stopDuringStartupIsNotAFailure() {
+        serveMonitors();
+        const std::unique_ptr<QThread> stopper(QThread::create([] {
+            if (waitForState(true))
+                stopRecorder();
+        }));
+        stopper->start();
+
+        const auto result = startCmd({});
+        QVERIFY(stopper->wait());
+        QCOMPARE(result.exit, 0);
+        QVERIFY(result.err.isEmpty());
+        QVERIFY(!log().contains(u"Failed to start recording"_s));
+        QVERIFY(!recorder::state().running);
+    }
+
     void quietStartSendsNoNotification() {
         serveMonitors();
         QCOMPARE(startCmd({ .quiet = true }).exit, 0);
