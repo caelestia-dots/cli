@@ -123,7 +123,7 @@ int saveCopyNotify(const ipc::Result<ipc::SaveResult>& scResult, const Args& arg
         if (*err == ipc::Error::Cancelled)
             return 0;
 
-        const auto msg = messageForError(*err);
+        const auto msg = common::messageForError(*err);
         common::printError(u"Failed to take screenshot: %1"_s.arg(msg), context.json);
 
         if (!args.quiet)

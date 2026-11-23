@@ -23,4 +23,18 @@ int printError(const QString& err, bool json, const QStringList& warnings) {
     return 1;
 }
 
+QString messageForError(ipc::Error err) {
+    switch (err) {
+    case ipc::Error::Busy:
+        return u"The shell is currently busy"_s;
+    case ipc::Error::Cancelled:
+        return u"Action cancelled"_s;
+    case ipc::Error::NotRunning:
+        return u"The shell is not currently running"_s;
+    case ipc::Error::Failed:
+        return u"An unknown error occurred"_s;
+    }
+    Q_UNREACHABLE_RETURN({});
+}
+
 } // namespace caelestia::cli::common

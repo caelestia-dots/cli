@@ -6,8 +6,6 @@
 
 namespace caelestia::cli::screenshot {
 
-QString messageForError(ipc::Error err);
-
 void notify(const QString& cachePath, const QString& savePath, bool copied, bool ok, bool showEdit = true);
 void notifyFailed(const QString& summary, const QString& body);
 
