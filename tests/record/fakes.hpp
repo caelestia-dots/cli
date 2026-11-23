@@ -3,19 +3,15 @@
 #include <qdir.h>
 #include <qjsonobject.h>
 #include <qlocalsocket.h>
-#include <qrect.h>
-#include <qsemaphore.h>
 #include <qthread.h>
 
-#include <caelestia/ipc/server.hpp>
 #include <caelestia/record/record.hpp>
 #include <caelestia/utils/hypr.hpp>
-#include <sys/stat.h>
 
 #include <memory>
-#include <optional>
 
-#include "common/fakebus.hpp"
+#include "common/desktopfakes.hpp"
+#include "common/fakeshell.hpp"
 #include "common/fakesocket.hpp"
 #include "record/record.hpp"
 #include "common.hpp"
@@ -29,47 +25,9 @@ constexpr auto k_monitors = R"([
     {"name":"HDMI-A-1","x":2560,"y":0,"width":1920,"height":1080,"refreshRate":60.0,"focused":false}
 ])";
 
-class FakeShell : public QThread {
-public:
-    explicit FakeShell(std::optional<QRect> region)
-        : m_region(region) {
-        start();
-        m_listening.acquire();
-    }
-
-    ~FakeShell() override {
-        quit();
-        wait();
-    }
-
+class RecordFakes : protected DesktopFakes {
 protected:
-    void run() override {
-        ipc::Server server;
-        connect(&server, &ipc::Server::pickRegionRequested, &server, [this](ipc::PickRegionRequest* request) {
-            if (m_region)
-                request->respond(*m_region);
-            else
-                request->reject();
-        });
-        m_listening.release();
-        exec();
-    }
-
-private:
-    std::optional<QRect> m_region;
-    QSemaphore m_listening;
-};
-
-class RecordFakes : protected Sandbox {
-protected:
-    QTemporaryDir m_bin;
-    FakeBus m_bus;
-    std::unique_ptr<FakeNotifications> m_notifications;
     std::unique_ptr<FakeSocket> m_hypr;
-
-    [[nodiscard]] QString logPath() const { return m_bin.filePath(u"log"_s); }
-
-    [[nodiscard]] QString log() const { return readFile(logPath()); }
 
     [[nodiscard]] QString recordingsDir() const { return path(u"Videos/Recordings"_s); }
 
@@ -116,39 +74,18 @@ protected:
         return false;
     }
 
-    void installTool(const QString& name, const QByteArray& script) {
-        const auto path = m_bin.filePath(name);
-        writeFile(path, "#!/bin/sh\nPATH=/usr/bin:/bin\n" + script);
-        QCOMPARE(chmod(path.toUtf8().constData(), 0755), 0);
-    }
-
     void setupRecordEnvironment() {
-        setupEnvironment();
-        QVERIFY(m_bin.isValid());
-
-        const auto runtime = path(u"runtime"_s);
-        QVERIFY(QDir().mkpath(runtime));
-        QCOMPARE(chmod(runtime.toUtf8().constData(), 0700), 0);
-        qputenv("XDG_RUNTIME_DIR", runtime.toUtf8());
+        setupDesktopEnvironment();
         qputenv("HYPRLAND_INSTANCE_SIGNATURE", "test");
         QVERIFY(QDir().mkpath(hypr::socketDir()));
         qputenv("XDG_VIDEOS_DIR", path(u"Videos"_s).toUtf8());
 
-        QVERIFY(m_bus.start(runtime + u"/bus"_s));
-        m_notifications = std::make_unique<FakeNotifications>(logPath());
-        QVERIFY(FakeBus::serve(
-            u"org.freedesktop.Notifications"_s, u"/org/freedesktop/Notifications"_s, m_notifications.get()));
-
-        qputenv("PATH", m_bin.path().toUtf8());
-        qputenv("FAKE_LOG", logPath().toUtf8());
         installTool(u"gpu-screen-recorder"_s, R"(echo "gpu-screen-recorder $*" >> "$FAKE_LOG"
 [ -n "$RECORDER_EXIT" ] && exit "$RECORDER_EXIT"
 trap 'exit 0' INT TERM
 trap 'echo pause >> "$FAKE_LOG"' USR2
 echo video > "${@: -1}" 2>/dev/null || { eval "out=\$$#"; echo video > "$out"; }
 while :; do sleep 0.05; done
-)");
-        installTool(u"wl-copy"_s, R"(printf 'wl-copy %s:' "$*" >> "$FAKE_LOG"; cat >> "$FAKE_LOG"
 )");
     }
 

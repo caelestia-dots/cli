@@ -71,7 +71,7 @@ private slots:
 
     void recordsPickedRegion() {
         serveMonitors();
-        const FakeShell shell(QRect(10, 20, 300, 200));
+        const FakeShell shell({ .region = QRect(10, 20, 300, 200) });
         QCOMPARE(startCmd({ .target = common::Target::Region }).exit, 0);
         QCOMPARE(
             recorderLine(), u"gpu-screen-recorder -w region -region 300x200+10+20 -f 144 -o %1"_s.arg(outputPath()));
@@ -95,7 +95,7 @@ private slots:
 
     void cancelledPickExitsQuietly() {
         serveMonitors();
-        const FakeShell shell(std::nullopt);
+        const FakeShell shell({});
         const auto result = startCmd({ .target = common::Target::Region });
         QCOMPARE(result.exit, 0);
         QVERIFY(result.err.isEmpty());
