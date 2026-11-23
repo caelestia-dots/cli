@@ -17,9 +17,9 @@ using Qt::StringLiterals::operator""_s;
 void notify(const QString& cachePath, const QString& savePath, bool copied, bool ok, bool showEdit) {
     QStringList actions;
     if (showEdit)
-        actions << u"Edit"_s;
+        actions << u"edit"_s << u"Edit"_s;
     if (!ok || savePath.isEmpty())
-        actions << u"Save"_s;
+        actions << u"save"_s << u"Save"_s;
 
     const auto path = QFileInfo(!ok || savePath.isEmpty() ? cachePath : savePath).absoluteFilePath();
     const auto helper = QStringLiteral(CAELESTIA_SCREENSHOT_HELPER_BIN);
@@ -91,6 +91,9 @@ int pickAndSave(const QString& cachePath, bool copied, bool quiet, bool json) {
 int annotateAndNotify(const QString& cachePath, bool quiet, bool json) {
     const auto result = ipc::annotate(cachePath);
     if (const auto* err = std::get_if<ipc::Error>(&result)) {
+        if (*err == ipc::Error::Cancelled)
+            return 0;
+
         const auto msg = common::messageForError(*err);
         common::printError(u"Failed to annotate screenshot: %1"_s.arg(msg), json);
         if (!quiet)
