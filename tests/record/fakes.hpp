@@ -97,13 +97,13 @@ protected:
 
     static Output pauseCmd(bool json = false) {
         return capture([=] {
-            return record::pause({}, { .command = u"caelestia record pause"_s, .json = json });
+            return record::pause(record::QuietArgs(), { .command = u"caelestia record pause"_s, .json = json });
         });
     }
 
     static Output resumeCmd() {
         return capture([] {
-            return record::resume({}, { .command = u"caelestia record resume"_s });
+            return record::resume(record::QuietArgs(), { .command = u"caelestia record resume"_s });
         });
     }
 
