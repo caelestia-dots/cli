@@ -13,6 +13,7 @@ endfunction()
 
 add_subdirectory(common)
 add_subdirectory(parser)
+add_subdirectory(record)
 add_subdirectory(clipboard)
 add_subdirectory(emoji)
 add_subdirectory(scheme)
