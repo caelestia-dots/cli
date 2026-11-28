@@ -305,11 +305,11 @@ def _determine_hue_color(r: int, g: int, b: int, brightness: int, use_pale: bool
 
 @log_exception
 def apply_gtk(colours: dict[str, str], mode: str, icon_theme: str | None = None) -> None:
-    gtk_template = gen_replace(colours, templates_dir / "gtk.css", hash=True)
     thunar_template = gen_replace(colours, templates_dir / "thunar.css", hash=True)
 
     for gtk_version in ["gtk-3.0", "gtk-4.0"]:
         gtk_config_dir = config_dir / gtk_version
+        gtk_template = gen_replace_dynamic(colours, templates_dir / f"{gtk_version}.css", mode)
         atomic_write(gtk_config_dir / "gtk.css", gtk_template)
         atomic_write(gtk_config_dir / "thunar.css", thunar_template)
 
