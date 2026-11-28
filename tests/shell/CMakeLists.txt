@@ -1,0 +1,5 @@
+create_test(shell start)
+create_test(shell stop)
+create_test(shell restart)
+create_test(shell log)
+create_test(shell ipc)
