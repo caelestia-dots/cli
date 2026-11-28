@@ -3,6 +3,7 @@ import subprocess
 from argparse import Namespace
 from urllib.request import urlopen
 
+from caelestia.utils.deprecation import deprecated_in_favour_of_global
 from caelestia.utils.paths import cli_data_dir
 
 
@@ -14,6 +15,8 @@ class Command:
 
     def run(self) -> None:
         if self.args.picker:
+            deprecated_in_favour_of_global("emoji -p", "emoji")
+
             emojis = (cli_data_dir / "emojis.txt").read_text()
             chosen = subprocess.check_output(
                 ["fuzzel", "--dmenu", "--placeholder=Type to search emojis"], input=emojis, text=True

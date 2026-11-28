@@ -1,6 +1,8 @@
 import subprocess
 from argparse import Namespace
 
+from caelestia.utils.deprecation import deprecated_in_favour_of_global
+
 
 class Command:
     args: Namespace
@@ -9,6 +11,8 @@ class Command:
         self.args = args
 
     def run(self) -> None:
+        deprecated_in_favour_of_global("clipboard", "clipboard")
+
         clip = subprocess.check_output(["cliphist", "list"])
 
         if self.args.delete:
